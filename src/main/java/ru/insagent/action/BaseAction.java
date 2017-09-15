@@ -11,13 +11,13 @@ import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.opensymphony.xwork2.ActionSupport;
+import com.opensymphony.xwork2.Preparable;
+
 import ru.insagent.exception.AppException;
 import ru.insagent.management.model.User;
 import ru.insagent.util.JdbcUtils;
 import ru.insagent.util.Setup;
-
-import com.opensymphony.xwork2.ActionSupport;
-import com.opensymphony.xwork2.Preparable;
 
 public abstract class BaseAction extends ActionSupport implements Preparable {
 	private static final long serialVersionUID = 1L;
@@ -39,11 +39,12 @@ public abstract class BaseAction extends ActionSupport implements Preparable {
 	/**
 	 * Пустой метод для получения фиктивной переменной из запроса,
 	 * отвечающей за отключение кеширования.
-	 * @param _
+	 * @param empty
 	 */
-	public void set_(String _) {
+	public void set_(String empty) {
 	}
 
+	@Override
 	public void prepare() {
 		conn = Setup.getInstance().getConnection();
 		if(conn == null) {
@@ -56,6 +57,7 @@ public abstract class BaseAction extends ActionSupport implements Preparable {
 		}
 	}
 
+	@Override
 	public String execute() {
 		try {
 			return executeImpl();
@@ -70,6 +72,7 @@ public abstract class BaseAction extends ActionSupport implements Preparable {
 
 	public abstract String executeImpl() throws AppException;
 
+	@Override
 	public void validate() {
 		hackFieldErrors();
 

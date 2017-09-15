@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE Configuration>
+
+<Configuration>
+	<Properties>
+		<Property name="log-path">e:/logs/</Property>
+	</Properties>
+	<Appenders>
+		<Console name="STDOUT" target="SYSTEM_OUT">
+			<PatternLayout>
+				<Pattern>%d{HH:mm:ss} %-5p [%t] %C{2} (%F:%L) - %m%n</Pattern>
+			</PatternLayout>
+		</Console>
+		<RollingFile name="FILE" fileName="insagent.log" filePattern="${log-path}/insagent-%d{yyyy-MM-dd}-%i.log">
+			<PatternLayout>
+				<Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p [%t] %C{2} (%F:%L) - %m%n</Pattern>
+			</PatternLayout>
+			<Policies>
+				<SizeBasedTriggeringPolicy size="1 MB"/>
+			</Policies>
+			<DefaultRolloverStrategy max="5"/>
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<Logger name="org.apache.log4j.xml" level="info"/>
+		<Root level="debug">
+			<AppenderRef ref="STDOUT"/>
+			<AppenderRef ref="FILE"/>
+		</Root>
+	</Loggers>
+</Configuration>

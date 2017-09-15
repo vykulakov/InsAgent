@@ -4,3 +4,4 @@ sql/mysqldump.bat
 .classpath
 .project
 build.properties
+/target/
