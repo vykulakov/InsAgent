@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
+	<constant name="struts.devMode" value="false" />
+
+	<package name="default" namespace="/" extends="struts-default">
+		<action name="bsoJournal" class="ru.insagent.document.action.BsoJournalAction">
+			<result name="error">/WEB-INF/jsp/journal/bso_error.jsp</result>
+			<result name="input">/WEB-INF/jsp/journal/bso_error.jsp</result>
+			<result name="*">/WEB-INF/jsp/journal/bso.jsp</result>
+		</action>
+
+		<action name="bsoArchivedJournal" class="ru.insagent.document.action.BsoArchivedJournalAction">
+			<result name="error">/WEB-INF/jsp/journal/bso_archived_error.jsp</result>
+			<result name="input">/WEB-INF/jsp/journal/bso_archived_error.jsp</result>
+			<result name="*">/WEB-INF/jsp/journal/bso_archived.jsp</result>
+		</action>
+
+		<action name="actJournal" class="ru.insagent.document.action.ActJournalAction">
+			<result name="error">/WEB-INF/jsp/journal/act_error.jsp</result>
+			<result name="input">/WEB-INF/jsp/journal/act_error.jsp</result>
+			<result name="*">/WEB-INF/jsp/journal/act.jsp</result>
+		</action>
+
+		<action name="cityManagement" class="ru.insagent.management.city.action.CityManagementAction">
+			<result name="error">/WEB-INF/jsp/management/city_error.jsp</result>
+			<result name="input">/WEB-INF/jsp/management/city_error.jsp</result>
+			<result name="*">/WEB-INF/jsp/management/city.jsp</result>
+		</action>
+
+		<action name="unitManagement" class="ru.insagent.management.unit.action.UnitManagementAction">
+			<result name="error">/WEB-INF/jsp/management/unit_error.jsp</result>
+			<result name="input">/WEB-INF/jsp/management/unit_error.jsp</result>
+			<result name="*">/WEB-INF/jsp/management/unit.jsp</result>
+		</action>
+
+		<action name="userManagement" class="ru.insagent.management.user.action.UserManagementAction">
+			<result name="error">/WEB-INF/jsp/management/user_error.jsp</result>
+			<result name="input">/WEB-INF/jsp/management/user_error.jsp</result>
+			<result name="*">/WEB-INF/jsp/management/user.jsp</result>
+		</action>
+
+		<action name="exportBsoJournal" class="ru.insagent.document.action.ExportBsoJournalAction">
+			<result name="success" type="stream">
+				<param name="contentType">application/vnd.xls</param>
+				<param name="contentDisposition">attachment;filename="bsos.xlsx"</param>
+			</result>
+		</action>
+
+		<action name="exportBsoArchivedJournal" class="ru.insagent.document.action.ExportBsoArchivedJournalAction">
+			<result name="success" type="stream">
+				<param name="contentType">application/vnd.xls</param>
+				<param name="contentDisposition">attachment;filename="bsos.xlsx"</param>
+			</result>
+		</action>
+
+		<!--
+		<action name="connectionsGetConnections" class="ru.joxnet.bss.modules.clients.connections.actions.GetConnectionsAction">
+			<result name="error">/jsp/modules/clients/connections/connections_error.jsp</result>
+			<result name="input">/jsp/modules/clients/connections/connections_error.jsp</result>
+			<result name="*">/jsp/modules/clients/connections/connections.jsp</result>
+		</action>
+
+		<action name="connectionsGetConnection" class="ru.joxnet.bss.modules.clients.connections.actions.GetConnectionAction">
+			<result name="error">/jsp/modules/clients/connections/connection_error.jsp</result>
+			<result name="input">/jsp/modules/clients/connections/connection_error.jsp</result>
+			<result name="*">/jsp/modules/clients/connections/connection.jsp</result>
+		</action>
+
+		<action name="connectionsProcess" class="ru.joxnet.bss.modules.clients.connections.actions.ProcessAction">
+			<result name="error">/jsp/modules/clients/connections/process_error.jsp</result>
+			<result name="input">/jsp/modules/clients/connections/process_error.jsp</result>
+			<result name="*">/jsp/modules/clients/connections/process.jsp</result>
+		</action>
+
+		<action name="connectionsTestProcess" class="ru.joxnet.bss.modules.clients.connections.actions.TestProcessAction">
+			<result name="*">/jsp/modules/clients/connections/test.jsp</result>
+		</action>
+	-->
+	</package>
+
+	<package name="clients-json" namespace="/" extends="json-default">
+		<default-interceptor-ref name="jsonValidationWorkflowStack"/>
+
+		<global-results>
+			<result name="input" type="json">
+				<param name="noCache">true</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">actionErrors\[\d+\], fieldErrors\..+$, actionMessages\[\d+\]</param>
+			</result>
+			<result name="error" type="json">
+				<param name="noCache">true</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="includeProperties">actionErrors\[\d+\], fieldErrors\..+$, actionMessages\[\d+\]</param>
+			</result>
+			<result name="success" type="json">
+				<param name="noCache">true</param>
+			</result>
+			<result name="Exception" type="json">
+				<param name="noCache">true</param>
+			</result>
+		</global-results>
+
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Throwable" result="Exception" />
+		</global-exception-mappings>
+<!--
+		<action name="connectionsUploadAttachedFileJson" class="ru.joxnet.bss.modules.clients.connections.actions.UploadAttachedFileJsonAction">
+			<interceptor-ref name="defaultStack"></interceptor-ref>
+		</action>
+ -->
+		<action name="listBsosJson" class="ru.insagent.document.action.ListBsosJsonAction"/>
+		<action name="listBsosArchivedJson" class="ru.insagent.document.action.ListBsosArchivedJsonAction"/>
+		<action name="listActsJson" class="ru.insagent.document.action.ListActsJsonAction"/>
+		<action name="getActJson" class="ru.insagent.document.action.GetActJsonAction"/>
+		<action name="checkBsoJson" class="ru.insagent.document.action.CheckBsoJsonAction"/>
+		<action name="checkPackJson" class="ru.insagent.document.action.CheckPackJsonAction"/>
+		<action name="doActionJson" class="ru.insagent.document.action.DoActionJsonAction"/>
+		<action name="updateActJson" class="ru.insagent.document.action.UpdateActJsonAction"/>
+
+		<action name="getCitiesJson" class="ru.insagent.management.city.action.GetCitiesJsonAction"/>
+		<action name="updateCityJson" class="ru.insagent.management.city.action.UpdateCityJsonAction"/>
+		<action name="removeCityJson" class="ru.insagent.management.city.action.RemoveCityJsonAction"/>
+
+		<action name="getUnitsJson" class="ru.insagent.management.unit.action.GetUnitsJsonAction"/>
+		<action name="updateUnitJson" class="ru.insagent.management.unit.action.UpdateUnitJsonAction"/>
+		<action name="removeUnitJson" class="ru.insagent.management.unit.action.RemoveUnitJsonAction"/>
+
+		<action name="getUsersJson" class="ru.insagent.management.user.action.GetUsersJsonAction"/>
+		<action name="updateUserJson" class="ru.insagent.management.user.action.UpdateUserJsonAction"/>
+		<action name="removeUserJson" class="ru.insagent.management.user.action.RemoveUserJsonAction"/>
+	</package>
+</struts>

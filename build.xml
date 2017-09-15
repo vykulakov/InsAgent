@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!DOCTYPE xml>
+
+<project basedir="." default="compile" name="InsAgent">
+	<property name="name.application" value="InsAgent"/>
+
+	<property name="jvm.source" value="1.6"/>
+	<property name="jvm.target" value="1.6"/>
+
+	<property name="dir.src" value="./src"/>
+	<property name="dir.lib" value="./web/WEB-INF/lib"/>
+	<property name="dir.build" value="./build"/>
+	<property name="dir.classes" value="${dir.build}/classes"/>
+	<property name="dir.content" value="${dir.build}/content"/>
+	<property name="dir.web" value="./web"/>
+
+
+	<property name="file.jar" value="${dir.build}/${name.application}.jar"/>
+	<property name="file.war" value="${dir.build}/${name.application}.war"/>
+	<property name="file.sql" value="./sql/insagent.sql"/>
+
+	<property environment="env"/>
+
+	<property file="./build.properties"/>
+	<property file="./default.properties"/>
+	<property file="./version.properties"/>
+
+	<path id="libs.InsAgent">
+		<fileset dir="${dir.lib}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+
+	<path id="libs.Apache Tomcat 7.0.35">
+		<fileset dir="../libraries/apache-tomcat-7.0.35">
+			<include name="bin/*.jar"/>
+			<include name="lib/*.jar"/>
+		</fileset>
+	</path>
+
+	<path id="libs.main">
+		<path refid="libs.InsAgent"/>
+		<pathelement location="./build/classes"/>
+		<pathelement location="./web/WEB-INF"/>
+	</path>
+
+	<target name="clean">
+		<delete dir="${dir.build}"/>
+	</target>
+
+	<target name="mkdirs">
+		<mkdir dir="${dir.build}"/>
+		<mkdir dir="${dir.classes}"/>
+		<mkdir dir="${dir.content}"/>
+	</target>
+
+	<target name="init" depends="mkdirs">
+	</target>
+
+	<target name="compile" depends="init">
+		<javac srcdir="${dir.src}" destdir="${dir.classes}" compiler="javac1.6" debug="true" encoding="UTF-8" source="${jvm.source}" target="${jvm.target}" includeantruntime="false" fork="true">
+			<classpath refid="libs.main" />
+			<classpath refid="libs.Apache Tomcat 7.0.35" />
+		</javac>
+	</target>
+
+	<target name="build.jar" depends="compile">
+		<jar destfile="${file.jar}"
+			basedir="${dir.classes}"
+			compress="false"
+			index="true">
+		</jar>
+	</target>
+
+	<target name="build.content" depends="build.jar">
+		<copy file="${file.jar}" todir="${dir.content}/WEB-INF/lib" preservelastmodified="true">
+		</copy>
+		<copy todir="${dir.content}" preservelastmodified="true" overwrite="true">
+			<fileset dir="./web">
+				<exclude name="**/shiro-users.txt"/>
+			</fileset>
+		</copy>
+		<copy todir="${dir.content}/WEB-INF/lib" preservelastmodified="true">
+			<path refid="libs.main"/>
+		</copy>
+		<copy todir="${dir.content}/WEB-INF/classes" preservelastmodified="true">
+			<fileset dir="${dir.src}">
+				<include name="log4j.xml"/>
+				<include name="logback.xml"/>
+				<include name="struts.xml"/>
+			</fileset>
+		</copy>
+		<replaceregexp file="${dir.content}/WEB-INF/classes/log4j.xml"
+			match="priority value=&quot;.*&quot;"
+			replace="priority value=&quot;off&quot;"
+			byline="true"
+		/>
+		<replaceregexp file="${dir.content}/WEB-INF/classes/logback.xml"
+			match=".*appender-ref\s+ref=&quot;STDOUT&quot;.*"
+			replace=""
+			byline="true"
+		/>
+		<replaceregexp file="${dir.content}/WEB-INF/classes/logback.xml"
+			match="property\s+name=&quot;fileName&quot;(\s+)value=&quot;.*&quot;"
+			replace="property name=&quot;fileName&quot;\1value=&quot;/home/tomcat/logs/InsAgent.log&quot;"
+			byline="true"
+		/>
+		<replaceregexp file="${dir.content}/WEB-INF/classes/logback.xml"
+			match="property\s+name=&quot;fileNamePattern&quot;(\s+)value=&quot;.*&quot;"
+			replace="property name=&quot;fileNamePattern&quot;\1value=&quot;/home/tomcat/logs/InsAgent_%d{yyyy-MM-dd}_%i.log&quot;"
+			byline="true"
+		/>
+	</target>
+
+	<target name="build.war" depends="build.content">
+		<propertyfile file="version.properties">
+			<entry key="product.build.major" type="int"  value="${product.build.major}"/>
+			<entry key="product.build.minor" type="int"  value="${product.build.minor}"/>
+			<entry key="product.build.patch" type="int"  value="${product.build.patch}"/>
+			<entry key="product.build.build" type="int"  default="0" operation="+"/>
+			<entry key="product.build.date"  type="date" value="now" pattern="dd.MM.yyyy HH:mm"/>
+		</propertyfile>
+		<delete file="${file.war}"/>
+		<war
+			compress="true"
+			encoding="utf-8"
+			warfile="${file.war}"
+			webxml="${dir.content}/WEB-INF/web.xml">
+
+			<fileset dir="${dir.content}" excludes="WEB-INF/web.xml"/>
+		</war>
+	</target>
+</project>
