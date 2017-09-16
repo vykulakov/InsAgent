@@ -7,11 +7,18 @@
 
 	<groupId>ru.vykulakov</groupId>
 	<artifactId>InsAgent</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<packaging>war</packaging>
 
 	<name>InsAgent</name>
 	<description>Service for insurance agents</description>
+
+	<scm>
+		<tag>HEAD</tag>
+		<url>http://127.0.0.1/dummy</url>
+		<connection>scm:svn:http://127.0.0.1/dummy</connection>
+		<developerConnection>scm:svn:https://127.0.0.1/dummy</developerConnection>
+	</scm>
 
 	<properties>
 		<junit.version>4.12</junit.version>
@@ -29,6 +36,7 @@
 
 		<c3p0.version>0.9.5.2</c3p0.version>
 		<mysql.version>5.1.44</mysql.version>
+		<hibernate.version>5.2.11.Final</hibernate.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -144,9 +152,15 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>${mysql.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
+		<finalName>${project.artifactId}##${buildNumber}</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -159,9 +173,73 @@
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<id>explode</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exploded</goal>
+						</goals>
+						<configuration>
+							<warSourceDirectory>web</warSourceDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>package</id>
+						<phase>package</phase>
+						<goals>
+							<goal>war</goal>
+						</goals>
+						<configuration>
+							<warSourceDirectory>${project.artifactId}##${buildNumber}</warSourceDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
-					<warSourceDirectory>web</warSourceDirectory>
+					<items>
+						<item>buildNumber</item>
+					</items>
+					<format>{0,number}</format>
+					<revisionOnScmFailure>true</revisionOnScmFailure>
+					<buildNumberPropertiesFileLocation>version.properties</buildNumberPropertiesFileLocation>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>replacer</artifactId>
+				<version>1.5.3</version>
+				<executions>
+					<execution>
+						<id>build-number</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+						<configuration>
+							<file>target/${project.artifactId}##${buildNumber}/WEB-INF/jsp/main.jsp</file>
+							<regex>false</regex>
+							<replacements>
+								<replacement>
+									<token>BUILD_NUMBER</token>
+									<value>${buildNumber}</value>
+								</replacement>
+							</replacements>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

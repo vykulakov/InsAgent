@@ -4,8 +4,8 @@
 	"http://struts.apache.org/dtds/struts-2.3.dtd">
 
 <struts>
-	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
 	<constant name="struts.devMode" value="false" />
+	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
 
 	<package name="default" namespace="/" extends="struts-default">
 		<action name="bsoJournal" class="ru.insagent.document.action.BsoJournalAction">
@@ -57,30 +57,6 @@
 				<param name="contentDisposition">attachment;filename="bsos.xlsx"</param>
 			</result>
 		</action>
-
-		<!--
-		<action name="connectionsGetConnections" class="ru.joxnet.bss.modules.clients.connections.actions.GetConnectionsAction">
-			<result name="error">/jsp/modules/clients/connections/connections_error.jsp</result>
-			<result name="input">/jsp/modules/clients/connections/connections_error.jsp</result>
-			<result name="*">/jsp/modules/clients/connections/connections.jsp</result>
-		</action>
-
-		<action name="connectionsGetConnection" class="ru.joxnet.bss.modules.clients.connections.actions.GetConnectionAction">
-			<result name="error">/jsp/modules/clients/connections/connection_error.jsp</result>
-			<result name="input">/jsp/modules/clients/connections/connection_error.jsp</result>
-			<result name="*">/jsp/modules/clients/connections/connection.jsp</result>
-		</action>
-
-		<action name="connectionsProcess" class="ru.joxnet.bss.modules.clients.connections.actions.ProcessAction">
-			<result name="error">/jsp/modules/clients/connections/process_error.jsp</result>
-			<result name="input">/jsp/modules/clients/connections/process_error.jsp</result>
-			<result name="*">/jsp/modules/clients/connections/process.jsp</result>
-		</action>
-
-		<action name="connectionsTestProcess" class="ru.joxnet.bss.modules.clients.connections.actions.TestProcessAction">
-			<result name="*">/jsp/modules/clients/connections/test.jsp</result>
-		</action>
-	-->
 	</package>
 
 	<package name="clients-json" namespace="/" extends="json-default">
@@ -108,11 +84,6 @@
 		<global-exception-mappings>
 			<exception-mapping exception="java.lang.Throwable" result="Exception" />
 		</global-exception-mappings>
-<!--
-		<action name="connectionsUploadAttachedFileJson" class="ru.joxnet.bss.modules.clients.connections.actions.UploadAttachedFileJsonAction">
-			<interceptor-ref name="defaultStack"></interceptor-ref>
-		</action>
- -->
 		<action name="listBsosJson" class="ru.insagent.document.action.ListBsosJsonAction"/>
 		<action name="listBsosArchivedJson" class="ru.insagent.document.action.ListBsosArchivedJsonAction"/>
 		<action name="listActsJson" class="ru.insagent.document.action.ListActsJsonAction"/>

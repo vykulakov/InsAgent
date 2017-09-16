@@ -3,7 +3,7 @@
 <%@taglib prefix="l" uri="http://shiro.apache.org/tags"%>
 <%@taglib prefix="s" uri="/struts-tags"%>
 
-<c:import url="/jsp/main.jsp"><c:param name="content">
+<c:import url="/WEB-INF/jsp/main.jsp"><c:param name="content">
 	<c:if test="${ not empty param.header }">
 		<h2>${ param.header }</h2>
 	</c:if>

@@ -11,7 +11,7 @@
 	<description>Service for insurance agents</description>
 
 	<welcome-file-list>
-		<welcome-file>/jsp/main.jsp</welcome-file>
+		<welcome-file>/WEB-INF/jsp/main.jsp</welcome-file>
 	</welcome-file-list>
 
 	<filter>

@@ -11,18 +11,17 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	    <meta name="description" content="">
-    	<meta name="author" content="Kulakov Vyacheclav kulakov.home@gmail.com">
+    	<meta name="author" content="Kulakov Vyacheclav &lt;kulakov.home@gmail.com&gt;">
 
-		<!-- Bootstrap -->
 		<link rel="stylesheet" type="text/css" href="<c:url value='/css/bootstrap.min.css'/>"/>
 		<c:out value="${ param.link }" escapeXml="false"/>
 		<s:guest>
-			<link rel="stylesheet" type="text/css" href="<c:url value='/css/login.css'/>"/>
+			<link rel="stylesheet" type="text/css" href="<c:url value='/css/login.css?v=BUILD_NUMBER'/>"/>
 		</s:guest>
 		<s:user>
-			<link rel="stylesheet" type="text/css" href="<c:url value='/css/main.css'/>"/>
+			<link rel="stylesheet" type="text/css" href="<c:url value='/css/main.css?v=BUILD_NUMBER'/>"/>
 		</s:user>
-		<title>Автодом Страхование</title>
+		<title>Новый век</title>
 		<script type="text/javascript">
 			var BASE_URL = '<c:url value="/"/>';
 		</script>
@@ -35,7 +34,7 @@
 			<nav class="navbar navbar-inverse navbar-fixed-top">
 				<div class="container-fluid">
 					<div class="navbar-inner">
-						<a class="navbar-brand" href="<c:url value='/'/>">Автодом Страхование</a>
+						<a class="navbar-brand" href="<c:url value='/'/>">Новый век</a>
 						<p class="navbar-text pull-right">
 							Вы вошли как <a href="<c:url value='logout'/>" class="navbar-link"><s:principal property="firstName"/> <s:principal property="lastName"/></a>
 						</p>
@@ -65,7 +64,7 @@
 		</s:user>
 	    <script type="application/javascript" src="<c:url value='/js/jquery-2.1.4.js'/>"></script>
 	    <script type="application/javascript" src="<c:url value='/js/bootstrap.js'/>"></script>
-	    <script type="application/javascript" src="<c:url value='/js/main.js'/>"></script>
+	    <script type="application/javascript" src="<c:url value='/js/main.js?v=BUILD_NUMBER'/>"></script>
    		<c:out value="${ param.script }" escapeXml="false"/>
 	</body>
 </html>

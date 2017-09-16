@@ -3,7 +3,7 @@
 <%@taglib prefix="l" uri="http://shiro.apache.org/tags"%>
 <%@taglib prefix="s" uri="/struts-tags"%>
 
-<c:import url="/jsp/main.jsp">
+<c:import url="/WEB-INF/jsp/main.jsp">
 <c:param name="link">
 	<link rel="stylesheet" type="text/css" href="<c:url value='/css/bootstrap-table.min.css'/>"/>
 	<link rel="stylesheet" type="text/css" href="<c:url value='/css/bootstrap-multiselect.css'/>"/>

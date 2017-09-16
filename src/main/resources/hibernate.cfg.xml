@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+	<session-factory>
+		<property name="show_sql">true</property>
+
+		<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+		<property name="hibernate.current_session_context_class">thread</property>
+
+		<property name="hibernate.c3p0.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="hibernate.c3p0.jdbc_url">jdbc:mysql://192.168.1.60/insagent?useUnicode=true&amp;characterEncoding=UTF-8</property>
+		<property name="hibernate.c3p0.user">insagent</property>
+		<property name="hibernate.c3p0.password">123456</property>
+		<property name="hibernate.c3p0.initial_pool_size">5</property>
+		<property name="hibernate.c3p0.min_size">5</property>
+		<property name="hibernate.c3p0.acquire_increment">5</property>
+		<property name="hibernate.c3p0.max_size">20</property>
+		<property name="hibernate.c3p0.max_statements">100</property>
+		<property name="hibernate.c3p0.preferred_test_query">SELECT 1</property>
+		<property name="hibernate.c3p0.idle_test_period">30</property>
+
+		<!--
+		<mapping class="com.sample.javaHibernate.data.Book" />
+		<mapping class="com.sample.javaHibernate.data.Student" />        
+		-->
+	</session-factory>
+</hibernate-configuration>

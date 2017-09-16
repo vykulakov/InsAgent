@@ -3,6 +3,6 @@
 <%@taglib prefix="l" uri="http://shiro.apache.org/tags"%>
 <%@taglib prefix="s" uri="/struts-tags"%>
 
-<c:import url="/jsp/error.jsp"><c:param name="header">
+<c:import url="/WEB-INF/jsp/error.jsp"><c:param name="header">
 	Управление пользователями
 </c:param></c:import>
