@@ -90,7 +90,7 @@ public class AuthFilter implements Filter {
 				forward(request, response, forwardPage);
 				return;
 			}
-			
+
 			if(username == null || username.isEmpty()) {
 				request.setAttribute("authError", "Вы не указали логин");
 				forward(request, response, forwardPage);
@@ -98,7 +98,7 @@ public class AuthFilter implements Filter {
 			} else {
 				request.setAttribute("authUser", username);
 			}
-	
+
 			if(password == null || password.isEmpty()) {
 				request.setAttribute("authError", "Вы не указали пароль");
 				forward(request, response, forwardPage);
@@ -119,7 +119,7 @@ public class AuthFilter implements Filter {
 		UsernamePasswordToken token = new UsernamePasswordToken(username, password);
 		token.setRememberMe(tokenRememberMe);
 		try {
-		    currentUser.login(token);
+			currentUser.login(token);
 		} catch (AuthenticationException ae) {
 			request.setAttribute("authError", "Ошибка аутентификации");
 		}
@@ -169,7 +169,7 @@ public class AuthFilter implements Filter {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		try {
-			conn = Setup.getInstance().getConnection();
+			conn = Setup.getConnection();
 
 			ps = conn.prepareStatement(""
 					+ " UPDATE"
@@ -186,8 +186,8 @@ public class AuthFilter implements Filter {
 		} catch(SQLException e) {
 			logger.error("Cannot update user in DB", e);
 		} finally {
-            JdbcUtils.closeStatement(ps);
-            JdbcUtils.closeConnection(conn);
+			JdbcUtils.closeStatement(ps);
+			JdbcUtils.closeConnection(conn);
 		}
 	}
 
@@ -226,7 +226,7 @@ public class AuthFilter implements Filter {
 					+ " ORDER BY"
 					+ "    m.order;");
 
-			conn = Setup.getInstance().getConnection();
+			conn = Setup.getConnection();
 			ps = conn.prepareStatement(query.toString());
 			if(user.getRoles() != null && !user.getRoles().isEmpty()) {
 				for(String role : user.getRoles()) {

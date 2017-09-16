@@ -9,12 +9,12 @@
 	<Appenders>
 		<Console name="STDOUT" target="SYSTEM_OUT">
 			<PatternLayout>
-				<Pattern>%d{HH:mm:ss} %-5p [%t] %C{2} (%F:%L) - %m%n</Pattern>
+				<Pattern>%d{HH:mm:ss} %-5p [%t] %C (%F:%L) - %m%n</Pattern>
 			</PatternLayout>
 		</Console>
 		<RollingFile name="FILE" fileName="insagent.log" filePattern="${log-path}/insagent-%d{yyyy-MM-dd}-%i.log">
 			<PatternLayout>
-				<Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p [%t] %C{2} (%F:%L) - %m%n</Pattern>
+				<Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p [%t] %C (%F:%L) - %m%n</Pattern>
 			</PatternLayout>
 			<Policies>
 				<SizeBasedTriggeringPolicy size="1 MB"/>
