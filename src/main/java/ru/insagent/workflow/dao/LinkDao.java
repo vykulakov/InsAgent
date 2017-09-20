@@ -12,7 +12,7 @@ import java.util.Set;
 import ru.insagent.dao.SimpleDao;
 import ru.insagent.document.model.ActType;
 import ru.insagent.exception.AppException;
-import ru.insagent.management.model.User;
+import ru.insagent.model.User;
 import ru.insagent.util.JdbcUtils;
 import ru.insagent.workflow.model.Link;
 import ru.insagent.workflow.model.Node;

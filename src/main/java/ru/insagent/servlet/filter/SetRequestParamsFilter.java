@@ -17,7 +17,7 @@ import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.insagent.model.Menu;
+import ru.insagent.model.MenuItem;
 
 public class SetRequestParamsFilter implements Filter {
 	private final Logger logger = LoggerFactory.getLogger(SetRequestParamsFilter.class);
@@ -38,9 +38,9 @@ public class SetRequestParamsFilter implements Filter {
 		String action = uris[uris.length - 1];
 
 		@SuppressWarnings("unchecked")
-		List<Menu> menu = (List<Menu>) SecurityUtils.getSubject().getSession().getAttribute("menu");
+		List<MenuItem> menu = (List<MenuItem>) SecurityUtils.getSubject().getSession().getAttribute("menu");
 		if(menu != null) {
-			for(Menu item : menu) {
+			for(MenuItem item : menu) {
 				if(item.getAction() != null && item.getAction().equals(action)) {
 					item.setActive(true);
 				} else {

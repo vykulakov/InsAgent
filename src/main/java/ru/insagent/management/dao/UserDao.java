@@ -16,9 +16,9 @@ import ru.insagent.exception.AppException;
 import ru.insagent.management.model.City;
 import ru.insagent.management.model.Unit;
 import ru.insagent.management.model.UnitType;
-import ru.insagent.management.model.User;
 import ru.insagent.management.model.UserFilter;
 import ru.insagent.model.Filter;
+import ru.insagent.model.User;
 import ru.insagent.util.JdbcUtils;
 import ru.insagent.util.TimeUtils;
 

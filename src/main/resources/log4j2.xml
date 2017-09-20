@@ -23,7 +23,13 @@
 		</RollingFile>
 	</Appenders>
 	<Loggers>
+		<Logger name="com.mchange" level="info"/>
+		<Logger name="org.hibernate" level="info"/>
+		<Logger name="org.apache.shiro" level="info"/>
+		<Logger name="org.apache.struts2" level="info"/>
 		<Logger name="org.apache.log4j.xml" level="info"/>
+		<Logger name="org.apache.commons.beanutils" level="info"/>
+		<Logger name="com.opensymphony.xwork2" level="info"/>
 		<Root level="debug">
 			<AppenderRef ref="STDOUT"/>
 			<AppenderRef ref="FILE"/>

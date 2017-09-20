@@ -6,11 +6,11 @@ import java.util.Date;
 import org.apache.struts2.json.annotations.JSON;
 
 import ru.insagent.management.model.Unit;
-import ru.insagent.management.model.User;
-import ru.insagent.model.Base;
+import ru.insagent.model.IdBase;
+import ru.insagent.model.User;
 import ru.insagent.workflow.model.Node;
 
-public class Bso extends Base {
+public class Bso extends IdBase {
 	private static final long serialVersionUID = -3893689810214482026L;
 
 	private Date created;

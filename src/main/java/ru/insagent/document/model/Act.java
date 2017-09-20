@@ -6,10 +6,10 @@ import java.util.List;
 import org.apache.struts2.json.annotations.JSON;
 
 import ru.insagent.management.model.Unit;
-import ru.insagent.model.Base;
+import ru.insagent.model.IdBase;
 import ru.insagent.workflow.model.Node;
 
-public class Act extends Base {
+public class Act extends IdBase {
 	private static final long serialVersionUID = 6963271182212532121L;
 
 	private ActType type;

@@ -1,8 +1,8 @@
 package ru.insagent.document.model;
 
-import ru.insagent.model.Base;
+import ru.insagent.model.IdBase;
 
-public class ActPack extends Base {
+public class ActPack extends IdBase {
 	private static final long serialVersionUID = 3681691887322137171L;
 
 	private String series;

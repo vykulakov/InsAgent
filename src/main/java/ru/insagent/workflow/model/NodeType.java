@@ -1,8 +1,8 @@
 package ru.insagent.workflow.model;
 
-import ru.insagent.model.Base;
+import ru.insagent.model.IdBase;
 
-public class NodeType extends Base {
+public class NodeType extends IdBase {
 	private static final long serialVersionUID = -9054275807494235590L;
 
 	private String name;

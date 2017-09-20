@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Map;
 
 import ru.insagent.exception.AppException;
-import ru.insagent.management.model.User;
-import ru.insagent.model.Base;
+import ru.insagent.model.IdBase;
+import ru.insagent.model.User;
 import ru.insagent.model.Filter;
 import ru.insagent.util.JdbcUtils;
 
-public abstract class SimpleDao<E extends Base> extends BaseDao {
+public abstract class SimpleDao<E extends IdBase> extends BaseDao {
 	protected Map<String, String> sortByMap = new HashMap<String, String>();
 	protected String countQueryPrefix = null;
 	protected String selectQueryPrefix = null;

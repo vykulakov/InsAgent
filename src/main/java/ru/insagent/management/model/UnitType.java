@@ -1,8 +1,8 @@
 package ru.insagent.management.model;
 
-import ru.insagent.model.Base;
+import ru.insagent.model.IdBase;
 
-public class UnitType extends Base {
+public class UnitType extends IdBase {
 	private static final long serialVersionUID = 4580145163020300664L;
 
 	private String name;

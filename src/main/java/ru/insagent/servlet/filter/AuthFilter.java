@@ -1,11 +1,28 @@
+/*
+ * InsAgent - https://github.com/vykulakov/InsAgent
+ *
+ * Copyright 2017 Vyacheslav Kulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.insagent.servlet.filter;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -24,17 +41,25 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.Factory;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.insagent.dao.MenuItemDao;
 import ru.insagent.exception.AppException;
-import ru.insagent.management.model.User;
-import ru.insagent.model.Menu;
+import ru.insagent.model.MenuItem;
+import ru.insagent.model.User;
+import ru.insagent.util.Hibernate;
 import ru.insagent.util.JdbcUtils;
 import ru.insagent.util.Setup;
 
+/**
+ * Authorization filter
+ *
+ * @author Kulakov Vyacheslav <kulakov.home@gmail.com>
+ */
 public class AuthFilter implements Filter {
-	private String forwardPage = "/jsp/main.jsp";
+	private String forwardPage = "/WEB-INF/jsp/main.jsp";
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthFilter.class);
 
@@ -81,9 +106,9 @@ public class AuthFilter implements Filter {
 		}
 
 		String auth = request.getParameter("authDo");
-		String remember = request.getParameter("authRememberMe");
 		String username = request.getParameter("authUser");
 		String password = request.getParameter("authPass");
+		String remember = request.getParameter("authRememberMe");
 		if(auth != null && auth.equals("true")) {
 			if((username == null || username.isEmpty()) && (password == null || password.isEmpty())) {
 				request.setAttribute("authError", "Вы не указали логин и пароль");
@@ -130,15 +155,22 @@ public class AuthFilter implements Filter {
 				lastIp = request.getRemoteAddr();
 			}
 
-			User user = (User) currentUser.getPrincipal();
-			user.setLastIp(lastIp);
-			user.setLastAuth(new Date());
+			Session session = Hibernate.getCurrentSession();
+			session.beginTransaction();
+			try {
+				User user = (User) currentUser.getPrincipal();
+				user.setLastIp(lastIp);
+				user.setLastAuth(new Date());
 
-			updateUser(user);
+				updateUser(user);
 
-			// Получаем меню для авторизованного пользователя и сохраняем его в сессию.
-			// Как видно, меню получается только один раз сразу после аутентификации пользователя.
-			currentUser.getSession().setAttribute("menu", getUserMenu(user));
+				currentUser.getSession().setAttribute("menu", getUserMenu(user));
+
+				Hibernate.commit(session);
+			} catch(AppException e) {
+				Hibernate.rollback(session);
+				logger.error("Cannot load or store entities", e);
+			}
 		} else {
 			forward(request, response, forwardPage);
 			return;
@@ -157,7 +189,7 @@ public class AuthFilter implements Filter {
 		} catch (ServletException e) {
 			logger.error("Cannot forward request", e);
 
-			response.sendError(500, "Cannot forward request: " + e.getMessage());
+			response.sendError(500, "Internal server error");
 		}
 	}
 
@@ -172,13 +204,13 @@ public class AuthFilter implements Filter {
 			conn = Setup.getConnection();
 
 			ps = conn.prepareStatement(""
-					+ " UPDATE"
-					+ "     m_users"
-					+ " SET"
-					+ "     lastIp = ?,"
-					+ "     lastAuth = FROM_UNIXTIME(?)"
-					+ " WHERE"
-					+ "     id = ?");
+				+ " UPDATE"
+				+ "     m_users"
+				+ " SET"
+				+ "     lastIp = ?,"
+				+ "     lastAuth = FROM_UNIXTIME(?)"
+				+ " WHERE"
+				+ "     id = ?");
 			ps.setString(1, user.getLastIp());
 			ps.setLong(2, user.getLastAuth().getTime()/1000);
 			ps.setInt(3, user.getId());
@@ -191,66 +223,15 @@ public class AuthFilter implements Filter {
 		}
 	}
 
-	public List<Menu> getUserMenu(User user) throws AppException {
-		List<Menu> menu = new ArrayList<Menu>();
-
-		int index = 1;
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			StringBuilder query = new StringBuilder("");
-			query.append(""
-					+ " SELECT"
-					+ "     m.id AS menuId,"
-					+ "     m.level AS menuLevel,"
-					+ "     m.name AS menuName,"
-					+ "     m.action AS menuAction"
-					+ " FROM"
-					+ "     b_menu m,"
-					+ "     m_roles r,"
-					+ "     b_menu_roles l"
-					+ " WHERE"
-					+ "     m.id = l.menuId AND"
-					+ "     r.id = l.roleId");
-			if(user.getRoles() != null && !user.getRoles().isEmpty()) {
-				query.append(" AND r.idx IN (");
-				for(int i = 0; i < user.getRoles().size(); i++) {
-					query.append("?");
-					query.append(",");
-				}
-				query.setLength(query.length() - 1);
-				query.append(")");
-			}
-			query.append(""
-					+ " ORDER BY"
-					+ "    m.order;");
-
-			conn = Setup.getConnection();
-			ps = conn.prepareStatement(query.toString());
-			if(user.getRoles() != null && !user.getRoles().isEmpty()) {
-				for(String role : user.getRoles()) {
-					ps.setString(index++, role);
-				}
-			}
-			rs = ps.executeQuery();
-			while(rs.next()) {
-				Menu item = new Menu();
-				item.setId(rs.getInt("menuId"));
-				item.setLevel(rs.getInt("menuLevel"));
-				item.setName(rs.getString("menuName"));
-				item.setAction(rs.getString("menuAction"));
-
-				menu.add(item);
-			}
-		} catch(SQLException e) {
-			throw new AppException("Cannot get menu", e);
-		} finally {
-			JdbcUtils.closeConnection(conn);
-			JdbcUtils.closeStatement(ps);
-			JdbcUtils.closeResultSet(rs);
+	public List<MenuItem> getUserMenu(User user) throws AppException {
+		if(user.getRoles() == null || user.getRoles().isEmpty()) {
+			return Collections.emptyList();
 		}
 
-		return menu;
+		try {
+			return new MenuItemDao().listByRoleIdxes(user.getRoles());
+		} catch(Exception e) {
+			throw new AppException("Cannot get menu", e);
+		}
 	}
 }

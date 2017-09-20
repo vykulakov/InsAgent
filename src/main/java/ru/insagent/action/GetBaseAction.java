@@ -6,9 +6,9 @@ import com.opensymphony.xwork2.validator.annotations.ConversionErrorFieldValidat
 
 import ru.insagent.action.BaseAction;
 import ru.insagent.dao.SimpleDao;
-import ru.insagent.model.Base;
+import ru.insagent.model.IdBase;
 
-public class GetBaseAction<E extends Base> extends BaseAction {
+public class GetBaseAction<E extends IdBase> extends BaseAction {
 	private static final long serialVersionUID = 1L;
 
 	protected String search;

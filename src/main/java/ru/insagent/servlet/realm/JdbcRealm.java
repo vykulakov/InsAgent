@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import ru.insagent.exception.AppException;
 import ru.insagent.management.dao.UserDao;
-import ru.insagent.management.model.User;
+import ru.insagent.model.User;
 import ru.insagent.util.JdbcUtils;
 import ru.insagent.util.Setup;
 

@@ -1,8 +1,8 @@
 package ru.insagent.workflow.model;
 
-import ru.insagent.model.Base;
+import ru.insagent.model.IdBase;
 
-public class Action extends Base {
+public class Action extends IdBase {
 	private static final long serialVersionUID = -3709167442225090544L;
 
 	private String idx;

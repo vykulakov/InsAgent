@@ -4,9 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ru.insagent.document.model.ActType;
-import ru.insagent.model.Base;
+import ru.insagent.model.IdBase;
 
-public class Link extends Base {
+public class Link extends IdBase {
 	private static final long serialVersionUID = -4192191224685061836L;
 
 	private String name;

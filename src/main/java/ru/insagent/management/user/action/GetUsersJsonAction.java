@@ -7,8 +7,8 @@ import org.apache.struts2.json.annotations.JSON;
 
 import ru.insagent.action.GetBaseAction;
 import ru.insagent.management.dao.UserDao;
-import ru.insagent.management.model.User;
 import ru.insagent.management.model.UserFilter;
+import ru.insagent.model.User;
 
 public class GetUsersJsonAction extends GetBaseAction<User> {
 	private static final long serialVersionUID = 1L;

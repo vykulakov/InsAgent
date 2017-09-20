@@ -15,7 +15,7 @@ import ru.insagent.document.model.ActType;
 import ru.insagent.exception.AppException;
 import ru.insagent.management.dao.UnitDao;
 import ru.insagent.management.model.Unit;
-import ru.insagent.management.model.User;
+import ru.insagent.model.User;
 import ru.insagent.util.JdbcUtils;
 import ru.insagent.util.TimeUtils;
 import ru.insagent.workflow.dao.LinkDao;

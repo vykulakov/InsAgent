@@ -10,8 +10,8 @@ import java.util.List;
 import ru.insagent.dao.SimpleDao;
 import ru.insagent.management.model.City;
 import ru.insagent.management.model.CityFilter;
-import ru.insagent.management.model.User;
 import ru.insagent.model.Filter;
+import ru.insagent.model.User;
 
 public class CityDao extends SimpleDao<City> {
 	{
