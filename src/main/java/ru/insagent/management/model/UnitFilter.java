@@ -2,6 +2,7 @@ package ru.insagent.management.model;
 
 import java.util.List;
 
+import ru.insagent.model.City;
 import ru.insagent.model.Filter;
 
 public class UnitFilter extends Filter {

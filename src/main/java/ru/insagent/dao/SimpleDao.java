@@ -1,3 +1,21 @@
+/*
+ * InsAgent - https://github.com/vykulakov/InsAgent
+ *
+ * Copyright 2017 Vyacheslav Kulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.insagent.dao;
 
 import java.sql.Connection;
@@ -12,9 +30,9 @@ import java.util.List;
 import java.util.Map;
 
 import ru.insagent.exception.AppException;
+import ru.insagent.model.Filter;
 import ru.insagent.model.IdBase;
 import ru.insagent.model.User;
-import ru.insagent.model.Filter;
 import ru.insagent.util.JdbcUtils;
 
 public abstract class SimpleDao<E extends IdBase> extends BaseDao {
@@ -38,7 +56,7 @@ public abstract class SimpleDao<E extends IdBase> extends BaseDao {
 	 * Количество строк, полученных последним get методом.
 	 */
 	protected int count;
-	
+
 	public SimpleDao(Connection conn) {
 		super(conn);
 	}
@@ -87,7 +105,7 @@ public abstract class SimpleDao<E extends IdBase> extends BaseDao {
 			search = "%" + search + "%";
 
 			where = searchWhere;
-			
+
 			objects = new ArrayList<Object>();
 			for(int i = 0; i < searchCount; i++) {
 				objects.add(search);
@@ -247,10 +265,10 @@ public abstract class SimpleDao<E extends IdBase> extends BaseDao {
 
 			throw new AppException("Ошибка получения объектов из базы данных.", e);
 		} finally {
-            JdbcUtils.closeResultSet(rs1);
-            JdbcUtils.closeResultSet(rs2);
-            JdbcUtils.closeStatement(ps1);
-            JdbcUtils.closeStatement(ps2);
+			JdbcUtils.closeResultSet(rs1);
+			JdbcUtils.closeResultSet(rs2);
+			JdbcUtils.closeStatement(ps1);
+			JdbcUtils.closeStatement(ps2);
 		}
 
 		return result;
@@ -289,8 +307,8 @@ public abstract class SimpleDao<E extends IdBase> extends BaseDao {
 
 			throw new AppException("Ошибка обновления объекта в базе данных.", e);
 		} finally {
-            JdbcUtils.closeResultSet(rs);
-            JdbcUtils.closeStatement(ps);
+			JdbcUtils.closeResultSet(rs);
+			JdbcUtils.closeStatement(ps);
 		}
 	}
 
@@ -313,7 +331,7 @@ public abstract class SimpleDao<E extends IdBase> extends BaseDao {
 
 			throw new AppException("Ошибка удаления объекта из базы данных.", e);
 		} finally {
-            JdbcUtils.closeStatement(ps);
+			JdbcUtils.closeStatement(ps);
 		}
 	}
 

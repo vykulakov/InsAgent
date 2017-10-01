@@ -18,25 +18,25 @@
 
 package ru.insagent.dao;
 
-import ru.insagent.model.Role;
+import ru.insagent.management.model.UnitType;
 
-public class RoleDao extends SimpleHDao<Role> {
+public class UnitTypeDao extends SimpleHDao<UnitType> {
 	{
-		clazz = Role.class;
+		clazz = UnitType.class;
 
 		countQueryPrefix = ""
 			+ " SELECT"
 			+ "     COUNT(*) AS count"
 			+ " FROM"
-			+ "     Role r"
+			+ "     UnitType t"
 			+ " WHERE"
 			+ "     1 = 1";
 
 		selectQueryPrefix = ""
 			+ " SELECT"
-			+ "     r"
+			+ "     t"
 			+ " FROM"
-			+ "     Role r"
+			+ "     UnitType t"
 			+ " WHERE"
 			+ "     1 = 1";
 	}

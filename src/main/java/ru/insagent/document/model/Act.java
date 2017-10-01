@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.apache.struts2.json.annotations.JSON;
 
-import ru.insagent.management.model.Unit;
 import ru.insagent.model.IdBase;
+import ru.insagent.model.Unit;
 import ru.insagent.workflow.model.Node;
 
 public class Act extends IdBase {

@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.insagent.dao.SimpleDao;
+import ru.insagent.dao.UnitDao;
 import ru.insagent.document.model.Bso;
 import ru.insagent.document.model.BsoFilter;
-import ru.insagent.management.dao.UnitDao;
-import ru.insagent.management.model.City;
-import ru.insagent.management.model.Unit;
 import ru.insagent.management.model.UnitType;
+import ru.insagent.model.City;
 import ru.insagent.model.Filter;
+import ru.insagent.model.Unit;
 import ru.insagent.model.User;
 import ru.insagent.util.TimeUtils;
 import ru.insagent.workflow.dao.LinkDao;

@@ -11,9 +11,9 @@ import com.opensymphony.xwork2.validator.annotations.IntRangeFieldValidator;
 import com.opensymphony.xwork2.validator.annotations.RequiredFieldValidator;
 
 import ru.insagent.action.BaseAction;
-import ru.insagent.management.dao.UnitDao;
-import ru.insagent.management.model.Unit;
+import ru.insagent.dao.UnitDao;
 import ru.insagent.model.Entry;
+import ru.insagent.model.Unit;
 import ru.insagent.workflow.dao.LinkDao;
 import ru.insagent.workflow.dao.NodeDao;
 import ru.insagent.workflow.model.Item;

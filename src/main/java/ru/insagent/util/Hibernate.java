@@ -51,11 +51,25 @@ public class Hibernate {
 	}
 
 	/**
+	 * Commit Hibernate transaction for the current session.
+	 */
+	public static void commit() {
+		getCurrentSession().getTransaction().commit();
+	}
+
+	/**
 	 * Commit Hibernate transaction.
 	 * @return A Hibernate session.
 	 */
 	public static void commit(Session session) {
 		session.getTransaction().commit();
+	}
+
+	/**
+	 * Rollback Hibernate transaction for the current session.
+	 */
+	public static void rollback() {
+		getCurrentSession().getTransaction().rollback();
 	}
 
 	/**
@@ -80,6 +94,10 @@ public class Hibernate {
 	 */
 	public static Session getCurrentSession() {
 		return instance.sessionFactory.getCurrentSession();
+	}
+
+	public static void beginTransaction() {
+		getCurrentSession().beginTransaction();
 	}
 
 	/**

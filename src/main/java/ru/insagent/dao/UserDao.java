@@ -1,6 +1,5 @@
-package ru.insagent.management.dao;
+package ru.insagent.dao;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,19 +10,17 @@ import java.util.Set;
 
 import org.apache.shiro.authc.credential.DefaultPasswordService;
 
-import ru.insagent.dao.SimpleDao;
 import ru.insagent.exception.AppException;
-import ru.insagent.management.model.City;
-import ru.insagent.management.model.Unit;
-import ru.insagent.management.model.UnitType;
 import ru.insagent.management.model.UserFilter;
 import ru.insagent.model.Filter;
+import ru.insagent.model.Unit;
 import ru.insagent.model.User;
 import ru.insagent.util.JdbcUtils;
-import ru.insagent.util.TimeUtils;
 
-public class UserDao extends SimpleDao<User> {
+public class UserDao extends SimpleHDao<User> {
 	{
+		clazz =  User.class;
+
 		sortByMap.put("id", "userId");
 		sortByMap.put("username", "userUsername");
 		sortByMap.put("firstName", "userFirstName");
@@ -32,89 +29,69 @@ public class UserDao extends SimpleDao<User> {
 		sortByMap.put("unit", "unitName");
 
 		countQueryPrefix = ""
-				+ " SELECT"
-				+ "     COUNT(*) AS count"
-				+ " FROM"
-				+ "     m_users u,"
-				+ "     m_units o,"
-				+ "     m_unit_types t,"
-				+ "     m_cities c"
-				+ " WHERE"
-				+ "     o.id = u.unitId AND"
-				+ "     t.id = o.typeId AND"
-				+ "     c.id = o.cityId";
+			+ " SELECT"
+			+ "     COUNT(*) AS count"
+			+ " FROM"
+			+ "     m_users u,"
+			+ "     m_units o,"
+			+ "     m_unit_types t,"
+			+ "     m_cities c"
+			+ " WHERE"
+			+ "     o.id = u.unitId AND"
+			+ "     t.id = o.typeId AND"
+			+ "     c.id = o.cityId";
 
 		selectQueryPrefix = ""
-				+ " SELECT"
-				+ "     u.id AS userId,"
-				+ "     u.username AS userUsername,"
-				+ "     u.password AS userEncrypt,"
-				+ "     u.firstName AS userFirstName,"
-				+ "     u.lastName AS userLastName,"
-				+ "     u.comment AS userComment,"
-				+ "     u.lastIp AS userLastIp,"
-				+ "     UNIX_TIMESTAMP(u.lastAuth) AS userLastAuth,"
-				+ "     u.removed AS userRemoved,"
-				+ "     o.id AS unitId,"
-				+ "     o.name AS unitName,"
-				+ "     t.id AS typeId,"
-				+ "     t.name AS typeName,"
-				+ "     c.id AS cityId,"
-				+ "     c.name AS cityName"
-				+ " FROM"
-				+ "     m_users u,"
-				+ "     m_units o,"
-				+ "     m_unit_types t,"
-				+ "     m_cities c"
-				+ " WHERE"
-				+ "     o.id = u.unitId AND"
-				+ "     t.id = o.typeId AND"
-				+ "     c.id = o.cityId";
+			+ " SELECT"
+			+ "     u.id AS userId,"
+			+ "     u.username AS userUsername,"
+			+ "     u.password AS userEncrypt,"
+			+ "     u.firstName AS userFirstName,"
+			+ "     u.lastName AS userLastName,"
+			+ "     u.comment AS userComment,"
+			+ "     u.lastIp AS userLastIp,"
+			+ "     UNIX_TIMESTAMP(u.lastAuth) AS userLastAuth,"
+			+ "     u.removed AS userRemoved,"
+			+ "     o.id AS unitId,"
+			+ "     o.name AS unitName,"
+			+ "     t.id AS typeId,"
+			+ "     t.name AS typeName,"
+			+ "     c.id AS cityId,"
+			+ "     c.name AS cityName"
+			+ " FROM"
+			+ "     m_users u,"
+			+ "     m_units o,"
+			+ "     m_unit_types t,"
+			+ "     m_cities c"
+			+ " WHERE"
+			+ "     o.id = u.unitId AND"
+			+ "     t.id = o.typeId AND"
+			+ "     c.id = o.cityId";
 
 		insertQuery = ""
-				+ " INSERT INTO"
-				+ "     m_users"
-				+ " SET"
-				+ "     unitId = ?,"
-				+ "     created = NOW(),"
-				+ "     username = ?,"
-				+ "     password = ?,"
-				+ "     firstName = ?,"
-				+ "     lastName = ?,"
-				+ "     comment = ?;";
+			+ " INSERT INTO"
+			+ "     m_users"
+			+ " SET"
+			+ "     unitId = ?,"
+			+ "     created = NOW(),"
+			+ "     username = ?,"
+			+ "     password = ?,"
+			+ "     firstName = ?,"
+			+ "     lastName = ?,"
+			+ "     comment = ?;";
 
-		updateQuery = "";
-
-		removeQuery = ""
-				+ " UPDATE"
-				+ "     m_users"
-				+ " SET"
-				+ "     removed = 1"
-				+ " WHERE"
-				+ "     id = ?;";
-
-		idField = "u.id";
-
-		searchCount = 4;
 		searchWhere = ""
-				+ " u.username LIKE ? OR"
-				+ " u.firstName LIKE ? OR"
-				+ " u.lastName LIKE ? OR"
-				+ " o.name LIKE ?";
-
-		removedWhere = ""
-				+ " u.removed = ?";
-	}
-
-	public UserDao(Connection conn) {
-		super(conn);
+			+ " u.username LIKE ? OR"
+			+ " u.firstName LIKE ? OR"
+			+ " u.lastName LIKE ? OR"
+			+ " o.name LIKE ?";
 	}
 
 	public User getByUsername(String username) {
 		List<Object> objects = new ArrayList<Object>();
 		objects.add(username);
 
-		List<User> users = listByWhere(false, "u.username = ?", objects);
+		List<User> users = listByWhere("u.username = ?", objects);
 		if(users.isEmpty()) {
 			return null;
 		} else {
@@ -122,17 +99,14 @@ public class UserDao extends SimpleDao<User> {
 		}
 	}
 
-	@Override
 	public List<User> listByUser(User user) {
 		return listByUser(user, null, null, 0, 0);
 	}
 
-	@Override
 	public List<User> listByUser(User user, String sortBy, String sortDir, int limitRows, int limitOffset) {
 		return listByUser(user, (String) null, sortBy, sortDir, limitRows, limitOffset);
 	}
 
-	@Override
 	public List<User> listByUser(User user, String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
 		List<Unit> units = new UnitDao(conn).listByUser(user);
 
@@ -168,7 +142,6 @@ public class UserDao extends SimpleDao<User> {
 		return listByWhere(false, where, objects, sortBy, sortDir, limitRows, limitOffset);
 	}
 
-	@Override
 	public List<User> listByUser(User user, Filter f, String sortBy, String sortDir, int limitRows, int limitOffset) {
 		UserFilter filter = (UserFilter) f;
 
@@ -239,20 +212,20 @@ public class UserDao extends SimpleDao<User> {
 		if(user.getId() > 0) {
 			StringBuilder query = new StringBuilder(updateQuery);
 			query.append(""
-					+ " UPDATE"
-					+ "     m_users"
-					+ " SET"
-					+ "     unitId = ?,"
-					+ "     username = ?,");
+				+ " UPDATE"
+				+ "     m_users"
+				+ " SET"
+				+ "     unitId = ?,"
+				+ "     username = ?,");
 			if(user.getPassword() != null && !user.getPassword().isEmpty()) {
 				query.append("     password = ?,");
 			}
 			query.append(""
-					+ "     firstName = ?,"
-					+ "     lastName = ?,"
-					+ "     comment = ?"
-					+ " WHERE"
-					+ "     id = ?;");
+				+ "     firstName = ?,"
+				+ "     lastName = ?,"
+				+ "     comment = ?"
+				+ " WHERE"
+				+ "     id = ?;");
 
 			updateQuery = query.toString();
 		}
@@ -262,10 +235,10 @@ public class UserDao extends SimpleDao<User> {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement(""
-					+ " DELETE FROM"
-					+ "     m_user_roles"
-					+ " WHERE"
-					+ "     userId = ?;");
+				+ " DELETE FROM"
+				+ "     m_user_roles"
+				+ " WHERE"
+				+ "     userId = ?;");
 			ps.setInt(1, user.getId());
 			ps.executeUpdate();
 		} catch(SQLException e) {
@@ -273,20 +246,20 @@ public class UserDao extends SimpleDao<User> {
 
 			throw new AppException("Ошибка удаления ролей пользователя из базы данных.", e);
 		} finally {
-            JdbcUtils.closeStatement(ps);
+			JdbcUtils.closeStatement(ps);
 		}
 
 		try {
 			ps = conn.prepareStatement(""
-					+ " INSERT INTO"
-					+ "     m_user_roles"
-					+ " SELECT"
-					+ "     ?,"
-					+ "     id"
-					+ " FROM"
-					+ "     m_roles"
-					+ " WHERE"
-					+ "     idx = ?;");
+				+ " INSERT INTO"
+				+ "     m_user_roles"
+				+ " SELECT"
+				+ "     ?,"
+				+ "     id"
+				+ " FROM"
+				+ "     m_roles"
+				+ " WHERE"
+				+ "     idx = ?;");
 			for(String role : user.getRoles()) {
 				ps.setInt(1, user.getId());
 				ps.setString(2, role);
@@ -297,7 +270,7 @@ public class UserDao extends SimpleDao<User> {
 
 			throw new AppException("Ошибка добавления ролей пользователя в базу данных.", e);
 		} finally {
-            JdbcUtils.closeStatement(ps);
+			JdbcUtils.closeStatement(ps);
 		}
 	}
 
@@ -305,16 +278,16 @@ public class UserDao extends SimpleDao<User> {
 		Set<String> roles = new HashSet<String>();
 
 		String query = ""
-				+ " SELECT"
-				+ "     r.id AS roleId,"
-				+ "     r.idx AS roleIdx,"
-				+ "     r.name AS roleName"
-				+ " FROM"
-				+ "     m_roles r,"
-				+ "     m_user_roles u"
-				+ " WHERE"
-				+ "     r.id = u.roleId AND"
-				+ "     u.userId = ?;";
+			+ " SELECT"
+			+ "     r.id AS roleId,"
+			+ "     r.idx AS roleIdx,"
+			+ "     r.name AS roleName"
+			+ " FROM"
+			+ "     m_roles r,"
+			+ "     m_user_roles u"
+			+ " WHERE"
+			+ "     r.id = u.roleId AND"
+			+ "     u.userId = ?;";
 
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -331,67 +304,10 @@ public class UserDao extends SimpleDao<User> {
 
 			throw new AppException("Ошибка получения ролей пользователя из базы данных.", e);
 		} finally {
-            JdbcUtils.closeResultSet(rs);
-            JdbcUtils.closeStatement(ps);
+			JdbcUtils.closeResultSet(rs);
+			JdbcUtils.closeStatement(ps);
 		}
 
 		return roles;
-	}
-
-	@Override
-	protected User getFromRs(ResultSet rs) throws SQLException {
-		UnitType type = new UnitType();
-		type.setId(rs.getInt("typeId"));
-		type.setName(rs.getString("typeName"));
-
-		City city = new City();
-		city.setId(rs.getInt("cityId"));
-		city.setName(rs.getString("cityName"));
-
-		Unit unit = new Unit();
-		unit.setId(rs.getInt("unitId"));
-		unit.setType(type);
-		unit.setCity(city);
-		unit.setName(rs.getString("unitName"));
-
-		User user = new User();
-		user.setId(rs.getInt("userId"));
-		user.setPassword(rs.getString("userEncrypt"));
-		user.setUsername(rs.getString("userUsername"));
-		user.setFirstName(rs.getString("userFirstName"));
-		user.setLastName(rs.getString("userLastName"));
-		user.setComment(rs.getString("userComment"));
-		user.setLastIp(rs.getString("userLastIp"));
-		user.setLastAuth(TimeUtils.convertTimestampToDate(rs.getLong("userLastAuth")));
-		user.setRemoved(rs.getBoolean("userRemoved"));
-		user.setUnit(unit);
-		user.setRoles(getRolesByUserId(user.getId()));
-
-		return user;
-	}
-
-	@Override
-	protected void setInsertPs(PreparedStatement ps, User user) throws SQLException {
-		int index = 1;
-		ps.setInt(index++, user.getUnit().getId());
-		ps.setString(index++, user.getUsername());
-		ps.setString(index++, user.getPassword());
-		ps.setString(index++, user.getFirstName());
-		ps.setString(index++, user.getLastName());
-		ps.setString(index++, user.getComment());
-	}
-
-	@Override
-	protected void setUpdatePs(PreparedStatement ps, User user) throws SQLException {
-		int index = 1;
-		ps.setInt(index++, user.getUnit().getId());
-		ps.setString(index++, user.getUsername());
-		if(user.getPassword() != null && !user.getPassword().isEmpty()) {
-			ps.setString(index++, user.getPassword());
-		}
-		ps.setString(index++, user.getFirstName());
-		ps.setString(index++, user.getLastName());
-		ps.setString(index++, user.getComment());
-		ps.setInt(index++, user.getId());
 	}
 }

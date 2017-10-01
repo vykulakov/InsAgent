@@ -59,12 +59,15 @@ import ru.insagent.util.Setup;
  * @author Kulakov Vyacheslav <kulakov.home@gmail.com>
  */
 public class AuthFilter implements Filter {
-	private String forwardPage = "/WEB-INF/jsp/main.jsp";
+	private static String contextPath;
+	private static final String MAIN_PAGE = "/WEB-INF/jsp/main.jsp";
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthFilter.class);
 
 	@Override
-	public void init(FilterConfig paramFilterConfig) throws ServletException {
+	public void init(FilterConfig filterConfig) throws ServletException {
+		contextPath = filterConfig.getServletContext().getContextPath();
+
 		Factory<org.apache.shiro.mgt.SecurityManager> factory = new IniSecurityManagerFactory();
 		org.apache.shiro.mgt.SecurityManager securityManager = factory.getInstance();
 		SecurityUtils.setSecurityManager(securityManager);
@@ -75,15 +78,14 @@ public class AuthFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) servletRequest;
 		HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-		String path = request.getContextPath();
-		String uri = request.getRequestURI().replaceFirst(path, "");
+		String uri = request.getRequestURI().replaceFirst(contextPath, "");
 
 		Subject currentUser = SecurityUtils.getSubject();
 
 		if(uri.equals("/logout")) {
 			currentUser.logout();
 
-			redirect(request, response, path);
+			redirectToMainUri(response);
 
 			return;
 		}
@@ -109,16 +111,17 @@ public class AuthFilter implements Filter {
 		String username = request.getParameter("authUser");
 		String password = request.getParameter("authPass");
 		String remember = request.getParameter("authRememberMe");
-		if(auth != null && auth.equals("true")) {
+		boolean tokenRememberMe = "true".equals(remember);
+		if("true".equals(auth)) {
 			if((username == null || username.isEmpty()) && (password == null || password.isEmpty())) {
 				request.setAttribute("authError", "Вы не указали логин и пароль");
-				forward(request, response, forwardPage);
+				forwardToMainPage(request, response);
 				return;
 			}
 
 			if(username == null || username.isEmpty()) {
 				request.setAttribute("authError", "Вы не указали логин");
-				forward(request, response, forwardPage);
+				forwardToMainPage(request, response);
 				return;
 			} else {
 				request.setAttribute("authUser", username);
@@ -126,20 +129,14 @@ public class AuthFilter implements Filter {
 
 			if(password == null || password.isEmpty()) {
 				request.setAttribute("authError", "Вы не указали пароль");
-				forward(request, response, forwardPage);
+				forwardToMainPage(request, response);
 				return;
 			}
 		} else {
-			forward(request, response, forwardPage);
+			forwardToMainPage(request, response);
 			return;
 		}
 
-		boolean tokenRememberMe;
-		if(remember != null && remember.equals("true")) {
-			tokenRememberMe = true;
-		} else {
-			tokenRememberMe = false;
-		}
 
 		UsernamePasswordToken token = new UsernamePasswordToken(username, password);
 		token.setRememberMe(tokenRememberMe);
@@ -172,7 +169,7 @@ public class AuthFilter implements Filter {
 				logger.error("Cannot load or store entities", e);
 			}
 		} else {
-			forward(request, response, forwardPage);
+			forwardToMainPage(request, response);
 			return;
 		}
 
@@ -183,9 +180,9 @@ public class AuthFilter implements Filter {
 	public void destroy() {
 	}
 
-	public void forward(HttpServletRequest request, HttpServletResponse response, String page) throws IOException {
+	private void forwardToMainPage(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		try {
-			request.getRequestDispatcher(page).forward(request, response);
+			request.getRequestDispatcher(MAIN_PAGE).forward(request, response);
 		} catch (ServletException e) {
 			logger.error("Cannot forward request", e);
 
@@ -193,11 +190,11 @@ public class AuthFilter implements Filter {
 		}
 	}
 
-	public void redirect(HttpServletRequest request, HttpServletResponse response, String location) throws IOException {
-		response.sendRedirect(location);
+	private void redirectToMainUri(HttpServletResponse response) throws IOException {
+		response.sendRedirect(contextPath);
 	}
 
-	public void updateUser(User user) {
+	private void updateUser(User user) {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		try {
@@ -216,14 +213,14 @@ public class AuthFilter implements Filter {
 			ps.setInt(3, user.getId());
 			ps.execute();
 		} catch(SQLException e) {
-			logger.error("Cannot update user in DB", e);
+			logger.error("Cannot update last access", e);
 		} finally {
 			JdbcUtils.closeStatement(ps);
 			JdbcUtils.closeConnection(conn);
 		}
 	}
 
-	public List<MenuItem> getUserMenu(User user) throws AppException {
+	private List<MenuItem> getUserMenu(User user) throws AppException {
 		if(user.getRoles() == null || user.getRoles().isEmpty()) {
 			return Collections.emptyList();
 		}

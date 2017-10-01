@@ -8,7 +8,7 @@ import com.opensymphony.xwork2.validator.annotations.StringLengthFieldValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 
 import ru.insagent.action.BaseAction;
-import ru.insagent.management.dao.UserDao;
+import ru.insagent.dao.UserDao;
 import ru.insagent.model.User;
 
 public class UpdateUserJsonAction extends BaseAction {

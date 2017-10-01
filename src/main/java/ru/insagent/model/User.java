@@ -24,16 +24,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.apache.struts2.json.annotations.JSON;
 
-import ru.insagent.management.model.Unit;
-
 /**
- * User
- *
- * @author Kulakov Vyacheslav <kulakov.home@gmail.com>
+ * User entity
  */
 @Entity
 @Table(name="m_users")
@@ -47,9 +48,19 @@ public class User extends IdBase {
 	private String comment;
 	private String lastIp;
 	private Date lastAuth;
-	private Unit unit;
-	private Set<String> roles = new HashSet<String>();
 	private boolean removed;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "unitId")
+	private Unit unit;
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+		name="m_user_roles",
+		joinColumns=@JoinColumn(name="userId", referencedColumnName="id"),
+		inverseJoinColumns=@JoinColumn(name="roleId", referencedColumnName="id")
+		)
+	private Set<Role> roles = new HashSet<Role>();
 
 	public String getUsername() {
 		return username;

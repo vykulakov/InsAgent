@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Set;
 
 import ru.insagent.action.BaseAction;
+import ru.insagent.dao.UnitDao;
 import ru.insagent.document.model.ActType;
-import ru.insagent.management.dao.UnitDao;
-import ru.insagent.management.model.Unit;
+import ru.insagent.model.Unit;
 import ru.insagent.workflow.dao.ActionDao;
 import ru.insagent.workflow.dao.LinkDao;
 import ru.insagent.workflow.dao.NodeDao;

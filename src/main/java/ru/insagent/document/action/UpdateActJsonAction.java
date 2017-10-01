@@ -12,14 +12,14 @@ import com.opensymphony.xwork2.validator.annotations.StringLengthFieldValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 
 import ru.insagent.action.BaseAction;
+import ru.insagent.dao.UnitDao;
 import ru.insagent.document.dao.ActDao;
 import ru.insagent.document.dao.BsoArchivedDao;
 import ru.insagent.document.dao.BsoDao;
 import ru.insagent.document.model.Act;
 import ru.insagent.document.model.ActPack;
 import ru.insagent.document.model.Bso;
-import ru.insagent.management.dao.UnitDao;
-import ru.insagent.management.model.Unit;
+import ru.insagent.model.Unit;
 import ru.insagent.util.Utils;
 import ru.insagent.workflow.dao.LinkDao;
 import ru.insagent.workflow.dao.NodeDao;

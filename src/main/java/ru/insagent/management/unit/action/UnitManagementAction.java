@@ -1,3 +1,21 @@
+/*
+ * InsAgent - https://github.com/vykulakov/InsAgent
+ *
+ * Copyright 2017 Vyacheslav Kulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.insagent.management.unit.action;
 
 import java.util.ArrayList;
@@ -5,17 +23,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import ru.insagent.action.BaseAction;
-import ru.insagent.management.dao.CityDao;
-import ru.insagent.management.dao.TypeDao;
-import ru.insagent.management.model.City;
 import ru.insagent.management.model.UnitType;
+import ru.insagent.model.City;
+import ru.insagent.service.UnitService;
 
 public class UnitManagementAction extends BaseAction {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -2440800695359237060L;
 
 	{
 		ALLOW_ROLES = Arrays.asList("admin");
-		ALLOW_MSG = "У вас нет прав для управления подразделениями";
 	}
 
 	private List<UnitType> types = new ArrayList<UnitType>();
@@ -30,16 +46,11 @@ public class UnitManagementAction extends BaseAction {
 
 	@Override
 	public String executeImpl() {
-		TypeDao td = new TypeDao(conn);
-		CityDao cd = new CityDao(conn);
+		UnitService us = new UnitService();
 
-		types = td.list();
-		cities = cd.list();
+		types = us.types();
+		cities = us.cities();
 
 		return SUCCESS;
-	}
-
-	@Override
-	public void validateImpl() {
 	}
 }

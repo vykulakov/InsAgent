@@ -3,6 +3,7 @@ package ru.insagent.management.model;
 import java.util.List;
 
 import ru.insagent.model.Filter;
+import ru.insagent.model.Unit;
 
 public class UserFilter extends Filter {
 	private static final long serialVersionUID = -1L;

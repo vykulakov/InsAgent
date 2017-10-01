@@ -22,7 +22,6 @@ import java.sql.Connection;
 import java.util.List;
 
 import org.apache.shiro.SecurityUtils;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +30,6 @@ import com.opensymphony.xwork2.Preparable;
 
 import ru.insagent.exception.AppException;
 import ru.insagent.model.User;
-import ru.insagent.util.Hibernate;
 import ru.insagent.util.JdbcUtils;
 import ru.insagent.util.Setup;
 
@@ -75,20 +73,11 @@ public abstract class BaseAction extends ActionSupport implements Preparable {
 
 	@Override
 	public String execute() {
-		Session session = Hibernate.getCurrentSession();
-		session.beginTransaction();
 		try {
-			String result = executeImpl();
-			if(result == SUCCESS) {
-				session.getTransaction().commit();
-			} else {
-				session.getTransaction().rollback();
-			}
-			return result;
+			return executeImpl();
 		} catch(AppException e) {
 			addActionError(e.getMessage());
 			logger.error("Cannot execute action", e);
-			session.getTransaction().rollback();
 			return ERROR;
 		} finally {
 			JdbcUtils.closeConnection(conn);
@@ -115,5 +104,6 @@ public abstract class BaseAction extends ActionSupport implements Preparable {
 		}
 	}
 
-	public abstract void validateImpl();
+	public void validateImpl() {
+	}
 }

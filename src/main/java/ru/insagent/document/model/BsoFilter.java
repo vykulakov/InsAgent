@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import ru.insagent.management.model.Unit;
 import ru.insagent.model.Filter;
+import ru.insagent.model.Unit;
 import ru.insagent.workflow.model.Node;
 
 public class BsoFilter extends Filter {

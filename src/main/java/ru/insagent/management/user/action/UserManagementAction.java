@@ -6,9 +6,9 @@ import java.util.List;
 
 import ru.insagent.action.BaseAction;
 import ru.insagent.dao.RoleDao;
-import ru.insagent.management.dao.UnitDao;
-import ru.insagent.management.model.Unit;
+import ru.insagent.dao.UnitDao;
 import ru.insagent.model.Role;
+import ru.insagent.model.Unit;
 
 public class UserManagementAction extends BaseAction {
 	private static final long serialVersionUID = 1L;

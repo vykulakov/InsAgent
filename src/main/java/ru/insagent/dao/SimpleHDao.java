@@ -207,19 +207,27 @@ public abstract class SimpleHDao<E extends IdBase> extends BaseHDao {
 	}
 
 	/**
-	 * Remove entity
-	 * @param o - entity to remove.
-	 * @throws AppException if passed entity is {@code null}.
+	 * Remove entity by id.
+	 * @param id - entity id.
 	 */
-	public void remove(E o) throws AppException {
+	public void remove(int id) {
+		E o = Hibernate.getCurrentSession().get(clazz, id);
 		if(o == null) {
-			throw new AppException("Passed null-object");
+			return;
 		}
 
-		try {
-			Hibernate.getCurrentSession().delete(o);;
-		} catch(Exception e) {
-			throw new AppException("Cannot remove object from DB", e);
-		}
+		removeImpl(o);
+	}
+
+	/**
+	 * Remove entity
+	 * @param o - entity to remove.
+	 */
+	public void remove(E o) {
+		removeImpl(o);
+	}
+
+	private void removeImpl(E o) {
+		Hibernate.getCurrentSession().delete(o);
 	}
 }

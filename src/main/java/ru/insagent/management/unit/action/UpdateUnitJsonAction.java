@@ -1,3 +1,21 @@
+/*
+ * InsAgent - https://github.com/vykulakov/InsAgent
+ *
+ * Copyright 2017 Vyacheslav Kulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.insagent.management.unit.action;
 
 import com.opensymphony.xwork2.validator.annotations.ConversionErrorFieldValidator;
@@ -8,11 +26,11 @@ import com.opensymphony.xwork2.validator.annotations.StringLengthFieldValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 
 import ru.insagent.action.BaseAction;
-import ru.insagent.management.dao.UnitDao;
-import ru.insagent.management.model.Unit;
+import ru.insagent.model.Unit;
+import ru.insagent.service.UnitService;
 
 public class UpdateUnitJsonAction extends BaseAction {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 4911618257796238681L;
 
 	private Unit unit;
 	public Unit getUnit() {
@@ -47,16 +65,10 @@ public class UpdateUnitJsonAction extends BaseAction {
 			@StringLengthFieldValidator(fieldName = "unit.name",    maxLength = "255",  message = "Название подразделения должно содержать менее 255 символов."),
 			@StringLengthFieldValidator(fieldName = "unit.comment", maxLength = "2048", message = "Комментарий к подразделению должен содержать менее 2048 символов.")
 		}
-	)
+		)
 	public String executeImpl() {
-		UnitDao ud = new UnitDao(conn);
-
-		ud.update(unit);
+		new UnitService().update(unit);
 
 		return SUCCESS;
-	}
-
-	@Override
-	public void validateImpl() {
 	}
 }

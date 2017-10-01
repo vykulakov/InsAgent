@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.struts2.json.annotations.JSON;
 
 import ru.insagent.action.GetBaseAction;
-import ru.insagent.management.dao.UserDao;
+import ru.insagent.dao.UserDao;
 import ru.insagent.management.model.UserFilter;
 import ru.insagent.model.User;
 

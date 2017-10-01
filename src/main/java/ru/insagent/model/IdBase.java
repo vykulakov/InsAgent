@@ -26,8 +26,6 @@ import javax.persistence.MappedSuperclass;
 
 /**
  * Base class for entities with id field
- *
- * @author Kulakov Vyacheslav <kulakov.home@gmail.com>
  */
 @MappedSuperclass
 public abstract class IdBase implements Serializable {

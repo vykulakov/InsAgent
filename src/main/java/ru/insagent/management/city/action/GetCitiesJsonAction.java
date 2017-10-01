@@ -1,3 +1,21 @@
+/*
+ * InsAgent - https://github.com/vykulakov/InsAgent
+ *
+ * Copyright 2017 Vyacheslav Kulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.insagent.management.city.action;
 
 import java.util.Arrays;
@@ -6,9 +24,9 @@ import java.util.List;
 import org.apache.struts2.json.annotations.JSON;
 
 import ru.insagent.action.GetBaseAction;
-import ru.insagent.management.dao.CityDao;
-import ru.insagent.management.model.City;
 import ru.insagent.management.model.CityFilter;
+import ru.insagent.model.City;
+import ru.insagent.service.CityService;
 
 public class GetCitiesJsonAction extends GetBaseAction<City> {
 	private static final long serialVersionUID = 1L;
@@ -22,29 +40,30 @@ public class GetCitiesJsonAction extends GetBaseAction<City> {
 		return filter;
 	}
 
+	@Override
+	public long getTotal() {
+		return total;
+	}
+
+	@Override
 	public List<City> getRows() {
 		return rows;
 	}
 
-	public Integer getTotal() {
-		return total;
-	}
-
 	{
 		ALLOW_ROLES = Arrays.asList("admin");
-		ALLOW_MSG = "У вас нет прав для просмотра списка подразделений";
 	}
 
 	@Override
 	public String executeImpl() {
-		dao = new CityDao(conn);
+		CityService cs = new CityService();
 
 		if(filter == null) {
-			rows = dao.listByUser(user, search, sort, order, limit, offset);
+			rows = cs.listByUser(user, search, sort, order, limit, offset);
 		} else {
-			rows = dao.listByUser(user, filter, sort, order, limit, offset);
+			rows = cs.listByUser(user, filter, sort, order, limit, offset);
 		}
-		total = dao.getCount();
+		total = cs.getCount();
 
 		return SUCCESS;
 	}

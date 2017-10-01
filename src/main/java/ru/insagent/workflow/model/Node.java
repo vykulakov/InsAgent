@@ -3,9 +3,9 @@ package ru.insagent.workflow.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.insagent.management.model.Unit;
 import ru.insagent.management.model.UnitType;
 import ru.insagent.model.IdBase;
+import ru.insagent.model.Unit;
 
 public class Node extends IdBase {
 	private static final long serialVersionUID = -9054275807494235590L;
