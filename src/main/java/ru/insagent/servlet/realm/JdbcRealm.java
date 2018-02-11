@@ -18,10 +18,7 @@
 
 package ru.insagent.servlet.realm;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.shiro.authc.AuthenticationException;
@@ -37,82 +34,42 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.insagent.dao.UserDao;
-import ru.insagent.exception.AppException;
-import ru.insagent.model.User;
-import ru.insagent.util.JdbcUtils;
-import ru.insagent.util.Setup;
+import ru.insagent.model.ShiroUser;
+import ru.insagent.service.UserService;
 
-public class JdbcRealm extends AuthorizingRealm   {
+public class JdbcRealm extends AuthorizingRealm {
 	private DefaultPasswordService passwordService = new DefaultPasswordService();
 
-	private final Logger logger = LoggerFactory.getLogger(JdbcRealm.class);
+	private final static Logger logger = LoggerFactory.getLogger(JdbcRealm.class);
 
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 		UsernamePasswordToken upToken = (UsernamePasswordToken) token;
 		String username = upToken.getUsername();
-		String password = String.valueOf(upToken.getPassword());
+		char[] password = upToken.getPassword();
 
-		User user = null;
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
 		try {
-			conn = Setup.getConnection();
-
-			UserDao ud = new UserDao(conn);
-
-			user = ud.getByUsername(username);
-			if(user == null || !passwordService.passwordsMatch(password, user.getPassword())) {
-				user = null;
+			ShiroUser shiroUser = new UserService().getByUsername(username);
+			if (shiroUser == null || !passwordService.passwordsMatch(password, shiroUser.getPassword())) {
+				logger.info("Password verification failed");
+				throw new AuthenticationException();
 			}
-		} catch(AppException e) {
+
+			return new SimpleAuthenticationInfo(shiroUser, upToken.getPassword(), "JoxLocalRealm");
+		} catch (AuthenticationException e) {
+			throw e;
+		} catch (Exception e) {
 			logger.error("Cannot get connection to DB", e);
-		} finally {
-			JdbcUtils.closeResultSet(rs);
-			JdbcUtils.closeStatement(ps);
-			JdbcUtils.closeConnection(conn);
-		}
-		if(user == null) {
 			throw new AuthenticationException();
 		}
-
-		Set<String> roles = getRoles(user);
-		user.addRoles(roles);
-
-		return new SimpleAuthenticationInfo(user, upToken.getPassword(), "JoxLocalRealm");
 	}
 
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		User user = (User) getAvailablePrincipal(principals);
+		ShiroUser authUser = (ShiroUser) getAvailablePrincipal(principals);
 
-		Set<String> roles = getRoles(user);
+		Set<String> roles = authUser.getRoles();
 
 		return new SimpleAuthorizationInfo(roles);
-	}
-
-	public Set<String> getRoles(User user) {
-		Set<String> roles = new LinkedHashSet<String>();
-
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			conn = Setup.getConnection();
-
-			UserDao ud = new UserDao(conn);
-
-			roles = ud.getRolesByUserId(user.getId());
-		} catch(AppException e) {
-			logger.error("Cannot get user roles from DB", e);
-		} finally {
-			JdbcUtils.closeResultSet(rs);
-			JdbcUtils.closeStatement(ps);
-			JdbcUtils.closeConnection(conn);
-		}
-
-		return roles;
 	}
 }

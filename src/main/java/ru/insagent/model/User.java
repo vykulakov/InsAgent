@@ -18,7 +18,6 @@
 
 package ru.insagent.model;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -112,41 +111,11 @@ public class User extends IdBase {
 	public void setUnit(Unit unit) {
 		this.unit = unit;
 	}
-	public boolean hasRole(String role) {
-		return roles.contains(role);
-	}
-	public boolean hasRolesOne(Collection<String> roles) {
-		if(roles == null) {
-			return true;
-		}
-
-		for(String role : roles) {
-			if(this.roles.contains(role)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-	public boolean hasRolesAll(Collection<String> roles) {
-		if(roles == null) {
-			return true;
-		}
-
-		return this.roles.containsAll(roles);
-	}
-	public Set<String> getRoles() {
+	public Set<Role> getRoles() {
 		return roles;
 	}
-	public void addRole(String role) {
-		this.roles.add(role);
-	}
-	public void addRoles(Collection<String> roles) {
-		this.roles.addAll(roles);
-	}
-	public void setRoles(Collection<String> roles) {
-		this.roles.clear();
-		this.roles.addAll(roles);
+	public void setRoles(Set<Role> roles) {
+		this.roles = roles;
 	}
 	public boolean isRemoved() {
 		return removed;

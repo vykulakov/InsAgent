@@ -33,64 +33,64 @@ public class ActDao extends SimpleDao<Act> {
 		sortByMap.put("amount", "actAmount");
 
 		countQueryPrefix = ""
-				+ " SELECT"
-				+ "     COUNT(*) AS count"
-				+ " FROM"
-				+ "     d_acts a"
-				+ "     LEFT JOIN m_units uf ON uf.id = a.unitFromId"
-				+ "     LEFT JOIN m_units ut ON ut.id = a.unitToId,"
-				+ "     d_act_types t"
-				+ " WHERE"
-				+ "     t.id = a.typeId";
+			+ " SELECT"
+			+ "     COUNT(*) AS count"
+			+ " FROM"
+			+ "     d_acts a"
+			+ "     LEFT JOIN m_units uf ON uf.id = a.unitFromId"
+			+ "     LEFT JOIN m_units ut ON ut.id = a.unitToId,"
+			+ "     d_act_types t"
+			+ " WHERE"
+			+ "     t.id = a.typeId";
 
 		selectQueryPrefix = ""
-				+ " SELECT"
-				+ "     a.id AS actId,"
-				+ "     UNIX_TIMESTAMP(a.created) AS actCreated,"
-				+ "     a.amount AS actAmount,"
-				+ "     a.comment AS actComment,"
-				+ "     nf.id AS nodeFromId,"
-				+ "     nf.name AS nodeFromName,"
-				+ "     nt.id AS nodeToId,"
-				+ "     nt.name AS nodeToName,"
-				+ "     uf.id AS unitFromId,"
-				+ "     uf.name AS unitFromName,"
-				+ "     ut.id AS unitToId,"
-				+ "     ut.name AS unitToName,"
-				+ "     t.id AS actTypeId,"
-				+ "     t.idx AS actTypeIdx,"
-				+ "     t.shortName AS actTypeShortName,"
-				+ "     t.fullName AS actTypeFullName"
-				+ " FROM"
-				+ "     d_acts a"
-				+ "     LEFT JOIN w_nodes nf ON nf.id = a.nodeFromId"
-				+ "     LEFT JOIN w_nodes nt ON nt.id = a.nodeToId"
-				+ "     LEFT JOIN m_units uf ON uf.id = a.unitFromId"
-				+ "     LEFT JOIN m_units ut ON ut.id = a.unitToId,"
-				+ "     d_act_types t"
-				+ " WHERE"
-				+ "     t.id = a.typeId";
+			+ " SELECT"
+			+ "     a.id AS actId,"
+			+ "     UNIX_TIMESTAMP(a.created) AS actCreated,"
+			+ "     a.amount AS actAmount,"
+			+ "     a.comment AS actComment,"
+			+ "     nf.id AS nodeFromId,"
+			+ "     nf.name AS nodeFromName,"
+			+ "     nt.id AS nodeToId,"
+			+ "     nt.name AS nodeToName,"
+			+ "     uf.id AS unitFromId,"
+			+ "     uf.name AS unitFromName,"
+			+ "     ut.id AS unitToId,"
+			+ "     ut.name AS unitToName,"
+			+ "     t.id AS actTypeId,"
+			+ "     t.idx AS actTypeIdx,"
+			+ "     t.shortName AS actTypeShortName,"
+			+ "     t.fullName AS actTypeFullName"
+			+ " FROM"
+			+ "     d_acts a"
+			+ "     LEFT JOIN w_nodes nf ON nf.id = a.nodeFromId"
+			+ "     LEFT JOIN w_nodes nt ON nt.id = a.nodeToId"
+			+ "     LEFT JOIN m_units uf ON uf.id = a.unitFromId"
+			+ "     LEFT JOIN m_units ut ON ut.id = a.unitToId,"
+			+ "     d_act_types t"
+			+ " WHERE"
+			+ "     t.id = a.typeId";
 
 		insertQuery = ""
-				+ " INSERT INTO"
-				+ "     d_acts"
-				+ " SET"
-				+ "     typeId = ?,"
-				+ "     created = NOW(),"
-				+ "     nodeFromId = ?,"
-				+ "     nodeToId = ?,"
-				+ "     unitFromId = ?,"
-				+ "     unitToId = ?,"
-				+ "     amount = ?,"
-				+ "     comment = ?;";
+			+ " INSERT INTO"
+			+ "     d_acts"
+			+ " SET"
+			+ "     typeId = ?,"
+			+ "     created = NOW(),"
+			+ "     nodeFromId = ?,"
+			+ "     nodeToId = ?,"
+			+ "     unitFromId = ?,"
+			+ "     unitToId = ?,"
+			+ "     amount = ?,"
+			+ "     comment = ?;";
 
 		updateQuery = ""
-				+ " UPDATE"
-				+ "     d_acts"
-				+ " SET"
-				+ "     comment = ?"
-				+ " WHERE"
-				+ "     id = ?;";
+			+ " UPDATE"
+			+ "     d_acts"
+			+ " SET"
+			+ "     comment = ?"
+			+ " WHERE"
+			+ "     id = ?;";
 
 		removeQuery = null;
 
@@ -109,7 +109,7 @@ public class ActDao extends SimpleDao<Act> {
 	@Override
 	public List<Act> listByUser(User user, String sortBy, String sortDir, int limitRows, int limitOffset) {
 		List<Link> links = new LinkDao(conn).listByUser(user);
-		List<Unit> units = new UnitDao(conn).listByUser(user);
+		List<Unit> units = new UnitDao().listByUser(user);
 
 		StringBuilder sb = new StringBuilder("");
 		List<Object> objects = new ArrayList<Object>();
@@ -171,27 +171,27 @@ public class ActDao extends SimpleDao<Act> {
 			ResultSet rs1 = null;
 			try {
 				ps1 = conn.prepareStatement(""
-						+ " INSERT INTO"
-						+ "     d_act_packs"
-						+ " SET"
-						+ "     actId = ?,"
-						+ "     series = ?,"
-						+ "     numberFrom = ?,"
-						+ "     numberTo = ?,"
-						+ "     amount = ?;");
+					+ " INSERT INTO"
+					+ "     d_act_packs"
+					+ " SET"
+					+ "     actId = ?,"
+					+ "     series = ?,"
+					+ "     numberFrom = ?,"
+					+ "     numberTo = ?,"
+					+ "     amount = ?;");
 
 				ps2 = conn.prepareStatement(""
-						+ " INSERT INTO"
-						+ "     d_bsos"
-						+ " SET"
-						+ "     nodeId = ?,"
-						+ "     unitId = ?,"
-						+ "     created = NOW(),"
-						+ "     series = ?,"
-						+ "     number = ?"
-						+ " ON DUPLICATE KEY UPDATE"
-						+ "     nodeId = ?,"
-						+ "     unitId = ?;");
+					+ " INSERT INTO"
+					+ "     d_bsos"
+					+ " SET"
+					+ "     nodeId = ?,"
+					+ "     unitId = ?,"
+					+ "     created = NOW(),"
+					+ "     series = ?,"
+					+ "     number = ?"
+					+ " ON DUPLICATE KEY UPDATE"
+					+ "     nodeId = ?,"
+					+ "     unitId = ?;");
 
 				int index = 1;
 				for(ActPack pack : act.getPacks()) {
@@ -224,12 +224,12 @@ public class ActDao extends SimpleDao<Act> {
 				}
 			} catch(SQLException e) {
 				logger.error("Cannot update packs or bsos in DB: {}", e.getMessage());
-	
+
 				throw new AppException("Ошибка изменения пачек БСО или самих БСО в базе данных.", e);
 			} finally {
-	            JdbcUtils.closeResultSet(rs1);
-	            JdbcUtils.closeStatement(ps1);
-	            JdbcUtils.closeStatement(ps2);
+				JdbcUtils.closeResultSet(rs1);
+				JdbcUtils.closeStatement(ps1);
+				JdbcUtils.closeStatement(ps2);
 			}
 		}
 
@@ -238,22 +238,22 @@ public class ActDao extends SimpleDao<Act> {
 			PreparedStatement ps2 = null;
 			try {
 				ps1 = conn.prepareStatement(""
-						+ " INSERT INTO"
-						+ "     d_bsos_archived"
-						+ " SELECT"
-						+ "     *"
-						+ " FROM"
-						+ "     d_bsos"
-						+ " WHERE"
-						+ "     series = ? AND"
-						+ "     ? <= number AND number <= ?;");
+					+ " INSERT INTO"
+					+ "     d_bsos_archived"
+					+ " SELECT"
+					+ "     *"
+					+ " FROM"
+					+ "     d_bsos"
+					+ " WHERE"
+					+ "     series = ? AND"
+					+ "     ? <= number AND number <= ?;");
 
 				ps2 = conn.prepareStatement(""
-						+ " DELETE FROM"
-						+ "     d_bsos"
-						+ " WHERE"
-						+ "     series = ? AND"
-						+ "     ? <= number AND number <= ?");
+					+ " DELETE FROM"
+					+ "     d_bsos"
+					+ " WHERE"
+					+ "     series = ? AND"
+					+ "     ? <= number AND number <= ?");
 
 				int index = 1;
 				for(ActPack pack : act.getPacks()) {
@@ -271,11 +271,11 @@ public class ActDao extends SimpleDao<Act> {
 				}
 			} catch(SQLException e) {
 				logger.error("Cannot archive bsos in DB: {}", e.getMessage());
-	
+
 				throw new AppException("Ошибка архивирования БСО в базе данных.", e);
 			} finally {
-	            JdbcUtils.closeStatement(ps1);
-	            JdbcUtils.closeStatement(ps2);
+				JdbcUtils.closeStatement(ps1);
+				JdbcUtils.closeStatement(ps2);
 			}
 		}
 	}

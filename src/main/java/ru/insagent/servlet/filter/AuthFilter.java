@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2017 Vyacheslav Kulakov
+ * Copyright 2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,23 +18,6 @@
 
 package ru.insagent.servlet.filter;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -44,19 +27,21 @@ import org.apache.shiro.util.Factory;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ru.insagent.dao.MenuItemDao;
 import ru.insagent.exception.AppException;
 import ru.insagent.model.MenuItem;
-import ru.insagent.model.User;
+import ru.insagent.model.ShiroUser;
 import ru.insagent.util.Hibernate;
-import ru.insagent.util.JdbcUtils;
-import ru.insagent.util.Setup;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Authorization filter
- *
- * @author Kulakov Vyacheslav <kulakov.home@gmail.com>
  */
 public class AuthFilter implements Filter {
 	private static String contextPath;
@@ -82,7 +67,7 @@ public class AuthFilter implements Filter {
 
 		Subject currentUser = SecurityUtils.getSubject();
 
-		if(uri.equals("/logout")) {
+		if (uri.equals("/logout")) {
 			currentUser.logout();
 
 			redirectToMainUri(response);
@@ -90,18 +75,18 @@ public class AuthFilter implements Filter {
 			return;
 		}
 
-		if(currentUser.isAuthenticated()) {
+		if (currentUser.isAuthenticated()) {
 			chain.doFilter(request, response);
 			return;
 		}
 
-		if(uri.startsWith("/css/") || uri.startsWith("/js/") || uri.startsWith("/image/")) {
+		if (uri.startsWith("/css/") || uri.startsWith("/js/") || uri.startsWith("/image/")) {
 			chain.doFilter(request, response);
 			return;
 		}
 
 		// Сохраняем адрес запроса, чтобы после авторизации сразу попасть на нужную страницу
-		if(request.getQueryString() != null && !request.getQueryString().trim().isEmpty()) {
+		if (request.getQueryString() != null && !request.getQueryString().trim().isEmpty()) {
 			request.setAttribute("authUrl", request.getRequestURI() + "?" + request.getQueryString());
 		} else {
 			request.setAttribute("authUrl", request.getRequestURI());
@@ -112,14 +97,14 @@ public class AuthFilter implements Filter {
 		String password = request.getParameter("authPass");
 		String remember = request.getParameter("authRememberMe");
 		boolean tokenRememberMe = "true".equals(remember);
-		if("true".equals(auth)) {
-			if((username == null || username.isEmpty()) && (password == null || password.isEmpty())) {
+		if ("true".equals(auth)) {
+			if ((username == null || username.isEmpty()) && (password == null || password.isEmpty())) {
 				request.setAttribute("authError", "Вы не указали логин и пароль");
 				forwardToMainPage(request, response);
 				return;
 			}
 
-			if(username == null || username.isEmpty()) {
+			if (username == null || username.isEmpty()) {
 				request.setAttribute("authError", "Вы не указали логин");
 				forwardToMainPage(request, response);
 				return;
@@ -127,7 +112,7 @@ public class AuthFilter implements Filter {
 				request.setAttribute("authUser", username);
 			}
 
-			if(password == null || password.isEmpty()) {
+			if (password == null || password.isEmpty()) {
 				request.setAttribute("authError", "Вы не указали пароль");
 				forwardToMainPage(request, response);
 				return;
@@ -137,7 +122,6 @@ public class AuthFilter implements Filter {
 			return;
 		}
 
-
 		UsernamePasswordToken token = new UsernamePasswordToken(username, password);
 		token.setRememberMe(tokenRememberMe);
 		try {
@@ -146,25 +130,21 @@ public class AuthFilter implements Filter {
 			request.setAttribute("authError", "Ошибка аутентификации");
 		}
 
-		if(currentUser.isAuthenticated()) {
+		if (currentUser.isAuthenticated()) {
 			String lastIp = request.getHeader("X-Real-IP");
-			if(lastIp == null) {
+			if (lastIp == null) {
 				lastIp = request.getRemoteAddr();
 			}
 
 			Session session = Hibernate.getCurrentSession();
 			session.beginTransaction();
 			try {
-				User user = (User) currentUser.getPrincipal();
-				user.setLastIp(lastIp);
-				user.setLastAuth(new Date());
+				ShiroUser shiroUser = (ShiroUser) currentUser.getPrincipal();
 
-				updateUser(user);
-
-				currentUser.getSession().setAttribute("menu", getUserMenu(user));
+				currentUser.getSession().setAttribute("menu", getUserMenu(shiroUser));
 
 				Hibernate.commit(session);
-			} catch(AppException e) {
+			} catch (AppException e) {
 				Hibernate.rollback(session);
 				logger.error("Cannot load or store entities", e);
 			}
@@ -194,40 +174,14 @@ public class AuthFilter implements Filter {
 		response.sendRedirect(contextPath);
 	}
 
-	private void updateUser(User user) {
-		Connection conn = null;
-		PreparedStatement ps = null;
-		try {
-			conn = Setup.getConnection();
-
-			ps = conn.prepareStatement(""
-				+ " UPDATE"
-				+ "     m_users"
-				+ " SET"
-				+ "     lastIp = ?,"
-				+ "     lastAuth = FROM_UNIXTIME(?)"
-				+ " WHERE"
-				+ "     id = ?");
-			ps.setString(1, user.getLastIp());
-			ps.setLong(2, user.getLastAuth().getTime()/1000);
-			ps.setInt(3, user.getId());
-			ps.execute();
-		} catch(SQLException e) {
-			logger.error("Cannot update last access", e);
-		} finally {
-			JdbcUtils.closeStatement(ps);
-			JdbcUtils.closeConnection(conn);
-		}
-	}
-
-	private List<MenuItem> getUserMenu(User user) throws AppException {
-		if(user.getRoles() == null || user.getRoles().isEmpty()) {
+	private List<MenuItem> getUserMenu(ShiroUser shiroUser) throws AppException {
+		if (shiroUser.getRoles() == null || shiroUser.getRoles().isEmpty()) {
 			return Collections.emptyList();
 		}
 
 		try {
-			return new MenuItemDao().listByRoleIdxes(user.getRoles());
-		} catch(Exception e) {
+			return new MenuItemDao().listByRoleIdxes(shiroUser.getRoles());
+		} catch (Exception e) {
 			throw new AppException("Cannot get menu", e);
 		}
 	}

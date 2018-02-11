@@ -4,7 +4,7 @@
 	"http://struts.apache.org/dtds/struts-2.3.dtd">
 
 <struts>
-	<constant name="struts.devMode" value="false" />
+	<constant name="struts.devMode" value="true" />
 	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
 
 	<package name="default" namespace="/" extends="struts-default">
@@ -82,8 +82,9 @@
 		</global-results>
 
 		<global-exception-mappings>
-			<exception-mapping exception="java.lang.Throwable" result="Exception" />
+			<exception-mapping exception="java.lang.Exception" result="Exception" />
 		</global-exception-mappings>
+
 		<action name="listBsosJson" class="ru.insagent.document.action.ListBsosJsonAction"/>
 		<action name="listBsosArchivedJson" class="ru.insagent.document.action.ListBsosArchivedJsonAction"/>
 		<action name="listActsJson" class="ru.insagent.document.action.ListActsJsonAction"/>

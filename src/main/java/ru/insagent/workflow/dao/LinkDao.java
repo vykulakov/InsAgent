@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +13,7 @@ import java.util.Set;
 import ru.insagent.dao.SimpleDao;
 import ru.insagent.document.model.ActType;
 import ru.insagent.exception.AppException;
+import ru.insagent.model.Role;
 import ru.insagent.model.User;
 import ru.insagent.util.JdbcUtils;
 import ru.insagent.workflow.model.Link;
@@ -20,30 +22,30 @@ import ru.insagent.workflow.model.Node;
 public class LinkDao extends SimpleDao<Link> {
 	{
 		countQueryPrefix = ""
-				+ " SELECT"
-				+ "     COUNT(*) AS count"
-				+ " FROM"
-				+ "     w_links l"
-				+ "     LEFT JOIN d_act_types t ON t.id = l.actTypeId"
-				+ " WHERE"
-				+ "     1 = 1";
+			+ " SELECT"
+			+ "     COUNT(*) AS count"
+			+ " FROM"
+			+ "     w_links l"
+			+ "     LEFT JOIN d_act_types t ON t.id = l.actTypeId"
+			+ " WHERE"
+			+ "     1 = 1";
 
 		selectQueryPrefix = ""
-				+ " SELECT"
-				+ "     l.id AS linkId,"
-				+ "     l.nodeFromId AS linkNodeFromId,"
-				+ "     l.nodeToId AS linkNodeToId,"
-				+ "     l.name AS linkName,"
-				+ "     l.comment AS linkComment,"
-				+ "     t.id AS actTypeId,"
-				+ "     t.idx AS actTypeIdx,"
-				+ "     t.shortName AS actTypeShortName,"
-				+ "     t.fullName AS actTypeFullName"
-				+ " FROM"
-				+ "     w_links l"
-				+ "     LEFT JOIN d_act_types t ON t.id = l.actTypeId"
-				+ " WHERE"
-				+ "     1 = 1";
+			+ " SELECT"
+			+ "     l.id AS linkId,"
+			+ "     l.nodeFromId AS linkNodeFromId,"
+			+ "     l.nodeToId AS linkNodeToId,"
+			+ "     l.name AS linkName,"
+			+ "     l.comment AS linkComment,"
+			+ "     t.id AS actTypeId,"
+			+ "     t.idx AS actTypeIdx,"
+			+ "     t.shortName AS actTypeShortName,"
+			+ "     t.fullName AS actTypeFullName"
+			+ " FROM"
+			+ "     w_links l"
+			+ "     LEFT JOIN d_act_types t ON t.id = l.actTypeId"
+			+ " WHERE"
+			+ "     1 = 1";
 
 		idField = "l.id";
 	}
@@ -70,7 +72,7 @@ public class LinkDao extends SimpleDao<Link> {
 		return links;
 	}
 
-	public List<Integer> getLinkIdByRoles(Set<String> roles) throws AppException {
+	public List<Integer> getLinkIdByRoles(Collection<Role> roles) throws AppException {
 		List<Integer> linkIds = new ArrayList<Integer>();
 
 		if(roles == null || roles.isEmpty()) {
@@ -78,14 +80,14 @@ public class LinkDao extends SimpleDao<Link> {
 		}
 
 		StringBuilder query = new StringBuilder(""
-				+ " SELECT"
-				+ "     l.linkId AS linkId"
-				+ " FROM"
-				+ "     m_roles r,"
-				+ "     w_link_roles l"
-				+ " WHERE"
-				+ "     r.id = l.roleId AND"
-				+ "     r.idx IN (");
+			+ " SELECT"
+			+ "     l.linkId AS linkId"
+			+ " FROM"
+			+ "     m_roles r,"
+			+ "     w_link_roles l"
+			+ " WHERE"
+			+ "     r.id = l.roleId AND"
+			+ "     r.idx IN (");
 		for(int i = 0; i < roles.size(); i++) {
 			query.append("?");
 			query.append(",");
@@ -98,8 +100,8 @@ public class LinkDao extends SimpleDao<Link> {
 		try {
 			int index = 1;
 			ps = conn.prepareStatement(query.toString());
-			for(String roleIdx : roles) {
-				ps.setString(index++, roleIdx);
+			for(Role role : roles) {
+				ps.setString(index++, role.getIdx());
 			}
 			rs = ps.executeQuery();
 			while(rs.next()) {
@@ -110,8 +112,8 @@ public class LinkDao extends SimpleDao<Link> {
 
 			throw new AppException("Ошибка получения идентификаторов связей из базы данных.", e);
 		} finally {
-            JdbcUtils.closeResultSet(rs);
-            JdbcUtils.closeStatement(ps);
+			JdbcUtils.closeResultSet(rs);
+			JdbcUtils.closeStatement(ps);
 		}
 
 		return linkIds;
@@ -121,16 +123,16 @@ public class LinkDao extends SimpleDao<Link> {
 		Set<String> roles = new HashSet<String>();
 
 		String query = ""
-				+ " SELECT"
-				+ "     r.id AS roleId,"
-				+ "     r.idx AS roleIdx,"
-				+ "     r.name AS roleName"
-				+ " FROM"
-				+ "     m_roles r,"
-				+ "     w_link_roles l"
-				+ " WHERE"
-				+ "     r.id = l.roleId AND"
-				+ "     l.linkId = ?;";
+			+ " SELECT"
+			+ "     r.id AS roleId,"
+			+ "     r.idx AS roleIdx,"
+			+ "     r.name AS roleName"
+			+ " FROM"
+			+ "     m_roles r,"
+			+ "     w_link_roles l"
+			+ " WHERE"
+			+ "     r.id = l.roleId AND"
+			+ "     l.linkId = ?;";
 
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -147,8 +149,8 @@ public class LinkDao extends SimpleDao<Link> {
 
 			throw new AppException("Ошибка получения ролей связи из базы данных.", e);
 		} finally {
-            JdbcUtils.closeResultSet(rs);
-            JdbcUtils.closeStatement(ps);
+			JdbcUtils.closeResultSet(rs);
+			JdbcUtils.closeStatement(ps);
 		}
 
 		return roles;
@@ -162,40 +164,40 @@ public class LinkDao extends SimpleDao<Link> {
 		}
 
 		StringBuilder query = new StringBuilder(""
-				+ " SELECT"
-				+ "     t.id AS actTypeId,"
-				+ "     t.idx AS actTypeIdx,"
-				+ "     t.shortName AS actTypeShortName,"
-				+ "     t.fullName AS actTypeFullName"
-				+ " FROM"
-				+ "     d_act_types t,"
-				+ "     w_links l,"
-				+ "     w_link_roles lr,"
-				+ "     m_roles r"
-				+ " WHERE"
-				+ "     t.id = l.actTypeId AND"
-				+ "     l.id = lr.linkId AND"
-				+ "     r.id = lr.roleId AND"
-				+ "     r.idx IN (");
+			+ " SELECT"
+			+ "     t.id AS actTypeId,"
+			+ "     t.idx AS actTypeIdx,"
+			+ "     t.shortName AS actTypeShortName,"
+			+ "     t.fullName AS actTypeFullName"
+			+ " FROM"
+			+ "     d_act_types t,"
+			+ "     w_links l,"
+			+ "     w_link_roles lr,"
+			+ "     m_roles r"
+			+ " WHERE"
+			+ "     t.id = l.actTypeId AND"
+			+ "     l.id = lr.linkId AND"
+			+ "     r.id = lr.roleId AND"
+			+ "     r.idx IN (");
 		for(int i = 0; i < user.getRoles().size(); i++) {
 			query.append("?");
 			query.append(",");
 		}
 		query.setLength(query.length() - 1);
 		query.append(""
-				+ "     )"
-				+ " GROUP BY"
-				+ "     t.id"
-				+ " ORDER BY"
-				+ "     t.order;");
+			+ "     )"
+			+ " GROUP BY"
+			+ "     t.id"
+			+ " ORDER BY"
+			+ "     t.order;");
 
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
 			int index = 1;
 			ps = conn.prepareStatement(query.toString());
-			for(String roleIdx : user.getRoles()) {
-				ps.setString(index++, roleIdx);
+			for(Role role : user.getRoles()) {
+				ps.setString(index++, role.getIdx());
 			}
 			rs = ps.executeQuery();
 			while(rs.next()) {
@@ -212,8 +214,8 @@ public class LinkDao extends SimpleDao<Link> {
 
 			throw new AppException("Ошибка получения типов актов из базы данных.", e);
 		} finally {
-            JdbcUtils.closeResultSet(rs);
-            JdbcUtils.closeStatement(ps);
+			JdbcUtils.closeResultSet(rs);
+			JdbcUtils.closeStatement(ps);
 		}
 
 		return actTypes;

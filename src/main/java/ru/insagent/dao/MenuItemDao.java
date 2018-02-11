@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2017 Vyacheslav Kulakov
+ * Copyright 2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@
 
 package ru.insagent.dao;
 
-import java.util.Collection;
+import ru.insagent.model.MenuItem;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import ru.insagent.model.MenuItem;
+import java.util.Set;
 
 /**
  * Menu item dao
@@ -57,12 +57,12 @@ public class MenuItemDao extends SimpleHDao<MenuItem> {
 
 	/**
 	 * Get menu items by roles idxes
-	 * @param idxes - role idxes.
+	 * @param roles - role idxes.
 	 * @return Menu items with given idxes.
 	 */
-	public List<MenuItem> listByRoleIdxes(Collection<String> idxes) {
-		Map<String, Object> parameters = new HashMap<String, Object>();
-		parameters.put("idxes", idxes);
+	public List<MenuItem> listByRoleIdxes(Set<String> roles) {
+		Map<String, Object> parameters = new HashMap<>();
+		parameters.put("idxes", roles);
 
 		return listByWhere(" r.idx IN (:idxes) ", parameters);
 	}

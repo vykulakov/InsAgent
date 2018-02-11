@@ -42,107 +42,107 @@ public class BsoDao extends SimpleDao<Bso> {
 		sortByMap.put("unit", "unitName");
 
 		countQueryPrefix = ""
-				+ " SELECT"
-				+ "     COUNT(*) AS count"
-				+ " FROM"
-				+ "     d_bsos b"
-				+ "     LEFT JOIN m_users ui ON ui.id = b.issuedBy"
-				+ "     LEFT JOIN m_users uc ON uc.id = b.corruptedBy"
-				+ "     LEFT JOIN m_users ur ON ur.id = b.registeredBy"
-				+ "     LEFT JOIN m_units oi ON oi.id = b.issuedUnitId"
-				+ "     LEFT JOIN m_units oc ON oc.id = b.corruptedUnitId"
-				+ "     LEFT JOIN m_units ox ON ox.id = b.registeredUnitId"
-				+ "     LEFT JOIN m_units o ON o.id = b.unitId"
-				+ "     LEFT JOIN m_unit_types t ON t.id = o.typeId"
-				+ "     LEFT JOIN m_cities c ON c.id = o.cityId,"
-				+ "     w_nodes n"
-				+ " WHERE"
-				+ "     n.id = b.nodeId";
+			+ " SELECT"
+			+ "     COUNT(*) AS count"
+			+ " FROM"
+			+ "     d_bsos b"
+			+ "     LEFT JOIN m_users ui ON ui.id = b.issuedBy"
+			+ "     LEFT JOIN m_users uc ON uc.id = b.corruptedBy"
+			+ "     LEFT JOIN m_users ur ON ur.id = b.registeredBy"
+			+ "     LEFT JOIN m_units oi ON oi.id = b.issuedUnitId"
+			+ "     LEFT JOIN m_units oc ON oc.id = b.corruptedUnitId"
+			+ "     LEFT JOIN m_units ox ON ox.id = b.registeredUnitId"
+			+ "     LEFT JOIN m_units o ON o.id = b.unitId"
+			+ "     LEFT JOIN m_unit_types t ON t.id = o.typeId"
+			+ "     LEFT JOIN m_cities c ON c.id = o.cityId,"
+			+ "     w_nodes n"
+			+ " WHERE"
+			+ "     n.id = b.nodeId";
 
 		selectQueryPrefix = ""
-				+ " SELECT"
-				+ "     b.id AS bsoId,"
-				+ "     UNIX_TIMESTAMP(b.created) AS bsoCreated,"
-				+ "     b.series AS bsoSeries,"
-				+ "     b.number AS bsoNumber,"
-				+ "     b.issued AS bsoIssued,"
-				+ "     UNIX_TIMESTAMP(b.issuedDate) AS bsoIssuedDate,"
-				+ "     ui.id AS bsoIssuedUserId,"
-				+ "     ui.firstName AS bsoIssuedUserFirstName,"
-				+ "     ui.lastName AS bsoIssuedUserLastName,"
-				+ "     oi.id AS bsoIssuedUnitId,"
-				+ "     oi.name AS bsoIssuedUnitName,"
-				+ "     b.corrupted AS bsoCorrupted,"
-				+ "     UNIX_TIMESTAMP(b.corruptedDate) AS bsoCorruptedDate,"
-				+ "     uc.id AS bsoCorruptedUserId,"
-				+ "     uc.firstName AS bsoCorruptedUserFirstName,"
-				+ "     uc.lastName AS bsoCorruptedUserLastName,"
-				+ "     oc.id AS bsoCorruptedUnitId,"
-				+ "     oc.name AS bsoCorruptedUnitName,"
-				+ "     b.registered AS bsoRegistered,"
-				+ "     UNIX_TIMESTAMP(b.registeredDate) AS bsoRegisteredDate,"
-				+ "     ur.id AS bsoRegisteredUserId,"
-				+ "     ur.firstName AS bsoRegisteredUserFirstName,"
-				+ "     ur.lastName AS bsoRegisteredUserLastName,"
-				+ "     ox.id AS bsoRegisteredUnitId,"
-				+ "     ox.name AS bsoRegisteredUnitName,"
-				+ "     b.insured AS bsoInsured,"
-				+ "     b.premium AS bsoPremium,"
-				+ "     o.id AS unitId,"
-				+ "     o.name AS unitName,"
-				+ "     t.id AS unitTypeId,"
-				+ "     t.name AS unitTypeName,"
-				+ "     c.id AS unitCityId,"
-				+ "     c.name AS unitCityName,"
-				+ "     n.id AS nodeId,"
-				+ "     n.name AS nodeName"
-				+ " FROM"
-				+ "     d_bsos b"
-				+ "     LEFT JOIN m_users ui ON ui.id = b.issuedBy"
-				+ "     LEFT JOIN m_users uc ON uc.id = b.corruptedBy"
-				+ "     LEFT JOIN m_users ur ON ur.id = b.registeredBy"
-				+ "     LEFT JOIN m_units oi ON oi.id = b.issuedUnitId"
-				+ "     LEFT JOIN m_units oc ON oc.id = b.corruptedUnitId"
-				+ "     LEFT JOIN m_units ox ON ox.id = b.registeredUnitId"
-				+ "     LEFT JOIN m_units o ON o.id = b.unitId"
-				+ "     LEFT JOIN m_unit_types t ON t.id = o.typeId"
-				+ "     LEFT JOIN m_cities c ON c.id = o.cityId,"
-				+ "     w_nodes n"
-				+ " WHERE"
-				+ "     n.id = b.nodeId";
+			+ " SELECT"
+			+ "     b.id AS bsoId,"
+			+ "     UNIX_TIMESTAMP(b.created) AS bsoCreated,"
+			+ "     b.series AS bsoSeries,"
+			+ "     b.number AS bsoNumber,"
+			+ "     b.issued AS bsoIssued,"
+			+ "     UNIX_TIMESTAMP(b.issuedDate) AS bsoIssuedDate,"
+			+ "     ui.id AS bsoIssuedUserId,"
+			+ "     ui.firstName AS bsoIssuedUserFirstName,"
+			+ "     ui.lastName AS bsoIssuedUserLastName,"
+			+ "     oi.id AS bsoIssuedUnitId,"
+			+ "     oi.name AS bsoIssuedUnitName,"
+			+ "     b.corrupted AS bsoCorrupted,"
+			+ "     UNIX_TIMESTAMP(b.corruptedDate) AS bsoCorruptedDate,"
+			+ "     uc.id AS bsoCorruptedUserId,"
+			+ "     uc.firstName AS bsoCorruptedUserFirstName,"
+			+ "     uc.lastName AS bsoCorruptedUserLastName,"
+			+ "     oc.id AS bsoCorruptedUnitId,"
+			+ "     oc.name AS bsoCorruptedUnitName,"
+			+ "     b.registered AS bsoRegistered,"
+			+ "     UNIX_TIMESTAMP(b.registeredDate) AS bsoRegisteredDate,"
+			+ "     ur.id AS bsoRegisteredUserId,"
+			+ "     ur.firstName AS bsoRegisteredUserFirstName,"
+			+ "     ur.lastName AS bsoRegisteredUserLastName,"
+			+ "     ox.id AS bsoRegisteredUnitId,"
+			+ "     ox.name AS bsoRegisteredUnitName,"
+			+ "     b.insured AS bsoInsured,"
+			+ "     b.premium AS bsoPremium,"
+			+ "     o.id AS unitId,"
+			+ "     o.name AS unitName,"
+			+ "     t.id AS unitTypeId,"
+			+ "     t.name AS unitTypeName,"
+			+ "     c.id AS unitCityId,"
+			+ "     c.name AS unitCityName,"
+			+ "     n.id AS nodeId,"
+			+ "     n.name AS nodeName"
+			+ " FROM"
+			+ "     d_bsos b"
+			+ "     LEFT JOIN m_users ui ON ui.id = b.issuedBy"
+			+ "     LEFT JOIN m_users uc ON uc.id = b.corruptedBy"
+			+ "     LEFT JOIN m_users ur ON ur.id = b.registeredBy"
+			+ "     LEFT JOIN m_units oi ON oi.id = b.issuedUnitId"
+			+ "     LEFT JOIN m_units oc ON oc.id = b.corruptedUnitId"
+			+ "     LEFT JOIN m_units ox ON ox.id = b.registeredUnitId"
+			+ "     LEFT JOIN m_units o ON o.id = b.unitId"
+			+ "     LEFT JOIN m_unit_types t ON t.id = o.typeId"
+			+ "     LEFT JOIN m_cities c ON c.id = o.cityId,"
+			+ "     w_nodes n"
+			+ " WHERE"
+			+ "     n.id = b.nodeId";
 
 		insertQuery = "";
 
 		updateQuery = ""
-				+ " UPDATE"
-				+ "     d_bsos"
-				+ " SET"
-				+ "     issued = ?,"
-				+ "     issuedDate = FROM_UNIXTIME(?),"
-				+ "     issuedBy = ?,"
-				+ "     issuedUnitId = ?,"
-				+ "     corrupted = ?,"
-				+ "     corruptedDate = FROM_UNIXTIME(?),"
-				+ "     corruptedBy = ?,"
-				+ "     corruptedUnitId = ?,"
-				+ "     registered = ?,"
-				+ "     registeredDate = FROM_UNIXTIME(?),"
-				+ "     registeredBy = ?,"
-				+ "     registeredUnitId = ?,"
-				+ "     insured = ?,"
-				+ "     premium = ?"
-				+ " WHERE"
-				+ "     id = ?";
+			+ " UPDATE"
+			+ "     d_bsos"
+			+ " SET"
+			+ "     issued = ?,"
+			+ "     issuedDate = FROM_UNIXTIME(?),"
+			+ "     issuedBy = ?,"
+			+ "     issuedUnitId = ?,"
+			+ "     corrupted = ?,"
+			+ "     corruptedDate = FROM_UNIXTIME(?),"
+			+ "     corruptedBy = ?,"
+			+ "     corruptedUnitId = ?,"
+			+ "     registered = ?,"
+			+ "     registeredDate = FROM_UNIXTIME(?),"
+			+ "     registeredBy = ?,"
+			+ "     registeredUnitId = ?,"
+			+ "     insured = ?,"
+			+ "     premium = ?"
+			+ " WHERE"
+			+ "     id = ?";
 
 		idField = "b.id";
 
 		searchCount = 5;
 		searchWhere = ""
-				+ " b.series LIKE ? OR"
-				+ " b.number LIKE ? OR"
-				+ " n.name LIKE ? OR"
-				+ " o.name LIKE ? OR"
-				+ " b.insured LIKE ?";
+			+ " b.series LIKE ? OR"
+			+ " b.number LIKE ? OR"
+			+ " n.name LIKE ? OR"
+			+ " o.name LIKE ? OR"
+			+ " b.insured LIKE ?";
 	}
 
 	public BsoDao(Connection conn) {
@@ -161,7 +161,7 @@ public class BsoDao extends SimpleDao<Bso> {
 
 	@Override
 	public List<Bso> listByUser(User user, String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		List<Unit> units = new UnitDao(conn).listByUser(user);
+		List<Unit> units = new UnitDao().listByUser(user);
 		List<Link> links = new LinkDao(conn).listByUser(user);
 
 		StringBuilder sb = new StringBuilder();
@@ -223,7 +223,7 @@ public class BsoDao extends SimpleDao<Bso> {
 	public List<Bso> listByUser(User user, Filter f, String sortBy, String sortDir, int limitRows, int limitOffset) {
 		BsoFilter filter = (BsoFilter) f;
 
-		List<Unit> units = new UnitDao(conn).listByUser(user);
+		List<Unit> units = new UnitDao().listByUser(user);
 		List<Link> links = new LinkDao(conn).listByUser(user);
 
 		StringBuilder sb = new StringBuilder();
@@ -365,7 +365,7 @@ public class BsoDao extends SimpleDao<Bso> {
 		Node node = new Node();
 		node.setId(rs.getInt("nodeId"));
 		node.setName(rs.getString("nodeName"));
-		
+
 		Unit unit = null;
 		if(rs.getInt("unitId") > 0) {
 			UnitType type = new UnitType();
@@ -420,14 +420,14 @@ public class BsoDao extends SimpleDao<Bso> {
 			registeredUser.setFirstName(rs.getString("bsoRegisteredUserFirstName"));
 			registeredUser.setLastName(rs.getString("bsoRegisteredUserLastName"));
 		}
-		
+
 		Unit registeredUnit = null;
 		if(rs.getInt("bsoRegisteredUnitId") > 0) {
 			registeredUnit = new Unit();
 			registeredUnit.setId(rs.getInt("bsoRegisteredUnitId"));
 			registeredUnit.setName(rs.getString("bsoRegisteredUnitName"));
 		}
-		
+
 		Bso bso = new Bso();
 		bso.setId(rs.getInt("bsoId"));
 		bso.setCreated(TimeUtils.convertTimestampToDate(rs.getLong("bsoCreated")));
@@ -511,7 +511,7 @@ public class BsoDao extends SimpleDao<Bso> {
 		} else {
 			ps.setInt(index++, bso.getRegisteredUnit().getId());
 		}
-		
+
 		ps.setString(index++, bso.getInsured());
 		ps.setBigDecimal(index++, bso.getPremium());
 

@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2017 Vyacheslav Kulakov
+ * Copyright 2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,11 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import ru.insagent.management.model.UnitType;
+import ru.insagent.model.*;
 
 /**
  * Class to work with Hibernate sessions
- *
- * @author Kulakov Vyacheslav <kulakov.home@gmail.com>
  */
 public class Hibernate {
 	private SessionFactory sessionFactory;
@@ -41,7 +41,13 @@ public class Hibernate {
 			.configure()
 			.build();
 
-		Metadata metadata = new MetadataSources( standardRegistry )
+		Metadata metadata = new MetadataSources(standardRegistry)
+			.addAnnotatedClass(City.class)
+			.addAnnotatedClass(Unit.class)
+			.addAnnotatedClass(UnitType.class)
+			.addAnnotatedClass(User.class)
+			.addAnnotatedClass(Role.class)
+			.addAnnotatedClass(MenuItem.class)
 			.getMetadataBuilder()
 			.applyImplicitNamingStrategy(ImplicitNamingStrategyJpaCompliantImpl.INSTANCE)
 			.build();
@@ -51,30 +57,28 @@ public class Hibernate {
 	}
 
 	/**
-	 * Commit Hibernate transaction for the current session.
+	 * Commits a Hibernate transaction for the current session.
 	 */
 	public static void commit() {
 		getCurrentSession().getTransaction().commit();
 	}
 
 	/**
-	 * Commit Hibernate transaction.
-	 * @return A Hibernate session.
+	 * Commits a Hibernate transaction.
 	 */
 	public static void commit(Session session) {
 		session.getTransaction().commit();
 	}
 
 	/**
-	 * Rollback Hibernate transaction for the current session.
+	 * Rollbacks a Hibernate transaction for the current session.
 	 */
 	public static void rollback() {
 		getCurrentSession().getTransaction().rollback();
 	}
 
 	/**
-	 * Rollback Hibernate transaction.
-	 * @return A Hibernate session.
+	 * Rollbacks a Hibernate transaction.
 	 */
 	public static void rollback(Session session) {
 		session.getTransaction().rollback();
@@ -89,13 +93,16 @@ public class Hibernate {
 	}
 
 	/**
-	 * Obtain a Hibernate session.
+	 * Obtain the current Hibernate session.
 	 * @return A Hibernate session.
 	 */
 	public static Session getCurrentSession() {
 		return instance.sessionFactory.getCurrentSession();
 	}
 
+	/**
+	 * Begins a new transaction for the current session.
+	 */
 	public static void beginTransaction() {
 		getCurrentSession().beginTransaction();
 	}

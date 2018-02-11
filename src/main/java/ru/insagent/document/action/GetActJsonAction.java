@@ -1,3 +1,21 @@
+/*
+ * InsAgent - https://github.com/vykulakov/InsAgent
+ *
+ * Copyright 2018 Vyacheslav Kulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.insagent.document.action;
 
 import java.util.ArrayList;
@@ -24,22 +42,22 @@ import ru.insagent.workflow.model.NodeType;
 public class GetActJsonAction extends BaseAction {
 	private static final long serialVersionUID = 1L;
 
-	List<Entry<Node, Node>> links = new ArrayList<Entry<Node, Node>>();
+	private List<Entry<Node, Node>> links = new ArrayList<>();
 	// JavaScript не поддерживает объекты в качестве ключей - только строки.
 	public List<Entry<Integer, Integer>> getLinks() {
-		List<Entry<Integer, Integer>> result = new ArrayList<Entry<Integer, Integer>>();
+		List<Entry<Integer, Integer>> result = new ArrayList<>();
 		for(Entry<Node, Node> entry : links) {
-			result.add(new Entry<Integer, Integer>(entry.getKey().getId(), entry.getValue().getId()));
+			result.add(new Entry<>(entry.getKey().getId(), entry.getValue().getId()));
 		}
 		return result;
 	}
-	
-	private List<Item> itemsFrom = new ArrayList<Item>();
+
+	private List<Item> itemsFrom = new ArrayList<>();
 	public List<Item> getItemsFrom() {
 		return itemsFrom;
 	}
 
-	private	List<Item> itemsTo = new ArrayList<Item>();
+	private	List<Item> itemsTo = new ArrayList<>();
 	public List<Item> getItemsTo() {
 		return itemsTo;
 	}
@@ -64,11 +82,11 @@ public class GetActJsonAction extends BaseAction {
 	public String executeImpl() {
 		NodeDao nd = new NodeDao(conn);
 		LinkDao ld = new LinkDao(conn);
-		UnitDao ud = new UnitDao(conn);
+		UnitDao ud = new UnitDao();
 
-		List<Unit> units = ud.listByUser(user);
+		List<Unit> units = ud.listByUser(baseUser);
 
-		for(Link link : ld.listByUser(user)) {
+		for(Link link : ld.listByUser(baseUser)) {
 			if(link.getActType() != null && link.getActType().getId() == actTypeId) {
 				Node nodeFrom = nd.getById(link.getNodeFrom().getId());
 				Node nodeTo = nd.getById(link.getNodeTo().getId());
@@ -82,14 +100,14 @@ public class GetActJsonAction extends BaseAction {
 					}
 				}
 
-				links.add(new Entry<Node, Node>(nodeFrom, nodeTo));
+				links.add(new Entry<>(nodeFrom, nodeTo));
 			}
 		}
 
-		Map<NodeType, Item> nodeToItemFrom = new HashMap<NodeType, Item>();
-		Map<NodeType, Item> nodeToItemTo = new HashMap<NodeType, Item>();
-		Map<Unit, Item> unitToItemFrom = new HashMap<Unit, Item>();
-		Map<Unit, Item> unitToItemTo = new HashMap<Unit, Item>();
+		Map<NodeType, Item> nodeToItemFrom = new HashMap<>();
+		Map<NodeType, Item> nodeToItemTo = new HashMap<>();
+		Map<Unit, Item> unitToItemFrom = new HashMap<>();
+		Map<Unit, Item> unitToItemTo = new HashMap<>();
 		for(Entry<Node, Node> entry : links) {
 			Item item;
 
@@ -189,9 +207,5 @@ public class GetActJsonAction extends BaseAction {
 		}
 
 		return SUCCESS;
-	}
-
-	@Override
-	public void validateImpl() {
 	}
 }

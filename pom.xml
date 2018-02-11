@@ -186,7 +186,7 @@
 							<goal>exploded</goal>
 						</goals>
 						<configuration>
-							<warSourceDirectory>web</warSourceDirectory>
+							<warSourceDirectory>src/main/webapp</warSourceDirectory>
 						</configuration>
 					</execution>
 					<execution>

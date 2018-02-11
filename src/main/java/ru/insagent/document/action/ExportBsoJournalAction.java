@@ -1,4 +1,29 @@
+/*
+ * InsAgent - https://github.com/vykulakov/InsAgent
+ *
+ * Copyright 2018 Vyacheslav Kulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.insagent.document.action;
+
+import org.apache.struts2.json.annotations.JSON;
+import ru.insagent.action.GetBaseAction;
+import ru.insagent.document.dao.BsoDao;
+import ru.insagent.document.model.Bso;
+import ru.insagent.document.model.BsoFilter;
+import ru.insagent.util.ExportToExcel;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -8,32 +33,28 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.struts2.json.annotations.JSON;
-
-import ru.insagent.action.GetBaseAction;
-import ru.insagent.document.dao.BsoDao;
-import ru.insagent.document.model.Bso;
-import ru.insagent.document.model.BsoFilter;
-import ru.insagent.util.ExportToExcel;
-
 public class ExportBsoJournalAction extends GetBaseAction<Bso> {
 	private static final long serialVersionUID = 1L;
 
 	private BsoFilter filter;
+
 	public void setFilter(BsoFilter filter) {
 		this.filter = filter;
 	}
+
 	@JSON(serialize = false)
 	public BsoFilter getFilter() {
 		return filter;
 	}
 
 	private long contentLength;
+
 	public long getContentLength() {
 		return contentLength;
 	}
 
 	private InputStream inputStream;
+
 	public InputStream getInputStream() {
 		return inputStream;
 	}
@@ -45,7 +66,7 @@ public class ExportBsoJournalAction extends GetBaseAction<Bso> {
 
 	@Override
 	public String executeImpl() {
-		dao = new BsoDao(conn);
+		BsoDao dao = new BsoDao(conn);
 
 		ExportToExcel excel = new ExportToExcel();
 		excel.setHeaders(Arrays.asList(
@@ -81,52 +102,52 @@ public class ExportBsoJournalAction extends GetBaseAction<Bso> {
 
 		int index = 1;
 		SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-		for(Bso bso : dao.listByUser(user, filter, sort, order, 0, 0)) {
+		for (Bso bso : dao.listByUser(baseUser, filter, sort, order, 0, 0)) {
 			List<Object> cells = new LinkedList<Object>();
 			cells.add(String.valueOf(index++));
 			cells.add(bso.getSeries());
 			cells.add(bso.getNumber());
-			if(bso.getIssuedDate() == null) {
+			if (bso.getIssuedDate() == null) {
 				cells.add("");
 			} else {
 				cells.add(df.format(bso.getIssuedDate()));
 			}
-			if(bso.getIssuedBy() == null) {
+			if (bso.getIssuedBy() == null) {
 				cells.add("");
 			} else {
 				cells.add(bso.getIssuedBy().getFirstName() + " " + bso.getIssuedBy().getLastName());
 			}
-			if(bso.getIssuedUnit() == null) {
+			if (bso.getIssuedUnit() == null) {
 				cells.add("");
 			} else {
 				cells.add(bso.getIssuedUnit().getName());
 			}
-			if(bso.getCorruptedDate() == null) {
+			if (bso.getCorruptedDate() == null) {
 				cells.add("");
 			} else {
 				cells.add(df.format(bso.getCorruptedDate()));
 			}
-			if(bso.getCorruptedBy() == null) {
+			if (bso.getCorruptedBy() == null) {
 				cells.add("");
 			} else {
 				cells.add(bso.getCorruptedBy().getFirstName() + " " + bso.getCorruptedBy().getLastName());
 			}
-			if(bso.getCorruptedUnit() == null) {
+			if (bso.getCorruptedUnit() == null) {
 				cells.add("");
 			} else {
 				cells.add(bso.getCorruptedUnit().getName());
 			}
-			if(bso.getRegisteredDate() == null) {
+			if (bso.getRegisteredDate() == null) {
 				cells.add("");
 			} else {
 				cells.add(df.format(bso.getRegisteredDate()));
 			}
-			if(bso.getRegisteredBy() == null) {
+			if (bso.getRegisteredBy() == null) {
 				cells.add("");
 			} else {
 				cells.add(bso.getRegisteredBy().getFirstName() + " " + bso.getRegisteredBy().getLastName());
 			}
-			if(bso.getRegisteredUnit() == null) {
+			if (bso.getRegisteredUnit() == null) {
 				cells.add("");
 			} else {
 				cells.add(bso.getRegisteredUnit().getName());

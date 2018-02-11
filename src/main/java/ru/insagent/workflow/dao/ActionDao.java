@@ -1,4 +1,29 @@
+/*
+ * InsAgent - https://github.com/vykulakov/InsAgent
+ *
+ * Copyright 2018 Vyacheslav Kulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.insagent.workflow.dao;
+
+import ru.insagent.dao.SimpleDao;
+import ru.insagent.exception.AppException;
+import ru.insagent.model.Role;
+import ru.insagent.model.User;
+import ru.insagent.util.JdbcUtils;
+import ru.insagent.workflow.model.Action;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,12 +32,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import ru.insagent.dao.SimpleDao;
-import ru.insagent.exception.AppException;
-import ru.insagent.model.User;
-import ru.insagent.util.JdbcUtils;
-import ru.insagent.workflow.model.Action;
 
 public class ActionDao extends SimpleDao<Action> {
 	{
@@ -45,10 +64,10 @@ public class ActionDao extends SimpleDao<Action> {
 	@Override
 	public List<Action> listByUser(User user) {
 		StringBuilder where = new StringBuilder();
-		List<Object> objects = new ArrayList<Object>();
+		List<Object> objects = new ArrayList<>();
 
 		where.append("a.id IN (");
-		for(int actionId : getActionIdByRoles(user.getRoles())) {
+		for (int actionId : getActionIdByRoles(user.getRoles())) {
 			where.append("?,");
 			objects.add(actionId);
 		}
@@ -59,7 +78,7 @@ public class ActionDao extends SimpleDao<Action> {
 	}
 
 	public List<Integer> listNodeIdsByActionId(int actionId) {
-		List<Integer> nodeIds = new ArrayList<Integer>();
+		List<Integer> nodeIds = new ArrayList<>();
 
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -74,25 +93,25 @@ public class ActionDao extends SimpleDao<Action> {
 			ps.setInt(1, actionId);
 
 			rs = ps.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				nodeIds.add(rs.getInt("nodeId"));
 			}
-		} catch(SQLException e) {
+		} catch (SQLException e) {
 			logger.error("Cannot get node ids from DB: {}", e.getMessage());
 
 			throw new AppException("Ошибка получения идентификаторов узлов из базы данных.", e);
 		} finally {
-            JdbcUtils.closeResultSet(rs);
-            JdbcUtils.closeStatement(ps);
+			JdbcUtils.closeResultSet(rs);
+			JdbcUtils.closeStatement(ps);
 		}
 
 		return nodeIds;
 	}
 
-	public List<Integer> getActionIdByRoles(Set<String> roles) throws AppException {
-		List<Integer> actionIds = new ArrayList<Integer>();
+	private List<Integer> getActionIdByRoles(Set<Role> roles) throws AppException {
+		List<Integer> actionIds = new ArrayList<>();
 
-		if(roles == null || roles.isEmpty()) {
+		if (roles == null || roles.isEmpty()) {
 			throw new AppException("Передан пустой список ролей.");
 		}
 
@@ -105,7 +124,7 @@ public class ActionDao extends SimpleDao<Action> {
 				+ " WHERE"
 				+ "     r.id = a.roleId AND"
 				+ "     r.idx IN (");
-		for(int i = 0; i < roles.size(); i++) {
+		for (int i = 0; i < roles.size(); i++) {
 			query.append("?");
 			query.append(",");
 		}
@@ -117,20 +136,20 @@ public class ActionDao extends SimpleDao<Action> {
 		try {
 			int index = 1;
 			ps = conn.prepareStatement(query.toString());
-			for(String roleIdx : roles) {
-				ps.setString(index++, roleIdx);
+			for (Role role : roles) {
+				ps.setString(index++, role.getIdx());
 			}
 			rs = ps.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				actionIds.add(rs.getInt("actionId"));
 			}
-		} catch(SQLException e) {
+		} catch (SQLException e) {
 			logger.error("Cannot get action ids from DB: {}", e.getMessage());
 
 			throw new AppException("Ошибка получения идентификаторов действий из базы данных.", e);
 		} finally {
-            JdbcUtils.closeResultSet(rs);
-            JdbcUtils.closeStatement(ps);
+			JdbcUtils.closeResultSet(rs);
+			JdbcUtils.closeStatement(ps);
 		}
 
 		return actionIds;
@@ -145,13 +164,5 @@ public class ActionDao extends SimpleDao<Action> {
 		action.setFullName(rs.getString("actionFullName"));
 
 		return action;
-	}
-
-	@Override
-	protected void setInsertPs(PreparedStatement ps, Action action) throws SQLException {
-	}
-
-	@Override
-	protected void setUpdatePs(PreparedStatement ps, Action action) throws SQLException {
 	}
 }

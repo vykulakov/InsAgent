@@ -1,3 +1,21 @@
+/*
+ * InsAgent - https://github.com/vykulakov/InsAgent
+ *
+ * Copyright 2018 Vyacheslav Kulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.insagent.document.action;
 
 import java.util.Arrays;
@@ -39,7 +57,7 @@ public class CheckBsoJsonAction extends BaseAction {
 		ActionDao ad = new ActionDao(conn);
 
 		boolean result = false;
-		for(Action action : ad.listByUser(user)) {
+		for(Action action : ad.listByUser(baseUser)) {
 			if(action.getId() == actionId) {
 				result = true;
 				break;
@@ -63,9 +81,5 @@ public class CheckBsoJsonAction extends BaseAction {
 		}
 
 		return SUCCESS;
-	}
-
-	@Override
-	public void validateImpl() {
 	}
 }

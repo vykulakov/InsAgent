@@ -7,7 +7,7 @@
 		<Property name="log-path">e:/logs/</Property>
 	</Properties>
 	<Appenders>
-		<Console name="STDOUT" target="SYSTEM_OUT">
+		<Console name="STDOUT">
 			<PatternLayout>
 				<Pattern>%d{HH:mm:ss} %-5p [%t] %C (%F:%L) - %m%n</Pattern>
 			</PatternLayout>

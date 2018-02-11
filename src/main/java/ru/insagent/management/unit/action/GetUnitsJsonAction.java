@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2017 Vyacheslav Kulakov
+ * Copyright 2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,23 +18,24 @@
 
 package ru.insagent.management.unit.action;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.struts2.json.annotations.JSON;
-
 import ru.insagent.action.GetBaseAction;
 import ru.insagent.management.model.UnitFilter;
 import ru.insagent.model.Unit;
 import ru.insagent.service.UnitService;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class GetUnitsJsonAction extends GetBaseAction<Unit> {
 	private static final long serialVersionUID = -4724835910757366392L;
 
 	private UnitFilter filter;
+
 	public void setFilter(UnitFilter filter) {
 		this.filter = filter;
 	}
+
 	@JSON(serialize = false)
 	public UnitFilter getFilter() {
 		return filter;
@@ -59,10 +60,10 @@ public class GetUnitsJsonAction extends GetBaseAction<Unit> {
 	public String executeImpl() {
 		UnitService us = new UnitService();
 
-		if(filter == null) {
-			rows = us.listByUser(user, search, sort, order, limit, offset);
+		if (filter == null) {
+			rows = us.listByUser(baseUser, search, sort, order, limit, offset);
 		} else {
-			rows = us.listByUser(user, filter, sort, order, limit, offset);
+			rows = us.listByUser(baseUser, filter, sort, order, limit, offset);
 		}
 		total = us.getCount();
 
