@@ -18,17 +18,21 @@
 
 package ru.insagent.dao;
 
+import org.hibernate.query.Query;
+import org.hibernate.transform.Transformers;
+import ru.insagent.management.model.UnitFilter;
+import ru.insagent.management.model.UnitType;
+import ru.insagent.management.unit.model.UnitDTO;
+import ru.insagent.model.City;
+import ru.insagent.model.Unit;
+import ru.insagent.model.User;
+import ru.insagent.util.Hibernate;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import ru.insagent.management.model.UnitFilter;
-import ru.insagent.management.model.UnitType;
-import ru.insagent.model.City;
-import ru.insagent.model.Unit;
-import ru.insagent.model.User;
 
 public class UnitDao extends SimpleHDao<Unit> {
 	{
@@ -36,33 +40,33 @@ public class UnitDao extends SimpleHDao<Unit> {
 
 		sortByMap.put("id", "u.id");
 		sortByMap.put("name", "u.name");
-		sortByMap.put("type", "t.name");
-		sortByMap.put("city", "c.name");
+		sortByMap.put("typeName", "u.type.name");
+		sortByMap.put("cityName", "u.city.name");
 
 		countQueryPrefix = ""
-			+ " SELECT"
-			+ "     COUNT(*) AS count"
-			+ " FROM"
-			+ "     Unit u"
-			+ "     LEFT JOIN u.type t,"
-			+ "     LEFT JOIN u.city c"
-			+ " WHERE"
-			+ "     1 = 1";
+				+ " SELECT"
+				+ "     COUNT(*) AS count"
+				+ " FROM"
+				+ "     Unit u"
+				+ "     LEFT JOIN u.type t"
+				+ "     LEFT JOIN u.city c"
+				+ " WHERE"
+				+ "     1 = 1";
 
 		selectQueryPrefix = ""
-			+ " SELECT"
-			+ "     u"
-			+ " FROM"
-			+ "     Unit u"
-			+ "     LEFT JOIN u.type t,"
-			+ "     LEFT JOIN u.city c"
-			+ " WHERE"
-			+ "     1 = 1";
+				+ " SELECT"
+				+ "     u"
+				+ " FROM"
+				+ "     Unit u"
+				+ "     LEFT JOIN u.type t"
+				+ "     LEFT JOIN u.city c"
+				+ " WHERE"
+				+ "     1 = 1";
 
 		searchWhere = ""
-			+ "     u.name LIKE :search OR"
-			+ "     t.name LIKE :search OR"
-			+ "     c.name LIKE :search";
+				+ "     u.name LIKE :search OR"
+				+ "     t.name LIKE :search OR"
+				+ "     c.name LIKE :search";
 	}
 
 	/**
@@ -81,77 +85,118 @@ public class UnitDao extends SimpleHDao<Unit> {
 	public static final int POINT_TYPE_ID = 3;
 
 	public List<Unit> listByUser(User user) {
-		return listByUser(user, null, null, 0, 0);
+		return listByWhere(null, null, null, null, 0, 0);
 	}
 
 	public List<Unit> listByUser(User user, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		return listByUser(user, (String) null, sortBy, sortDir, limitRows, limitOffset);
+		return listByWhere(null, null, sortBy, sortDir, limitRows, limitOffset);
 	}
 
-	public List<Unit> listByUser(User user, String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		StringBuilder sb = new StringBuilder();
-		Map<String, Object> objects = new HashMap<String, Object>();
+	public List<UnitDTO> listByUser(User user, String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
+		StringBuilder sb = new StringBuilder(""
+				+ " SELECT"
+				+ "     u.id AS id,"
+				+ "     u.name AS name,"
+				+ "     u.comment AS comment,"
+				+ "     u.removed AS removed,"
+				+ "     u.city.id AS cityId,"
+				+ "     u.city.name AS cityName,"
+				+ "     u.type.id AS typeId,"
+				+ "     u.type.name AS typeName"
+				+ " FROM"
+				+ "     Unit u"
+		);
 
-		if(search != null && !search.trim().isEmpty()) {
+		Map<String, Object> objects = new HashMap<>();
+		if (search != null && !search.trim().isEmpty()) {
 			search = "%" + search + "%";
 
-			sb.append("u.name LIKE :search OR");
-			sb.append("t.name LIKE :search OR");
-			sb.append("c.name LIKE :search OR");
+			sb.append(" WHERE");
+			sb.append(" u.name LIKE :search OR");
+			sb.append(" t.name LIKE :search OR");
+			sb.append(" c.name LIKE :search OR");
+			sb.append(" 0 = 1");
 			objects.put("search", search);
 		}
-
-		String where = null;
-		if(objects.size() > 0) {
-			where = sb.toString();
-		} else {
-			objects = null;
+		if (sortBy != null && sortDir != null) {
+			sb.append(" ORDER BY ");
+			sb.append(sortByMap.get(sortBy));
+			sb.append(" ");
+			sb.append(sortDir);
 		}
 
-		return listByWhere(where, objects, sortBy, sortDir, limitRows, limitOffset);
+		Query query = Hibernate.getCurrentSession().createQuery(sb.toString());
+		objects.forEach(query::setParameter);
+		if (limitRows > 0) {
+			query.setFirstResult(limitOffset);
+			query.setMaxResults(limitRows);
+		}
+
+		count = 0L;
+		return query.setResultTransformer(Transformers.aliasToBean(UnitDTO.class)).getResultList();
 	}
 
-	public List<Unit> listByUser(User user, UnitFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		StringBuilder sb = new StringBuilder();
-		Map<String, Object> objects = new HashMap<String, Object>();
+	public List<UnitDTO> listByUser(User user, UnitFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
+		StringBuilder sb = new StringBuilder(""
+				+ " SELECT"
+				+ "     u.id AS id,"
+				+ "     u.name AS name,"
+				+ "     u.comment AS comment,"
+				+ "     u.removed AS removed,"
+				+ "     u.city.id AS cityId,"
+				+ "     u.city.name AS cityName,"
+				+ "     u.type.id AS typeId,"
+				+ "     u.type.name AS typeName"
+				+ " FROM"
+				+ "     Unit u"
+		);
 
-		if(filter != null) {
-			sb.append("1 = 1");
-			if(filter.getName() != null) {
+		Map<String, Object> objects = new HashMap<String, Object>();
+		if (filter != null) {
+			sb.append(" WHERE");
+			sb.append(" 1 = 1");
+			if (filter.getName() != null) {
 				sb.append(" AND u.name LIKE :name");
 				objects.put("name", "%" + filter.getName().replace("*", "%") + "%");
 			}
-			if(filter.getTypes() != null && !filter.getTypes().isEmpty()) {
-				sb.append(" AND t.id IN :typeIds");
+			if (filter.getTypes() != null && !filter.getTypes().isEmpty()) {
+				sb.append(" AND u.type.id IN :typeIds");
 				objects.put("typeIds", filter.getTypes().stream().map(UnitType::getId).collect(Collectors.toList()));
 			}
-			if(filter.getCities() != null && !filter.getCities().isEmpty()) {
-				sb.append(" AND c.id IN :cityIds");
+			if (filter.getCities() != null && !filter.getCities().isEmpty()) {
+				sb.append(" AND u.city.id IN :cityIds");
 				objects.put("cityIds", filter.getCities().stream().map(City::getId).collect(Collectors.toList()));
 			}
 		}
-
-		String where = null;
-		if(objects.size() > 0) {
-			where = sb.toString();
-		} else {
-			objects = null;
+		if (sortBy != null && sortDir != null) {
+			sb.append(" ORDER BY ");
+			sb.append(sortByMap.get(sortBy));
+			sb.append(" ");
+			sb.append(sortDir);
 		}
 
-		return listByWhere(where, objects, sortBy, sortDir, limitRows, limitOffset);
+		Query query = Hibernate.getCurrentSession().createQuery(sb.toString());
+		objects.forEach(query::setParameter);
+		if (limitRows > 0) {
+			query.setFirstResult(limitOffset);
+			query.setMaxResults(limitRows);
+		}
+
+		count = 0L;
+		return query.setResultTransformer(Transformers.aliasToBean(UnitDTO.class)).getResultList();
 	}
 
 	public List<Unit> listByTypeIds(Collection<Integer> typeIds) {
 		StringBuilder sb = new StringBuilder();
-		Map<String, Object> objects = new HashMap<String, Object>();
+		Map<String, Object> objects = new HashMap<>();
 
-		if(typeIds != null && !typeIds.isEmpty()) {
+		if (typeIds != null && !typeIds.isEmpty()) {
 			sb.append(" AND t.id IN :typeIds");
 			objects.put("typeIds", typeIds);
 		}
 
 		String where = null;
-		if(objects.size() > 0) {
+		if (objects.size() > 0) {
 			where = sb.toString();
 		} else {
 			objects = null;

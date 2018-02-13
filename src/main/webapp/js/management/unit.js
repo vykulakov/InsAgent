@@ -46,19 +46,13 @@ $(function() {
 			title: 'Название',
 			sortable: true
 		}, {
-			field: 'type',
+			field: 'typeName',
 			title: 'Тип',
-			sortable: true,
-			formatter: function(type) {
-				return type.name;
-			}
+			sortable: true
 		}, {
-			field: 'city',
+			field: 'cityName',
 			title: 'Город',
-			sortable: true,
-			formatter: function(city) {
-				return city.name;
-			}
+			sortable: true
 		}],
 		rowStyle: function(row) {
 			if(row.removed) {
@@ -140,7 +134,7 @@ $(function() {
 				if(element.val() == 0) {
 					return false;
 				}
-	
+
 				return true;
 			}
 		},
@@ -156,7 +150,7 @@ $(function() {
 
 		// Форма отправляется через AJAX, поэтому стандартную отправку нужно отключить.
 		e.preventDefault();
-		
+
 		var form = $('#editUnitForm');
 		$.getJSON(form.attr('action'), form.serialize(), function(response) {
 			$('#editUnitBody').find('.alert').remove();
@@ -171,9 +165,9 @@ $(function() {
 					alert += errors[i] + '<br/>';
 				}
 				alert += '</div>';
-				
+
 				$('#editUnitBody').prepend(alert);
-				
+
 				return;
 			}
 
@@ -215,8 +209,8 @@ $(function() {
 	 * Добавляем фильтр к таблице.
 	 */
 	unitsTableObj.parents('.bootstrap-table').find('.fixed-table-toolbar').append('' +
-			'<div class="columns columns-left btn-group pull-right">' + 
-			'    <button id="openFilterUnitButton" title="Фильтр подразделений" name="filter" type="button" class="btn btn-default">' + 
+			'<div class="columns columns-left btn-group pull-right">' +
+			'    <button id="openFilterUnitButton" title="Фильтр подразделений" name="filter" type="button" class="btn btn-default">' +
 			'        <i id="openFilterUnitIcon" class="glyphicon glyphicon-menu-up icon-menu-up"></i>' +
 			'    </button>' +
 			'</div>');
@@ -301,14 +295,14 @@ $(function() {
 			}
 			if(param.name == 'filter.cities') {
 				cookie.filter = true;
-				
+
 				filter['filter.cities[' + (cityIndex++) + '].id'] = param.value;
 				if(cookie['filter.cities'] === undefined) {
 					cookie['filter.cities'] = [param.value];
 				} else {
 					cookie['filter.cities'].push(param.value);
 				}
-				
+
 				return;
 			}
 			if(param.name == 'filter.removed' && param.value == 'true') {

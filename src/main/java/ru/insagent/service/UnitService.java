@@ -26,13 +26,13 @@ import ru.insagent.dao.UnitTypeDao;
 import ru.insagent.exception.AppException;
 import ru.insagent.management.model.UnitFilter;
 import ru.insagent.management.model.UnitType;
+import ru.insagent.management.unit.model.UnitDTO;
 import ru.insagent.model.City;
 import ru.insagent.model.Unit;
 import ru.insagent.model.User;
 import ru.insagent.util.Hibernate;
 
 public class UnitService {
-	final private CityDao cityDao = new CityDao();
 	final private UnitDao unitDao = new UnitDao();
 	final private UnitTypeDao unitTypeDao = new UnitTypeDao();
 
@@ -41,11 +41,11 @@ public class UnitService {
 	 * @return Rows count for the last query.
 	 */
 	public Long getCount() {
-		return cityDao.getCount();
+		return unitDao.getCount();
 	}
 
-	public List<Unit> listByUser(User user, String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		List<Unit> units = null;
+	public List<UnitDTO> listByUser(User user, String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
+		List<UnitDTO> units;
 
 		Hibernate.beginTransaction();
 		try {
@@ -55,14 +55,14 @@ public class UnitService {
 		} catch(Exception e) {
 			Hibernate.rollback();
 
-			throw new AppException("Cannot get cities", e);
+			throw new AppException("Cannot get units", e);
 		}
 
 		return units;
 	}
 
-	public List<Unit> listByUser(User user, UnitFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		List<Unit> units = null;
+	public List<UnitDTO> listByUser(User user, UnitFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
+		List<UnitDTO> units;
 
 		Hibernate.beginTransaction();
 		try {
@@ -72,7 +72,7 @@ public class UnitService {
 		} catch(Exception e) {
 			Hibernate.rollback();
 
-			throw new AppException("Cannot get cities", e);
+			throw new AppException("Cannot get units", e);
 		}
 
 		return units;
@@ -87,28 +87,37 @@ public class UnitService {
 		} catch(Exception e) {
 			Hibernate.rollback();
 
-			throw new AppException("Cannot update city", e);
+			throw new AppException("Cannot update unit", e);
 		}
 	}
 
-	public void remove(int cityId) {
+	public void remove(int unitId) {
 		Hibernate.beginTransaction();
 		try {
-			cityDao.remove(cityId);
+			unitDao.remove(unitId);
 
 			Hibernate.commit();
 		} catch(Exception e) {
 			Hibernate.rollback();
 
-			throw new AppException("Cannot remove city", e);
+			throw new AppException("Cannot remove unit", e);
 		}
 	}
 
 	public List<UnitType> types() {
-		return unitTypeDao.list();
-	}
+		List<UnitType> result;
 
-	public List<City> cities() {
-		return cityDao.list();
+		Hibernate.beginTransaction();
+		try {
+			result = unitTypeDao.list();
+
+			Hibernate.commit();
+		} catch(Exception e) {
+			Hibernate.rollback();
+
+			throw new AppException("Cannot get unit types", e);
+		}
+
+		return result;
 	}
 }

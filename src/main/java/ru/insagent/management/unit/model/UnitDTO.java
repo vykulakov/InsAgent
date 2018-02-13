@@ -16,66 +16,82 @@
  * limitations under the License.
  */
 
-package ru.insagent.model;
+package ru.insagent.management.unit.model;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-import ru.insagent.management.model.UnitType;
-
-@Entity
-@Table(name = "m_units")
-public class Unit extends IdBase {
-	private static final long serialVersionUID = -6544474496483192296L;
-
+/**
+ *
+ */
+public class UnitDTO {
+	private int id;
 	private String name;
 	private String comment;
 	private boolean removed;
+	private int cityId;
+	private String cityName;
+	private int typeId;
+	private String typeName;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "cityId")
-	private City city;
+	public int getId() {
+		return id;
+	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "typeId")
-	private UnitType type;
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	public UnitType getType() {
-		return type;
-	}
-	public void setType(UnitType type) {
-		this.type = type;
-	}
-	public City getCity() {
-		return city;
-	}
-	public void setCity(City city) {
-		this.city = city;
-	}
+
 	public String getComment() {
 		return comment;
 	}
+
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
+
 	public boolean isRemoved() {
 		return removed;
 	}
+
 	public void setRemoved(boolean removed) {
 		this.removed = removed;
 	}
 
-	@Override
-	public String toString() {
-		return "Unit [id=" + id + ", name=" + name + ", type=" + type + ", city=" + city + ", comment=" + comment + ", removed=" + removed + "]";
+	public int getCityId() {
+		return cityId;
+	}
+
+	public void setCityId(int cityId) {
+		this.cityId = cityId;
+	}
+
+	public String getCityName() {
+		return cityName;
+	}
+
+	public void setCityName(String cityName) {
+		this.cityName = cityName;
+	}
+
+	public int getTypeId() {
+		return typeId;
+	}
+
+	public void setTypeId(int typeId) {
+		this.typeId = typeId;
+	}
+
+	public String getTypeName() {
+		return typeName;
+	}
+
+	public void setTypeName(String typeName) {
+		this.typeName = typeName;
 	}
 }

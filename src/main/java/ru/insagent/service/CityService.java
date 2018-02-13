@@ -38,8 +38,25 @@ public class CityService {
 		return cityDao.getCount();
 	}
 
+	public List<City> list() {
+		List<City> cities;
+
+		Hibernate.beginTransaction();
+		try {
+			cities = cityDao.list();
+
+			Hibernate.commit();
+		} catch(Exception e) {
+			Hibernate.rollback();
+
+			throw new AppException("Cannot get cities", e);
+		}
+
+		return cities;
+	}
+
 	public List<City> listByUser(User user, String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		List<City> cities = null;
+		List<City> cities;
 
 		Hibernate.beginTransaction();
 		try {
@@ -56,7 +73,7 @@ public class CityService {
 	}
 
 	public List<City> listByUser(User user, CityFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		List<City> cities = null;
+		List<City> cities;
 
 		Hibernate.beginTransaction();
 		try {

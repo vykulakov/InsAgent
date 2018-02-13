@@ -18,14 +18,15 @@
 
 package ru.insagent.management.unit.action;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import ru.insagent.action.BaseAction;
 import ru.insagent.management.model.UnitType;
 import ru.insagent.model.City;
+import ru.insagent.service.CityService;
 import ru.insagent.service.UnitService;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class UnitManagementAction extends BaseAction {
 	private static final long serialVersionUID = -2440800695359237060L;
@@ -34,22 +35,25 @@ public class UnitManagementAction extends BaseAction {
 		ALLOW_ROLES = Arrays.asList("admin");
 	}
 
-	private List<UnitType> types = new ArrayList<UnitType>();
+	private List<UnitType> types = new ArrayList<>();
+
 	public List<UnitType> getTypes() {
 		return types;
 	}
 
-	private List<City> cities = new ArrayList<City>();
+	private List<City> cities = new ArrayList<>();
+
 	public List<City> getCities() {
 		return cities;
 	}
 
 	@Override
 	public String executeImpl() {
+		CityService cs = new CityService();
 		UnitService us = new UnitService();
 
 		types = us.types();
-		cities = us.cities();
+		cities = cs.list();
 
 		return SUCCESS;
 	}

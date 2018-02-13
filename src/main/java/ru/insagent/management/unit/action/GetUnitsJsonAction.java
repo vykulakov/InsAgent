@@ -21,13 +21,14 @@ package ru.insagent.management.unit.action;
 import org.apache.struts2.json.annotations.JSON;
 import ru.insagent.action.GetBaseAction;
 import ru.insagent.management.model.UnitFilter;
+import ru.insagent.management.unit.model.UnitDTO;
 import ru.insagent.model.Unit;
 import ru.insagent.service.UnitService;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class GetUnitsJsonAction extends GetBaseAction<Unit> {
+public class GetUnitsJsonAction extends GetBaseAction<UnitDTO> {
 	private static final long serialVersionUID = -4724835910757366392L;
 
 	private UnitFilter filter;
@@ -42,7 +43,7 @@ public class GetUnitsJsonAction extends GetBaseAction<Unit> {
 	}
 
 	@Override
-	public List<Unit> getRows() {
+	public List<UnitDTO> getRows() {
 		return rows;
 	}
 
