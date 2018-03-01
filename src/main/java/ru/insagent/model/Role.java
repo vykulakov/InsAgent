@@ -23,8 +23,6 @@ import javax.persistence.Table;
 
 /**
  * User role
- *
- * @author Kulakov Vyacheslav <kulakov.home@gmail.com>
  */
 @Entity
 @Table(name="m_roles")

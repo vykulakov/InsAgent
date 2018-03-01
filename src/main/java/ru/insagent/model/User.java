@@ -18,115 +18,126 @@
 
 package ru.insagent.model;
 
+import org.apache.struts2.json.annotations.JSON;
+
+import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-import org.apache.struts2.json.annotations.JSON;
 
 /**
  * User entity
  */
 @Entity
-@Table(name="m_users")
+@Table(name = "m_users")
 public class User extends IdBase {
-	private static final long serialVersionUID = 4996317034959435687L;
+    private static final long serialVersionUID = 4996317034959435687L;
 
-	private String username;
-	private String password;
-	private String firstName;
-	private String lastName;
-	private String comment;
-	private String lastIp;
-	private Date lastAuth;
-	private boolean removed;
+    private String username;
+    private String password;
+    private String firstName;
+    private String lastName;
+    private String comment;
+    private String lastIp;
+    private Date lastAuth;
+    private boolean removed;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "unitId")
-	private Unit unit;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unitId")
+    private Unit unit;
 
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(
-		name="m_user_roles",
-		joinColumns=@JoinColumn(name="userId", referencedColumnName="id"),
-		inverseJoinColumns=@JoinColumn(name="roleId", referencedColumnName="id")
-		)
-	private Set<Role> roles = new HashSet<Role>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "m_user_roles",
+            joinColumns = @JoinColumn(name = "userId", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "roleId", referencedColumnName = "id")
+    )
+    private Set<Role> roles = new HashSet<>();
 
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	@JSON(serialize = false)
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	public String getFirstName() {
-		return firstName;
-	}
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-	public String getLastName() {
-		return lastName;
-	}
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-	public String getComment() {
-		return comment;
-	}
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-	public String getLastIp() {
-		return lastIp;
-	}
-	public void setLastIp(String lastIp) {
-		this.lastIp = lastIp;
-	}
-	@JSON(format = "dd.MM.yyyy HH:mm")
-	public Date getLastAuth() {
-		return lastAuth;
-	}
-	public void setLastAuth(Date lastAuth) {
-		this.lastAuth = lastAuth;
-	}
-	public Unit getUnit() {
-		return unit;
-	}
-	public void setUnit(Unit unit) {
-		this.unit = unit;
-	}
-	public Set<Role> getRoles() {
-		return roles;
-	}
-	public void setRoles(Set<Role> roles) {
-		this.roles = roles;
-	}
-	public boolean isRemoved() {
-		return removed;
-	}
-	public void setRemoved(boolean removed) {
-		this.removed = removed;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", username=" + username + ", password=" + password + ", firstName=" + firstName + ", lastName=" + lastName + ", comment=" + comment + ", lastIp=" + lastIp
-			+ ", lastAuth=" + lastAuth + ", unit=" + unit + ", roles=" + roles + ", removed=" + removed + "]";
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @JSON(serialize = false)
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getLastIp() {
+        return lastIp;
+    }
+
+    public void setLastIp(String lastIp) {
+        this.lastIp = lastIp;
+    }
+
+    @JSON(format = "dd.MM.yyyy HH:mm")
+    public Date getLastAuth() {
+        return lastAuth;
+    }
+
+    public void setLastAuth(Date lastAuth) {
+        this.lastAuth = lastAuth;
+    }
+
+    public Unit getUnit() {
+        return unit;
+    }
+
+    public void setUnit(Unit unit) {
+        this.unit = unit;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
+    }
+
+    @Override
+    public String toString() {
+        return "User [id=" + id + ", username=" + username + "]";
+    }
 }

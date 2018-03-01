@@ -6,3 +6,4 @@ sql/mysqldump.bat
 build.properties
 /target
 *.iml
+*.log
