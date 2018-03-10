@@ -2,287 +2,289 @@
 
 var filter = {};
 
-$(function() {
-	var citiesTableObj = $('#citiesTable');
-	citiesTableObj.bootstrapTable({
-		url: '',
-		queryParams: function(params) {
-			$.extend(params, filter);
+$(function () {
+    var $table = $('#citiesTable');
+    var $alert = $('#citiesTableAlert');
 
-			return params;
-		},
-		responseHandler: function(response) {
-			$('#citiesTableAlert').children().remove();
+    $table.bootstrapTable({
+        url: '',
+        queryParams: function (params) {
+            $.extend(params, filter);
 
-			var errors = checkError(response);
-			if(errors !== undefined) {
-				var alertMsg = '' +
-				'<div class="alert alert-danger fade in">' +
-				'    <a href="#" class="close" data-dismiss="alert">&times;</a>' +
-				'    <strong>При получении данных возникли ошибки:</strong><br/>';
-				for(var i = 0, l = errors.length; i < l; i++) {
-					alertMsg += errors[i] + '<br/>';
-				}
-				alertMsg += '</div>';
+            return params;
+        },
+        responseHandler: function (response) {
+            $alert.children().remove();
 
-				$('#citiesTableAlert').append(alertMsg);
+            var errors = checkError(response);
+            if (errors !== undefined) {
+                var alertMsg = '' +
+                    '<div class="alert alert-danger fade in">' +
+                    '    <a href="#" class="close" data-dismiss="alert">&times;</a>' +
+                    '    <strong>При получении данных возникли ошибки:</strong><br/>';
+                for (var i = 0, l = errors.length; i < l; i++) {
+                    alertMsg += errors[i] + '<br/>';
+                }
+                alertMsg += '</div>';
 
-				return [];
-			}
+                $alert.append(alertMsg);
 
-			return response;
-		},
-		clickToSelect: true,
-		singleSelect: true,
-		checkboxHeader: false,
-		columns: [{
-			checkbox: true
-		}, {
-			field: 'id',
-			title: 'id',
-			sortable: true
-		}, {
-			field: 'name',
-			title: 'Название',
-			sortable: true
-		}],
-		rowStyle: function(row) {
-			if(row.removed) {
-				return {
-					classes: 'danger'
-				};
-			}
+                return [];
+            }
 
-			return {};
-		},
-		search: true,
-		showRefresh: true,
-		toolbar: '#toolbar',
-		pagination: true,
-		sidePagination: 'server',
-		pageSize: 10,
-		pageList: [5, 10, 20, 50],
-		stateSave: true,
-		stateSaveIdTable: 'citiesTable'
-	});
+            return response;
+        },
+        clickToSelect: true,
+        singleSelect: true,
+        checkboxHeader: false,
+        columns: [{
+            checkbox: true
+        }, {
+            field: 'id',
+            title: 'id',
+            sortable: true
+        }, {
+            field: 'name',
+            title: 'Название',
+            sortable: true
+        }],
+        rowStyle: function (row) {
+            if (row.removed) {
+                return {
+                    classes: 'danger'
+                };
+            }
 
-	$('#openAddCityButton').on('click', function() {
-		$('#cityIdInput').val(0);
-		$('#cityNameInput').val('');
-		$('#cityCommentInput').val('');
+            return {};
+        },
+        search: true,
+        showRefresh: true,
+        toolbar: '#toolbar',
+        pagination: true,
+        sidePagination: 'server',
+        pageSize: 10,
+        pageList: [5, 10, 20, 50],
+        stateSave: true,
+        stateSaveIdTable: 'citiesTable'
+    });
 
-		$('#editCityLabel').text('Добавление города');
-		$('#editCityButton').text('Добавить');
+    $('#openAddCityButton').on('click', function () {
+        $('#cityIdInput').val(0);
+        $('#cityNameInput').val('');
+        $('#cityCommentInput').val('');
 
-		$('#editCityModal').modal({});
-	});
+        $('#editCityLabel').text('Добавление города');
+        $('#editCityButton').text('Добавить');
 
-	$('#openEditCityButton').on('click', function() {
-		$('#editCityBody').find('.alert').remove();
+        $('#editCityModal').modal({});
+    });
 
-		var row = $('#citiesTable').bootstrapTable('getSelections');
+    $('#openEditCityButton').on('click', function () {
+        $('#editCityBody').find('.alert').remove();
 
-		var l = row.length;
-		if(l === 0) {
-			alert('Необходимо выбрать город.');
-			return;
-		}
+        var row = $('#citiesTable').bootstrapTable('getSelections');
 
-		var city = row[0];
-		$('#cityIdInput').val(city.id);
-		$('#cityNameInput').val(city.name);
-		$('#cityCommentInput').val(city.comment);
+        var l = row.length;
+        if (l === 0) {
+            alert('Необходимо выбрать город.');
+            return;
+        }
 
-		$('#editCityLabel').text('Редактирование города');
-		$('#editCityButton').text('Сохранить');
+        var city = row[0];
+        $('#cityIdInput').val(city.id);
+        $('#cityNameInput').val(city.name);
+        $('#cityCommentInput').val(city.comment);
 
-		$('#editCityModal').modal({});
-	});
+        $('#editCityLabel').text('Редактирование города');
+        $('#editCityButton').text('Сохранить');
 
-	$('#openRemoveCityButton').on('click', function() {
-		$('#removeCityBody').find('.alert').remove();
+        $('#editCityModal').modal({});
+    });
 
-		var row = $('#citiesTable').bootstrapTable('getSelections');
+    $('#openRemoveCityButton').on('click', function () {
+        $('#removeCityBody').find('.alert').remove();
 
-		var l = row.length;
-		if(l === 0) {
-			alert('Необходимо выбрать город.');
-			return;
-		}
+        var row = $('#citiesTable').bootstrapTable('getSelections');
 
-		var city = row[0];
-		$('#removeCityIdInput').val(city.id);
+        var l = row.length;
+        if (l === 0) {
+            alert('Необходимо выбрать город.');
+            return;
+        }
 
-		$('#removeCityModal').modal({});
-	});
+        var city = row[0];
+        $('#removeCityIdInput').val(city.id);
 
-	$('#editCityForm').validator({
-		errors: {
-			match: "Значения полей не совпадают",
-			minlength: "Значение слишком короткое"
-		}
-	}).on('submit', function(e) {
-		if(e.isDefaultPrevented()) {
-			return;
-		}
+        $('#removeCityModal').modal({});
+    });
 
-		// Форма отправляется через AJAX, поэтому стандартную отправку нужно отключить.
-		e.preventDefault();
-		
-		var form = $('#editCityForm');
-		$.getJSON(form.attr('action'), form.serialize(), function(response) {
-			$('#editCityBody').find('.alert').remove();
+    $('#editCityForm').validator({
+        errors: {
+            match: "Значения полей не совпадают",
+            minlength: "Значение слишком короткое"
+        }
+    }).on('submit', function (e) {
+        if (e.isDefaultPrevented()) {
+            return;
+        }
 
-			var errors = checkError(response);
-			if(errors !== undefined) {
-				var alert = '' +
-				'<div class="alert alert-danger fade in">' +
-				'    <a href="#" class="close" data-dismiss="alert">&times;</a>' +
-				'    <strong>При добавлении/обновлении города возникли ошибки:</strong><br/>';
-				for(var i = 0, l = errors.length; i < l; i++) {
-					alert += errors[i] + '<br/>';
-				}
-				alert += '</div>';
-				
-				$('#editCityBody').prepend(alert);
-				
-				return;
-			}
+        // Форма отправляется через AJAX, поэтому стандартную отправку нужно отключить.
+        e.preventDefault();
 
-			$('#editCityModal').modal('hide');
-			$('#citiesTable').bootstrapTable('refresh');
-		});
-	});
+        var form = $('#editCityForm');
+        $.getJSON(form.attr('action'), form.serialize(), function (response) {
+            $('#editCityBody').find('.alert').remove();
 
-	$('#removeCityForm').on('submit', function(e) {
-		// Форма отправляется через AJAX, поэтому стандартную отправку нужно отключить.
-		e.preventDefault();
+            var errors = checkError(response);
+            if (errors !== undefined) {
+                var alert = '' +
+                    '<div class="alert alert-danger fade in">' +
+                    '    <a href="#" class="close" data-dismiss="alert">&times;</a>' +
+                    '    <strong>При добавлении/обновлении города возникли ошибки:</strong><br/>';
+                for (var i = 0, l = errors.length; i < l; i++) {
+                    alert += errors[i] + '<br/>';
+                }
+                alert += '</div>';
 
-		var form = $('#removeCityForm');
-		$.getJSON(form.attr('action'), form.serialize(), function(response) {
-			$('#removeCityBody').find('.alert').remove();
+                $('#editCityBody').prepend(alert);
 
-			var errors = checkError(response);
-			if(errors !== undefined) {
-				var alert = '' +
-				'<div class="alert alert-danger fade in">' +
-				'    <a href="#" class="close" data-dismiss="alert">&times;</a>' +
-				'    <strong>При удалении города возникли ошибки:</strong><br/>';
-				for(var i = 0, l = errors.length; i < l; i++) {
-					alert += errors[i] + '<br/>';
-				}
-				alert += '</div>';
+                return;
+            }
 
-				$('#removeCityBody').prepend(alert);
+            $('#editCityModal').modal('hide');
+            $('#citiesTable').bootstrapTable('refresh');
+        });
+    });
 
-				return;
-			}
+    $('#removeCityForm').on('submit', function (e) {
+        // Форма отправляется через AJAX, поэтому стандартную отправку нужно отключить.
+        e.preventDefault();
 
-			$('#removeCityModal').modal('hide');
-			$('#citiesTable').bootstrapTable('refresh');
-		});
-	});
+        var form = $('#removeCityForm');
+        $.getJSON(form.attr('action'), form.serialize(), function (response) {
+            $('#removeCityBody').find('.alert').remove();
 
-	/**
-	 * Добавляем фильтр к таблице.
-	 */
-	citiesTableObj.parents('.bootstrap-table').find('.fixed-table-toolbar').append('' +
-			'<div class="columns columns-left btn-group pull-right">' + 
-			'    <button id="openFilterCityButton" title="Фильтр городов" name="filter" type="button" class="btn btn-default">' + 
-			'        <i id="openFilterCityIcon" class="glyphicon glyphicon-menu-up icon-menu-up"></i>' +
-			'    </button>' +
-			'</div>');
-	$('#openFilterCityButton').on('click', function() {
-		$('#filterCityDiv').toggleClass('hidden');
-		$('#openFilterCityIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
-	});
-	var filterCityFormObj = $('#filterCityForm');
-	var cookie = Cookies.getJSON('citiesFilter');
-	if(!!cookie && !!cookie.filter) {
-		filter = {};
+            var errors = checkError(response);
+            if (errors !== undefined) {
+                var alert = '' +
+                    '<div class="alert alert-danger fade in">' +
+                    '    <a href="#" class="close" data-dismiss="alert">&times;</a>' +
+                    '    <strong>При удалении города возникли ошибки:</strong><br/>';
+                for (var i = 0, l = errors.length; i < l; i++) {
+                    alert += errors[i] + '<br/>';
+                }
+                alert += '</div>';
 
-		filterCityFormObj.find(':input').each(function() {
-			if(this.name && cookie[this.name]) {
-				$(this).val(cookie[this.name]);
-			}
-    	});
+                $('#removeCityBody').prepend(alert);
 
-		filterCityFormObj.serializeArray().map(function(param) {
-			if(param.value !== '') {
-				filter[param.name] = param.value;
-				return;
-			}
-		});
+                return;
+            }
 
-		$('#openFilterCityButton').removeClass('btn-default').addClass('btn-warning');
+            $('#removeCityModal').modal('hide');
+            $('#citiesTable').bootstrapTable('refresh');
+        });
+    });
 
-		citiesTableObj.bootstrapTable('refresh', {url: 'getCitiesJson.action'});
-	} else {
-		citiesTableObj.bootstrapTable('refresh', {url: 'getCitiesJson.action'});
-	}
-	filterCityFormObj.on('submit', function(e) {
-		// Форму отправлять не нужно.
-		e.preventDefault();
+    /**
+     * Добавляем фильтр к таблице.
+     */
+    $table.parents('.bootstrap-table').find('.fixed-table-toolbar').append('' +
+        '<div class="columns columns-left btn-group pull-right">' +
+        '    <button id="openFilterCityButton" title="Фильтр городов" name="filter" type="button" class="btn btn-default">' +
+        '        <i id="openFilterCityIcon" class="glyphicon glyphicon-menu-up icon-menu-up"></i>' +
+        '    </button>' +
+        '</div>');
+    $('#openFilterCityButton').on('click', function () {
+        $('#filterCityDiv').toggleClass('hidden');
+        $('#openFilterCityIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
+    });
+    var filterCityFormObj = $('#filterCityForm');
+    var cookie = Cookies.getJSON('citiesFilter');
+    if (!!cookie && !!cookie.filter) {
+        filter = {};
 
-		filter = {};
+        filterCityFormObj.find(':input').each(function () {
+            if (this.name && cookie[this.name]) {
+                $(this).val(cookie[this.name]);
+            }
+        });
 
-		var cookie = {};
-		filterCityFormObj.serializeArray().map(function(param) {
-			if(param.name == 'filter.removed' && param.value == 'true') {
-				cookie.filter = true;
+        filterCityFormObj.serializeArray().map(function (param) {
+            if (param.value !== '') {
+                filter[param.name] = param.value;
+                return;
+            }
+        });
 
-				filter[param.name] = param.value;
-				cookie[param.name] = param.value;
+        $('#openFilterCityButton').removeClass('btn-default').addClass('btn-warning');
 
-				return;
-			}
-			if(param.value !== '') {
-				cookie.filter = true;
+        $table.bootstrapTable('refresh', {url: '/management/cities'});
+    } else {
+        $table.bootstrapTable('refresh', {url: '/management/cities'});
+    }
+    filterCityFormObj.on('submit', function (e) {
+        // Форму отправлять не нужно.
+        e.preventDefault();
 
-				filter[param.name] = param.value;
-				cookie[param.name] = param.value;
+        filter = {};
 
-				return;
-			}
-		});
+        var cookie = {};
+        filterCityFormObj.serializeArray().map(function (param) {
+            if (param.name == 'filter.removed' && param.value == 'true') {
+                cookie.filter = true;
 
-		Cookies.set('citiesFilter', cookie);
+                filter[param.name] = param.value;
+                cookie[param.name] = param.value;
 
-		$('#filterCityDiv').toggleClass('hidden');
-		$('#openFilterCityIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
-		if(!!cookie && !!cookie.filter) {
-			$('#openFilterCityButton').removeClass('btn-default').addClass('btn-warning');
-			
-			citiesTableObj.bootstrapTable('refresh');
-		}
-	});
-	filterCityFormObj.on('reset', function(e) {
-		// Форму отправлять не нужно.
-		e.preventDefault();
+                return;
+            }
+            if (param.value !== '') {
+                cookie.filter = true;
 
-		filter = {};
-		filterCityFormObj.find(':input').each(function() {
-			switch(this.type) {
-				case 'password':
-				case 'select-multiple':
-				case 'select-one':
-				case 'text':
-				case 'textarea':
-					$(this).val('');
-					break;
-				case 'checkbox':
-				case 'radio':
-					this.checked = false;
-			}
-			$('#filterCityRemovedInput').val('false');
-		});
+                filter[param.name] = param.value;
+                cookie[param.name] = param.value;
 
-		Cookies.remove('citiesFilter');
+                return;
+            }
+        });
 
-		$('#filterCityDiv').toggleClass('hidden');
-		$('#openFilterCityIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
-		$('#openFilterCityButton').removeClass('btn-warning').addClass('btn-default');
+        Cookies.set('citiesFilter', cookie);
 
-		citiesTableObj.bootstrapTable('refresh');
-	});
+        $('#filterCityDiv').toggleClass('hidden');
+        $('#openFilterCityIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
+        if (!!cookie && !!cookie.filter) {
+            $('#openFilterCityButton').removeClass('btn-default').addClass('btn-warning');
+
+            $table.bootstrapTable('refresh');
+        }
+    });
+    filterCityFormObj.on('reset', function (e) {
+        // Форму отправлять не нужно.
+        e.preventDefault();
+
+        filter = {};
+        filterCityFormObj.find(':input').each(function () {
+            switch (this.type) {
+                case 'password':
+                case 'select-multiple':
+                case 'select-one':
+                case 'text':
+                case 'textarea':
+                    $(this).val('');
+                    break;
+                case 'checkbox':
+                case 'radio':
+                    this.checked = false;
+            }
+            $('#filterCityRemovedInput').val('false');
+        });
+
+        Cookies.remove('citiesFilter');
+
+        $('#filterCityDiv').toggleClass('hidden');
+        $('#openFilterCityIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
+        $('#openFilterCityButton').removeClass('btn-warning').addClass('btn-default');
+
+        $table.bootstrapTable('refresh');
+    });
 });

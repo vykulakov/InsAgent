@@ -29,7 +29,7 @@
         <div class="navbar-inner">
             <a class="navbar-brand" href="<c:url value='/'/>">Новый век</a>
             <p class="navbar-text pull-right">
-                Вы вошли как <a href="<c:url value='logout'/>" class="navbar-link"><s:authentication property="principal.name" /></a>
+                Вы вошли как <a href="<c:url value='/logout'/>" class="navbar-link"><s:authentication property="principal.name" /></a>
             </p>
         </div>
     </div>

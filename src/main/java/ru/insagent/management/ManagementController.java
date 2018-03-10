@@ -18,25 +18,62 @@
 
 package ru.insagent.management;
 
-import org.springframework.context.annotation.Scope;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import ru.insagent.management.model.CityFilter;
+import ru.insagent.model.City;
+import ru.insagent.model.Response;
+import ru.insagent.model.User;
+import ru.insagent.service.CityService;
+
+import java.security.Principal;
+import java.util.List;
 
 @Controller
-@Scope("session")
 public class ManagementController {
+    private CityService cityService;
+
+    @Autowired
+    public void setCityService(CityService cityService) {
+        this.cityService = cityService;
+    }
+
     @RequestMapping("/management/city")
     public String city() {
-        return "/management/city";
+        return "management/city";
+    }
+
+    @RequestMapping("/management/cities")
+    public ResponseEntity<Response> cities(
+            @RequestParam(name = "sort", required = false) String sort,
+            @RequestParam(name = "order", required = false) String order,
+            @RequestParam(name = "limit", required = false) Integer limit,
+            @RequestParam(name = "offset", required = false) Integer offset,
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "filter", required = false) CityFilter filter
+    ) {
+        Response response = new Response();
+        if (filter == null) {
+            response.setRows(cityService.listByUser(null, search, sort, order, limit, offset));
+        } else {
+            response.setRows(cityService.listByUser(null, filter, sort, order, limit, offset));
+        }
+        response.setTotal(cityService.getCount());
+
+        return new ResponseEntity<Response>(response, HttpStatus.OK);
     }
 
     @RequestMapping("/management/unit")
     public String unit() {
-        return "/management/unit";
+        return "management/unit";
     }
 
     @RequestMapping("/management/user")
     public String user() {
-        return "/management/user";
+        return "management/user";
     }
 }

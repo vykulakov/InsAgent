@@ -22,10 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Repository;
 import ru.insagent.management.model.CityFilter;
 import ru.insagent.model.City;
 import ru.insagent.model.User;
 
+@Repository
 public class CityDao extends SimpleHDao<City> {
 	{
 		clazz = City.class;

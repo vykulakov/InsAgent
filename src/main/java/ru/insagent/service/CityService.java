@@ -20,6 +20,8 @@ package ru.insagent.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.insagent.dao.CityDao;
 import ru.insagent.exception.AppException;
 import ru.insagent.management.model.CityFilter;
@@ -27,10 +29,16 @@ import ru.insagent.model.City;
 import ru.insagent.model.User;
 import ru.insagent.util.Hibernate;
 
+@Service
 public class CityService {
-	final private CityDao cityDao = new CityDao();
+	private CityDao cityDao;
 
-	/**
+	@Autowired
+    public void setCityDao(CityDao cityDao) {
+        this.cityDao = cityDao;
+    }
+
+    /**
 	 * Get rows count for the last query.
 	 * @return Rows count for the last query.
 	 */
