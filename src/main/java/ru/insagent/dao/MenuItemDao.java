@@ -18,6 +18,7 @@
 
 package ru.insagent.dao;
 
+import org.springframework.stereotype.Repository;
 import ru.insagent.model.MenuItem;
 
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import java.util.Set;
  *
  * @author Kulakov Vyacheslav <kulakov.home@gmail.com>
  */
+@Repository
 public class MenuItemDao extends SimpleHDao<MenuItem> {
 	{
 		clazz = MenuItem.class;

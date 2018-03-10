@@ -29,7 +29,7 @@
         <div class="navbar-inner">
             <a class="navbar-brand" href="<c:url value='/'/>">Новый век</a>
             <p class="navbar-text pull-right">
-                Вы вошли как <a href="<c:url value='logout'/>" class="navbar-link"><s:authentication property="principal.username" /></a>
+                Вы вошли как <a href="<c:url value='logout'/>" class="navbar-link"><s:authentication property="principal.name" /></a>
             </p>
         </div>
     </div>
@@ -39,7 +39,8 @@
     <div class="row">
         <div class="col-sm-2 col-md-2 sidebar">
             <ul class="nav nav-sidebar">
-                <c:forEach var="item" items="${ menu }">
+                <s:authentication property="principal.items" var="items" />
+                <c:forEach var="item" items="${ items }">
                     <c:if test='${ item.level == 1 }'>
                         <li class="nav-header"><c:out value='${ item.name }'/></li>
                     </c:if>

@@ -25,29 +25,38 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ru.insagent.dao.MenuItemDao;
 import ru.insagent.dao.RoleDao;
 import ru.insagent.dao.UnitDao;
 import ru.insagent.dao.UserDao;
 import ru.insagent.exception.AppException;
 import ru.insagent.management.model.UserFilter;
-import ru.insagent.model.Role;
-import ru.insagent.model.ShiroUser;
-import ru.insagent.model.Unit;
-import ru.insagent.model.User;
+import ru.insagent.model.*;
 import ru.insagent.util.Hibernate;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
     final private UnitDao unitDao = new UnitDao();
 
-    @Autowired
     private UserDao userDao;
 
+    @Autowired
+    public void setUnitDao(UserDao userDao) {
+        this.userDao = userDao;
+    }
+
     final private RoleDao roleDao = new RoleDao();
+
+    private MenuItemDao menuItemDao;
+
+    @Autowired
+    public void setMenuItemDao(MenuItemDao menuItemDao) {
+        this.menuItemDao = menuItemDao;
+    }
 
     /**
      * Get rows count for the last query.
@@ -171,9 +180,12 @@ public class UserService implements UserDetailsService {
         try {
             User user = userDao.getByUsername(username);
             if (user != null) {
-                user.getRoles().stream().map(Role::getIdx).forEach(System.out::println);
-                List<GrantedAuthority> authorities = user.getRoles().stream().map(Role::getIdx).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-                userDetails = (UserDetails) new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+                Set<String> roles = user.getRoles().stream().map(Role::getIdx).collect(Collectors.toSet());
+
+                List<MenuItem> items = menuItemDao.listByRoleIdxes(roles);
+                List<GrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+
+                userDetails = (UserDetails) new SpringUser(user, items, authorities);
             }
 
             Hibernate.commit();

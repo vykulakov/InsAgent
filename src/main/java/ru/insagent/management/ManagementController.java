@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package ru.insagent;
+package ru.insagent.management;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -24,24 +24,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @Scope("session")
-public class MainController {
-    @RequestMapping("/")
-    public String root() {
-        return "main";
+public class ManagementController {
+    @RequestMapping("/management/city")
+    public String city() {
+        return "/management/city";
     }
 
-    @RequestMapping("/user/")
-    public String userIndex() {
-        return "user/index";
+    @RequestMapping("/management/unit")
+    public String unit() {
+        return "/management/unit";
     }
 
-    @RequestMapping("/login")
-    public String login() {
-        return "login";
-    }
-
-    @RequestMapping("/logout")
-    public String logout() {
-        return "redirect:/login?logout";
+    @RequestMapping("/management/user")
+    public String user() {
+        return "/management/user";
     }
 }
