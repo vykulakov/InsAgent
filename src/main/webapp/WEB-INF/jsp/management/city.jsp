@@ -91,16 +91,16 @@
                     <div class="form-group">
                         <label for="filterCityNameInput" class="col-sm-2 control-label">Название:</label>
                         <div class="col-sm-10">
-                            <input id="filterCityNameInput" name="filter.name" type="text" class="form-control"
+                            <input id="filterCityNameInput" name="name" type="text" class="form-control"
                                    placeholder="Название"/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="filterCityRemovedInput" class="col-sm-2 control-label">Удалённые:</label>
                         <div class="col-sm-10">
-                            <select id="filterCityRemovedInput" name="filter.removed" class="form-control">
-                                <option value="false">Не отображать</option>
+                            <select id="filterCityRemovedInput" name="removed" class="form-control">
                                 <option value="true">Отображать</option>
+                                <option value="false" selected="selected">Не отображать</option>
                             </select>
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2017 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,23 +52,6 @@ public class CityService {
 		Hibernate.beginTransaction();
 		try {
 			cities = cityDao.list();
-
-			Hibernate.commit();
-		} catch(Exception e) {
-			Hibernate.rollback();
-
-			throw new AppException("Cannot get cities", e);
-		}
-
-		return cities;
-	}
-
-	public List<City> listByUser(User user, String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		List<City> cities;
-
-		Hibernate.beginTransaction();
-		try {
-			cities = cityDao.listByUser(user, search, sortBy, sortDir, limitRows, limitOffset);
 
 			Hibernate.commit();
 		} catch(Exception e) {

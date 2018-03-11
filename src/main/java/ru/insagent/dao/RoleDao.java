@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2017 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +18,28 @@
 
 package ru.insagent.dao;
 
+import org.springframework.stereotype.Repository;
 import ru.insagent.model.Role;
 
+@Repository
 public class RoleDao extends SimpleHDao<Role> {
-	{
-		clazz = Role.class;
+    {
+        clazz = Role.class;
 
-		countQueryPrefix = ""
-			+ " SELECT"
-			+ "     COUNT(*) AS count"
-			+ " FROM"
-			+ "     Role r"
-			+ " WHERE"
-			+ "     1 = 1";
+        countQueryPrefix = ""
+                + " SELECT"
+                + "     COUNT(*) AS count"
+                + " FROM"
+                + "     Role r"
+                + " WHERE"
+                + "     1 = 1";
 
-		selectQueryPrefix = ""
-			+ " SELECT"
-			+ "     r"
-			+ " FROM"
-			+ "     Role r"
-			+ " WHERE"
-			+ "     1 = 1";
-	}
+        selectQueryPrefix = ""
+                + " SELECT"
+                + "     r"
+                + " FROM"
+                + "     Role r"
+                + " WHERE"
+                + "     1 = 1";
+    }
 }

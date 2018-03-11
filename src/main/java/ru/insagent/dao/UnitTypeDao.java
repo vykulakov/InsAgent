@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2017 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@
 
 package ru.insagent.dao;
 
+import org.springframework.stereotype.Repository;
 import ru.insagent.management.model.UnitType;
 
+@Repository
 public class UnitTypeDao extends SimpleHDao<UnitType> {
 	{
 		clazz = UnitType.class;

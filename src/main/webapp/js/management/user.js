@@ -3,8 +3,9 @@
 var filter = {};
 
 $(function() {
-	var usersTableObj = $('#usersTable');
-	usersTableObj.bootstrapTable({
+	var $table = $('#usersTable');
+	var $alert = $('#usersTableAlert');
+	$table.bootstrapTable({
 		url: '',
 		queryParams: function(params) {
 			$.extend(params, filter);
@@ -12,7 +13,7 @@ $(function() {
 			return params;
 		},
 		responseHandler: function(response) {
-			$('#usersTableAlert').children().remove();
+            $alert.children().remove();
 
 			var errors = checkError(response);
 			if(errors !== undefined) {
@@ -25,7 +26,7 @@ $(function() {
 				}
 				alertMsg += '</div>';
 
-				$('#usersTableAlert').append(alertMsg);
+                $alert.append(alertMsg);
 
 				return [];
 			}
@@ -252,7 +253,7 @@ $(function() {
 	/**
 	 * Добавляем фильтр к таблице.
 	 */
-	usersTableObj.parents('.bootstrap-table').find('.fixed-table-toolbar').append('' +
+	$table.parents('.bootstrap-table').find('.fixed-table-toolbar').append('' +
 			'<div class="columns columns-left btn-group pull-right">' + 
 			'    <button id="openFilterUserButton" title="Фильтр пользователей" name="filter" type="button" class="btn btn-default">' + 
 			'        <i id="openFilterUserIcon" class="glyphicon glyphicon-menu-up icon-menu-up"></i>' +
@@ -272,13 +273,13 @@ $(function() {
 	});
 	var filterUserFormObj = $('#filterUserForm');
 	var cookie = Cookies.getJSON('usersFilter');
-	if(!!cookie && !!cookie.filter) {
+	if(!!cookie && cookie.filter) {
 		filter = {};
 
 		filterUserFormObj.find(':input').each(function() {
 			if(this.name && cookie[this.name]) {
 				$(this).val(cookie[this.name]);
-				if(this.name == 'filter.units') {
+				if(this.name === 'units') {
 					$(this).multiselect('refresh');
 				}
 			}
@@ -286,8 +287,8 @@ $(function() {
 
 		var unitIndex = 0;
 		filterUserFormObj.serializeArray().map(function(param) {
-			if(param.name == 'filter.units') {
-				filter['filter.units[' + (unitIndex++) + '].id'] = param.value;
+			if(param.name === 'units') {
+				filter['units[' + (unitIndex++) + '].id'] = param.value;
 				return;
 			}
 			if(param.value !== '') {
@@ -298,9 +299,9 @@ $(function() {
 
 		$('#openFilterUserButton').removeClass('btn-default').addClass('btn-warning');
 
-		usersTableObj.bootstrapTable('refresh', {url: 'getUsersJson.action'});
+		$table.bootstrapTable('refresh', {url: '/management/users'});
 	} else {
-		usersTableObj.bootstrapTable('refresh', {url: 'getUsersJson.action'});
+		$table.bootstrapTable('refresh', {url: '/management/users'});
 	}
 	filterUserFormObj.on('submit', function(e) {
 		// Форму отправлять не нужно.
@@ -311,19 +312,19 @@ $(function() {
 		var cookie = {};
 		var unitIndex = 0;
 		filterUserFormObj.serializeArray().map(function(param) {
-			if(param.name == 'filter.units') {
+			if(param.name === 'units') {
 				cookie.filter = true;
 
-				filter['filter.units[' + (unitIndex++) + '].id'] = param.value;
-				if(cookie['filter.units'] === undefined) {
-					cookie['filter.units'] = [param.value];
+				filter['units[' + (unitIndex++) + '].id'] = param.value;
+				if(cookie['units'] === undefined) {
+					cookie['units'] = [param.value];
 				} else {
-					cookie['filter.units'].push(param.value);
+					cookie['units'].push(param.value);
 				}
 
 				return;
 			}
-			if(param.name == 'filter.removed' && param.value == 'true') {
+			if(param.name === 'removed' && param.value === 'true') {
 				cookie.filter = true;
 
 				filter[param.name] = param.value;
@@ -345,14 +346,13 @@ $(function() {
 
 		$('#filterUserDiv').toggleClass('hidden');
 		$('#openFilterUserIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
-		if(!!cookie && !!cookie.filter) {
+		if(!!cookie && cookie.filter) {
 			$('#openFilterUserButton').removeClass('btn-default').addClass('btn-warning');
 			
-			usersTableObj.bootstrapTable('refresh');
+			$table.bootstrapTable('refresh');
 		}
 	});
 	filterUserFormObj.on('reset', function(e) {
-		// Форму отправлять не нужно.
 		e.preventDefault();
 
 		filter = {};
@@ -379,6 +379,6 @@ $(function() {
 		$('#openFilterUserIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
 		$('#openFilterUserButton').removeClass('btn-warning').addClass('btn-default');
 
-		usersTableObj.bootstrapTable('refresh');
+		$table.bootstrapTable('refresh');
 	});
 });

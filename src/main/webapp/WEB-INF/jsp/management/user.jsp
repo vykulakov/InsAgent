@@ -1,4 +1,5 @@
 <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="l" uri="http://shiro.apache.org/tags"%>
 <%@taglib prefix="s" uri="/struts-tags"%>
@@ -128,19 +129,19 @@
 				<div class="form-group">
 					<label for="filterUserLoginInput" class="col-sm-2 control-label">Логин:</label>
 					<div class="col-sm-10">
-						<input id="filterUserLoginInput" name="filter.login" type="text" class="form-control" placeholder="Логин"/>
+						<input id="filterUserLoginInput" name="login" type="text" class="form-control" placeholder="Логин"/>
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="filterUserNameInput" class="col-sm-2 control-label">Пользователь:</label>
 					<div class="col-sm-10">
-						<input id="filterUserNameInput" name="filter.name" type="text" class="form-control" placeholder="Пользователь"/>
+						<input id="filterUserNameInput" name="name" type="text" class="form-control" placeholder="Пользователь"/>
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="filterUserUnitsInput" class="col-sm-2 control-label">Подразделения:</label>
 					<div class="col-sm-10">
-						<select id="filterUserUnitsInput" name="filter.units" class="form-control" multiple>
+						<select id="filterUserUnitsInput" name="units" class="form-control" multiple>
 							<c:forEach var="unit" items="${ units }">
 								<option value="${ unit.id }">${ unit.name }</option>
 							</c:forEach>
@@ -150,9 +151,9 @@
 				<div class="form-group">
 					<label for="filterUserRemovedInput" class="col-sm-2 control-label">Удалённые:</label>
 					<div class="col-sm-10">
-						<select id="filterUserRemovedInput" name="filter.removed" class="form-control">
-							<option value="false">Не отображать</option>
+						<select id="filterUserRemovedInput" name="removed" class="form-control">
 							<option value="true">Отображать</option>
+							<option value="false" selected="selected">Не отображать</option>
 						</select>
 					</div>
 				</div>

@@ -5,6 +5,7 @@ var filter = {};
 $(function () {
     var $table = $('#citiesTable');
     var $alert = $('#citiesTableAlert');
+    var $filter = $('#filterCityForm');
 
     $table.bootstrapTable({
         url: '',
@@ -48,6 +49,12 @@ $(function () {
             title: 'Название',
             sortable: true
         }],
+        /**
+         *
+         * @param row
+         * @param {boolean} row.removed
+         * @returns {*}
+         */
         rowStyle: function (row) {
             if (row.removed) {
                 return {
@@ -132,8 +139,9 @@ $(function () {
         e.preventDefault();
 
         var form = $('#editCityForm');
+        var $body = $('#editCityBody');
         $.getJSON(form.attr('action'), form.serialize(), function (response) {
-            $('#editCityBody').find('.alert').remove();
+            $body.find('.alert').remove();
 
             var errors = checkError(response);
             if (errors !== undefined) {
@@ -146,7 +154,7 @@ $(function () {
                 }
                 alert += '</div>';
 
-                $('#editCityBody').prepend(alert);
+                $body.prepend(alert);
 
                 return;
             }
@@ -181,7 +189,7 @@ $(function () {
             }
 
             $('#removeCityModal').modal('hide');
-            $('#citiesTable').bootstrapTable('refresh');
+            $table.bootstrapTable('refresh');
         });
     });
 
@@ -194,43 +202,43 @@ $(function () {
         '        <i id="openFilterCityIcon" class="glyphicon glyphicon-menu-up icon-menu-up"></i>' +
         '    </button>' +
         '</div>');
-    $('#openFilterCityButton').on('click', function () {
+
+    var $filterButton = $('#openFilterCityButton');
+    $filterButton.on('click', function () {
         $('#filterCityDiv').toggleClass('hidden');
         $('#openFilterCityIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
     });
-    var filterCityFormObj = $('#filterCityForm');
+
     var cookie = Cookies.getJSON('citiesFilter');
-    if (!!cookie && !!cookie.filter) {
+    if (!!cookie && cookie.filter) {
         filter = {};
 
-        filterCityFormObj.find(':input').each(function () {
+        $filter.find(':input').each(function () {
             if (this.name && cookie[this.name]) {
                 $(this).val(cookie[this.name]);
             }
         });
 
-        filterCityFormObj.serializeArray().map(function (param) {
+        $filter.serializeArray().map(function (param) {
             if (param.value !== '') {
                 filter[param.name] = param.value;
-                return;
             }
         });
 
-        $('#openFilterCityButton').removeClass('btn-default').addClass('btn-warning');
+        $filterButton.removeClass('btn-default').addClass('btn-warning');
 
         $table.bootstrapTable('refresh', {url: '/management/cities'});
     } else {
         $table.bootstrapTable('refresh', {url: '/management/cities'});
     }
-    filterCityFormObj.on('submit', function (e) {
-        // Форму отправлять не нужно.
+    $filter.on('submit', function (e) {
         e.preventDefault();
 
         filter = {};
 
         var cookie = {};
-        filterCityFormObj.serializeArray().map(function (param) {
-            if (param.name == 'filter.removed' && param.value == 'true') {
+        $filter.serializeArray().map(function (param) {
+            if (param.name === 'removed' && param.value === 'true') {
                 cookie.filter = true;
 
                 filter[param.name] = param.value;
@@ -252,18 +260,18 @@ $(function () {
 
         $('#filterCityDiv').toggleClass('hidden');
         $('#openFilterCityIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
-        if (!!cookie && !!cookie.filter) {
-            $('#openFilterCityButton').removeClass('btn-default').addClass('btn-warning');
+        if (!!cookie && cookie.filter) {
+            $filterButton.removeClass('btn-default').addClass('btn-warning');
 
             $table.bootstrapTable('refresh');
         }
     });
-    filterCityFormObj.on('reset', function (e) {
+    $filter.on('reset', function (e) {
         // Форму отправлять не нужно.
         e.preventDefault();
 
         filter = {};
-        filterCityFormObj.find(':input').each(function () {
+        $filter.find(':input').each(function () {
             switch (this.type) {
                 case 'password':
                 case 'select-multiple':
@@ -283,7 +291,7 @@ $(function () {
 
         $('#filterCityDiv').toggleClass('hidden');
         $('#openFilterCityIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
-        $('#openFilterCityButton').removeClass('btn-warning').addClass('btn-default');
+        $filterButton.removeClass('btn-warning').addClass('btn-default');
 
         $table.bootstrapTable('refresh');
     });

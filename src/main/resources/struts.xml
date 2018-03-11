@@ -26,24 +26,6 @@
 			<result name="*">/WEB-INF/jsp/journal/act.jsp</result>
 		</action>
 
-		<action name="cityManagement" class="ru.insagent.management.city.action.CityManagementAction">
-			<result name="error">/WEB-INF/jsp/management/city_error.jsp</result>
-			<result name="input">/WEB-INF/jsp/management/city_error.jsp</result>
-			<result name="*">/WEB-INF/jsp/management/city.jsp</result>
-		</action>
-
-		<action name="unitManagement" class="ru.insagent.management.unit.action.UnitManagementAction">
-			<result name="error">/WEB-INF/jsp/management/unit_error.jsp</result>
-			<result name="input">/WEB-INF/jsp/management/unit_error.jsp</result>
-			<result name="*">/WEB-INF/jsp/management/unit.jsp</result>
-		</action>
-
-		<action name="userManagement" class="ru.insagent.management.user.action.UserManagementAction">
-			<result name="error">/WEB-INF/jsp/management/user_error.jsp</result>
-			<result name="input">/WEB-INF/jsp/management/user_error.jsp</result>
-			<result name="*">/WEB-INF/jsp/management/user.jsp</result>
-		</action>
-
 		<action name="exportBsoJournal" class="ru.insagent.document.action.ExportBsoJournalAction">
 			<result name="success" type="stream">
 				<param name="contentType">application/vnd.xls</param>
@@ -94,15 +76,12 @@
 		<action name="doActionJson" class="ru.insagent.document.action.DoActionJsonAction"/>
 		<action name="updateActJson" class="ru.insagent.document.action.UpdateActJsonAction"/>
 
-		<action name="getCitiesJson" class="ru.insagent.management.city.action.GetCitiesJsonAction"/>
 		<action name="updateCityJson" class="ru.insagent.management.city.action.UpdateCityJsonAction"/>
 		<action name="removeCityJson" class="ru.insagent.management.city.action.RemoveCityJsonAction"/>
 
-		<action name="getUnitsJson" class="ru.insagent.management.unit.action.GetUnitsJsonAction"/>
 		<action name="updateUnitJson" class="ru.insagent.management.unit.action.UpdateUnitJsonAction"/>
 		<action name="removeUnitJson" class="ru.insagent.management.unit.action.RemoveUnitJsonAction"/>
 
-		<action name="getUsersJson" class="ru.insagent.management.user.action.GetUsersJsonAction"/>
 		<action name="updateUserJson" class="ru.insagent.management.user.action.UpdateUserJsonAction"/>
 		<action name="removeUserJson" class="ru.insagent.management.user.action.RemoveUserJsonAction"/>
 	</package>

@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2017 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,106 +18,101 @@
 
 package ru.insagent.service;
 
-import java.util.List;
-
-import ru.insagent.dao.CityDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.insagent.dao.UnitDao;
 import ru.insagent.dao.UnitTypeDao;
 import ru.insagent.exception.AppException;
 import ru.insagent.management.model.UnitFilter;
 import ru.insagent.management.model.UnitType;
 import ru.insagent.management.unit.model.UnitDTO;
-import ru.insagent.model.City;
 import ru.insagent.model.Unit;
 import ru.insagent.model.User;
 import ru.insagent.util.Hibernate;
 
+import java.util.List;
+
+@Service
 public class UnitService {
-	final private UnitDao unitDao = new UnitDao();
-	final private UnitTypeDao unitTypeDao = new UnitTypeDao();
+    private UnitDao unitDao;
+    private UnitTypeDao unitTypeDao;
 
-	/**
-	 * Get rows count for the last query.
-	 * @return Rows count for the last query.
-	 */
-	public Long getCount() {
-		return unitDao.getCount();
-	}
+    @Autowired
+    public void setUnitDao(UnitDao unitDao) {
+        this.unitDao = unitDao;
+    }
 
-	public List<UnitDTO> listByUser(User user, String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		List<UnitDTO> units;
+    @Autowired
+    public void setUnitTypeDao(UnitTypeDao unitTypeDao) {
+        this.unitTypeDao = unitTypeDao;
+    }
 
-		Hibernate.beginTransaction();
-		try {
-			units = unitDao.listByUser(user, search, sortBy, sortDir, limitRows, limitOffset);
+    /**
+     * Get rows count for the last query.
+     *
+     * @return Rows count for the last query.
+     */
+    public Long getCount() {
+        return unitDao.getCount();
+    }
 
-			Hibernate.commit();
-		} catch(Exception e) {
-			Hibernate.rollback();
+    public List<UnitDTO> listByUser(User user, UnitFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
+        List<UnitDTO> units;
 
-			throw new AppException("Cannot get units", e);
-		}
+        Hibernate.beginTransaction();
+        try {
+            units = unitDao.listByUser(user, filter, sortBy, sortDir, limitRows, limitOffset);
 
-		return units;
-	}
+            Hibernate.commit();
+        } catch (Exception e) {
+            Hibernate.rollback();
 
-	public List<UnitDTO> listByUser(User user, UnitFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		List<UnitDTO> units;
+            throw new AppException("Cannot get units", e);
+        }
 
-		Hibernate.beginTransaction();
-		try {
-			units = unitDao.listByUser(user, filter, sortBy, sortDir, limitRows, limitOffset);
+        return units;
+    }
 
-			Hibernate.commit();
-		} catch(Exception e) {
-			Hibernate.rollback();
+    public void update(Unit unit) {
+        Hibernate.beginTransaction();
+        try {
+            unitDao.update(unit);
 
-			throw new AppException("Cannot get units", e);
-		}
+            Hibernate.commit();
+        } catch (Exception e) {
+            Hibernate.rollback();
 
-		return units;
-	}
+            throw new AppException("Cannot update unit", e);
+        }
+    }
 
-	public void update(Unit unit) {
-		Hibernate.beginTransaction();
-		try {
-			unitDao.update(unit);
+    public void remove(int unitId) {
+        Hibernate.beginTransaction();
+        try {
+            unitDao.remove(unitId);
 
-			Hibernate.commit();
-		} catch(Exception e) {
-			Hibernate.rollback();
+            Hibernate.commit();
+        } catch (Exception e) {
+            Hibernate.rollback();
 
-			throw new AppException("Cannot update unit", e);
-		}
-	}
+            throw new AppException("Cannot remove unit", e);
+        }
+    }
 
-	public void remove(int unitId) {
-		Hibernate.beginTransaction();
-		try {
-			unitDao.remove(unitId);
+    public List<UnitType> types() {
+        List<UnitType> result;
 
-			Hibernate.commit();
-		} catch(Exception e) {
-			Hibernate.rollback();
+        Hibernate.beginTransaction();
+        try {
+            result = unitTypeDao.list();
 
-			throw new AppException("Cannot remove unit", e);
-		}
-	}
+            Hibernate.commit();
+        } catch (Exception e) {
+            Hibernate.rollback();
 
-	public List<UnitType> types() {
-		List<UnitType> result;
+            throw new AppException("Cannot get unit types", e);
+        }
 
-		Hibernate.beginTransaction();
-		try {
-			result = unitTypeDao.list();
-
-			Hibernate.commit();
-		} catch(Exception e) {
-			Hibernate.rollback();
-
-			throw new AppException("Cannot get unit types", e);
-		}
-
-		return result;
-	}
+        return result;
+    }
 }

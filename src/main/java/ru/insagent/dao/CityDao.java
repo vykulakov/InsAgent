@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2017 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import ru.insagent.management.model.CityFilter;
 import ru.insagent.model.City;
@@ -52,44 +53,19 @@ public class CityDao extends SimpleHDao<City> {
 			+ "     1 = 1";
 	}
 
-	public List<City> listByUser(User user) {
-		return listByUser(user, null, null, 0, 0);
-	}
-
-	public List<City> listByUser(User user, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		return listByUser(user, (String) null, sortBy, sortDir, limitRows, limitOffset);
-	}
-
-	public List<City> listByUser(User user, String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		StringBuilder sb = new StringBuilder();
-		Map<String, Object> objects = new HashMap<String, Object>();
-
-		if(search != null && !search.trim().isEmpty()) {
-			search = "%" + search + "%";
-
-			sb.append("c.name LIKE :search");
-			objects.put("search", search);
-		}
-
-		String where = null;
-		if(objects.size() > 0) {
-			where = sb.toString();
-		} else {
-			objects = null;
-		}
-
-		return listByWhere(where, objects, sortBy, sortDir, limitRows, limitOffset);
-	}
-
 	public List<City> listByUser(User user, CityFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
 		StringBuilder sb = new StringBuilder();
-		Map<String, Object> objects = new HashMap<String, Object>();
+		Map<String, Object> objects = new HashMap<>();
 
 		if(filter != null) {
 			sb.append("1 = 1");
-			if(filter.getName() != null) {
+			if(StringUtils.isNotBlank(filter.getName())) {
 				sb.append(" AND c.name LIKE :name");
 				objects.put("name", "%" + filter.getName().replace("*", "%") + "%");
+			}
+			if(StringUtils.isNotBlank(filter.getSearch())) {
+				sb.append(" AND c.name LIKE :search");
+				objects.put("search", "%" + filter.getSearch() + "%");
 			}
 		}
 

@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2018 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.insagent.dao.MenuItemDao;
 import ru.insagent.dao.RoleDao;
 import ru.insagent.dao.UnitDao;
@@ -40,18 +41,25 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
-    final private UnitDao unitDao = new UnitDao();
-
     private UserDao userDao;
+    private UnitDao unitDao;
+    private RoleDao roleDao;
+    private MenuItemDao menuItemDao;
 
     @Autowired
-    public void setUnitDao(UserDao userDao) {
+    public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
     }
 
-    final private RoleDao roleDao = new RoleDao();
+    @Autowired
+    public void setUnitDao(UnitDao unitDao) {
+        this.unitDao = unitDao;
+    }
 
-    private MenuItemDao menuItemDao;
+    @Autowired
+    public void setRoleDao(RoleDao roleDao) {
+        this.roleDao = roleDao;
+    }
 
     @Autowired
     public void setMenuItemDao(MenuItemDao menuItemDao) {
@@ -104,29 +112,13 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public List<User> listByUser(User user, String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
-        List<User> users;
-
-        Hibernate.beginTransaction();
-        try {
-            users = userDao.listByUser(user, search, sortBy, sortDir, limitRows, limitOffset);
-
-            Hibernate.commit();
-        } catch (Exception e) {
-            Hibernate.rollback();
-
-            throw new AppException("Cannot get users", e);
-        }
-
-        return users;
-    }
-
     public List<User> listByUser(User user, UserFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
         List<User> users;
 
         Hibernate.beginTransaction();
         try {
             users = userDao.listByUser(user, filter, sortBy, sortDir, limitRows, limitOffset);
+            users.forEach(u -> org.hibernate.Hibernate.initialize(u.getUnit().getCity()));
 
             Hibernate.commit();
         } catch (Exception e) {
@@ -165,11 +157,37 @@ public class UserService implements UserDetailsService {
     }
 
     public List<Role> roles() {
-        return roleDao.list();
+        List<Role> roles = null;
+
+        Hibernate.beginTransaction();
+        try {
+            roles = roleDao.list();
+
+            Hibernate.commit();
+        } catch (Exception e) {
+            Hibernate.rollback();
+
+            throw new AppException("Cannot get roles", e);
+        }
+
+        return roles;
     }
 
     public List<Unit> units() {
-        return unitDao.list();
+        List<Unit> units = null;
+
+        Hibernate.beginTransaction();
+        try {
+            units = unitDao.list();
+
+            Hibernate.commit();
+        } catch (Exception e) {
+            Hibernate.rollback();
+
+            throw new AppException("Cannot get units", e);
+        }
+
+        return units;
     }
 
     @Override

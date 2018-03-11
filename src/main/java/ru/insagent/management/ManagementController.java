@@ -19,27 +19,38 @@
 package ru.insagent.management;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import ru.insagent.management.model.CityFilter;
-import ru.insagent.model.City;
+import ru.insagent.management.model.UnitFilter;
+import ru.insagent.management.model.UserFilter;
 import ru.insagent.model.Response;
-import ru.insagent.model.User;
 import ru.insagent.service.CityService;
-
-import java.security.Principal;
-import java.util.List;
+import ru.insagent.service.UnitService;
+import ru.insagent.service.UserService;
 
 @Controller
 public class ManagementController {
     private CityService cityService;
+    private UnitService unitService;
+    private UserService userService;
 
     @Autowired
     public void setCityService(CityService cityService) {
         this.cityService = cityService;
+    }
+
+    @Autowired
+    public void setUnitService(UnitService unitService) {
+        this.unitService = unitService;
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     @RequestMapping("/management/city")
@@ -47,33 +58,67 @@ public class ManagementController {
         return "management/city";
     }
 
+    @ResponseBody
     @RequestMapping("/management/cities")
-    public ResponseEntity<Response> cities(
+    public Response cities(
+            CityFilter filter,
             @RequestParam(name = "sort", required = false) String sort,
             @RequestParam(name = "order", required = false) String order,
-            @RequestParam(name = "limit", required = false) Integer limit,
-            @RequestParam(name = "offset", required = false) Integer offset,
-            @RequestParam(name = "search", required = false) String search,
-            @RequestParam(name = "filter", required = false) CityFilter filter
+            @RequestParam(name = "limit", required = false, defaultValue = "0") int limit,
+            @RequestParam(name = "offset", required = false, defaultValue = "0") int offset
     ) {
         Response response = new Response();
-        if (filter == null) {
-            response.setRows(cityService.listByUser(null, search, sort, order, limit, offset));
-        } else {
-            response.setRows(cityService.listByUser(null, filter, sort, order, limit, offset));
-        }
+        response.setRows(cityService.listByUser(null, filter, sort, order, limit, offset));
         response.setTotal(cityService.getCount());
 
-        return new ResponseEntity<Response>(response, HttpStatus.OK);
+        return response;
     }
 
     @RequestMapping("/management/unit")
-    public String unit() {
+    public String unit(Model model) {
+        model.addAttribute("types", unitService.types());
+        model.addAttribute("cities", cityService.list());
+
         return "management/unit";
     }
 
+    @ResponseBody
+    @RequestMapping("/management/units")
+    public Response units(
+            UnitFilter filter,
+            @RequestParam(name = "sort", required = false) String sort,
+            @RequestParam(name = "order", required = false) String order,
+            @RequestParam(name = "limit", required = false, defaultValue = "0") int limit,
+            @RequestParam(name = "offset", required = false, defaultValue = "0") int offset
+    ) {
+        Response response = new Response();
+        response.setRows(unitService.listByUser(null, filter, sort, order, limit, offset));
+        response.setTotal(unitService.getCount());
+
+        return response;
+    }
+
     @RequestMapping("/management/user")
-    public String user() {
+    public String user(Model model) {
+        model.addAttribute("roles", userService.roles());
+        model.addAttribute("units", userService.units());
+
         return "management/user";
+    }
+
+    @ResponseBody
+    @RequestMapping("/management/users")
+    public Response users(
+            UserFilter filter,
+            @RequestParam(name = "sort", required = false) String sort,
+            @RequestParam(name = "order", required = false) String order,
+            @RequestParam(name = "limit", required = false, defaultValue = "0") int limit,
+            @RequestParam(name = "offset", required = false, defaultValue = "0") int offset
+    ) {
+        Response response = new Response();
+        response.setRows(userService.listByUser(null, filter, sort, order, limit, offset));
+        response.setTotal(userService.getCount());
+
+        return response;
     }
 }

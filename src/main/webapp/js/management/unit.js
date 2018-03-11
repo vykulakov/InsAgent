@@ -3,8 +3,10 @@
 var filter = {};
 
 $(function() {
-	var unitsTableObj = $('#unitsTable');
-	unitsTableObj.bootstrapTable({
+	var $table = $('#unitsTable');
+	var $alert = $('#unitsTableAlert');
+
+	$table.bootstrapTable({
 		url: '',
 		queryParams: function(params) {
 			$.extend(params, filter);
@@ -12,7 +14,7 @@ $(function() {
 			return params;
 		},
 		responseHandler: function(response) {
-			$('#unitsTableAlert').children().remove();
+            $alert.children().remove();
 
 			var errors = checkError(response);
 			if(errors !== undefined) {
@@ -25,7 +27,7 @@ $(function() {
 				}
 				alertMsg += '</div>';
 
-				$('#unitsTableAlert').append(alertMsg);
+                $alert.append(alertMsg);
 
 				return [];
 			}
@@ -151,9 +153,10 @@ $(function() {
 		// Форма отправляется через AJAX, поэтому стандартную отправку нужно отключить.
 		e.preventDefault();
 
-		var form = $('#editUnitForm');
-		$.getJSON(form.attr('action'), form.serialize(), function(response) {
-			$('#editUnitBody').find('.alert').remove();
+		var $form = $('#editUnitForm');
+		var $body = $('#editUnitBody');
+		$.getJSON($form.attr('action'), $form.serialize(), function(response) {
+			$body.find('.alert').remove();
 
 			var errors = checkError(response);
 			if(errors !== undefined) {
@@ -166,7 +169,7 @@ $(function() {
 				}
 				alert += '</div>';
 
-				$('#editUnitBody').prepend(alert);
+                $body.prepend(alert);
 
 				return;
 			}
@@ -208,7 +211,7 @@ $(function() {
 	/**
 	 * Добавляем фильтр к таблице.
 	 */
-	unitsTableObj.parents('.bootstrap-table').find('.fixed-table-toolbar').append('' +
+	$table.parents('.bootstrap-table').find('.fixed-table-toolbar').append('' +
 			'<div class="columns columns-left btn-group pull-right">' +
 			'    <button id="openFilterUnitButton" title="Фильтр подразделений" name="filter" type="button" class="btn btn-default">' +
 			'        <i id="openFilterUnitIcon" class="glyphicon glyphicon-menu-up icon-menu-up"></i>' +
@@ -236,13 +239,13 @@ $(function() {
 	});
 	var filterUnitFormObj = $('#filterUnitForm');
 	var cookie = Cookies.getJSON('unitsFilter');
-	if(!!cookie && !!cookie.filter) {
+	if(!!cookie && cookie.filter) {
 		filter = {};
 
 		filterUnitFormObj.find(':input').each(function() {
 			if(this.name && cookie[this.name]) {
 				$(this).val(cookie[this.name]);
-				if(this.name == 'filter.types' || this.name == 'filter.cities') {
+				if(this.name === 'types' || this.name === 'cities') {
 					$(this).multiselect('refresh');
 				}
 			}
@@ -251,12 +254,12 @@ $(function() {
 		var typeIndex = 0;
 		var cityIndex = 0;
 		filterUnitFormObj.serializeArray().map(function(param) {
-			if(param.name == 'filter.types') {
-				filter['filter.types[' + (typeIndex++) + '].id'] = param.value;
+			if(param.name === 'types') {
+				filter['types[' + (typeIndex++) + '].id'] = param.value;
 				return;
 			}
-			if(param.name == 'filter.cities') {
-				filter['filter.cities[' + (cityIndex++) + '].id'] = param.value;
+			if(param.name === 'cities') {
+				filter['cities[' + (cityIndex++) + '].id'] = param.value;
 				return;
 			}
 			if(param.value !== '') {
@@ -267,12 +270,11 @@ $(function() {
 
 		$('#openFilterUnitButton').removeClass('btn-default').addClass('btn-warning');
 
-		unitsTableObj.bootstrapTable('refresh', {url: 'getUnitsJson.action'});
+		$table.bootstrapTable('refresh', {url: '/management/units'});
 	} else {
-		unitsTableObj.bootstrapTable('refresh', {url: 'getUnitsJson.action'});
+		$table.bootstrapTable('refresh', {url: '/management/units'});
 	}
 	filterUnitFormObj.on('submit', function(e) {
-		// Форму отправлять не нужно.
 		e.preventDefault();
 
 		filter = {};
@@ -281,31 +283,31 @@ $(function() {
 		var typeIndex = 0;
 		var cityIndex = 0;
 		filterUnitFormObj.serializeArray().map(function(param) {
-			if(param.name == 'filter.types') {
+			if(param.name === 'types') {
 				cookie.filter = true;
 
-				filter['filter.types[' + (typeIndex++) + '].id'] = param.value;
-				if(cookie['filter.types'] === undefined) {
-					cookie['filter.types'] = [param.value];
+				filter['types[' + (typeIndex++) + '].id'] = param.value;
+				if(cookie['types'] === undefined) {
+					cookie['types'] = [param.value];
 				} else {
-					cookie['filter.types'].push(param.value);
+					cookie['types'].push(param.value);
 				}
 
 				return;
 			}
-			if(param.name == 'filter.cities') {
+			if(param.name === 'cities') {
 				cookie.filter = true;
 
-				filter['filter.cities[' + (cityIndex++) + '].id'] = param.value;
-				if(cookie['filter.cities'] === undefined) {
-					cookie['filter.cities'] = [param.value];
+				filter['cities[' + (cityIndex++) + '].id'] = param.value;
+				if(cookie['cities'] === undefined) {
+					cookie['cities'] = [param.value];
 				} else {
-					cookie['filter.cities'].push(param.value);
+					cookie['cities'].push(param.value);
 				}
 
 				return;
 			}
-			if(param.name == 'filter.removed' && param.value == 'true') {
+			if(param.name === 'removed' && param.value === 'true') {
 				cookie.filter = true;
 
 				filter[param.name] = param.value;
@@ -327,10 +329,10 @@ $(function() {
 
 		$('#filterUnitDiv').toggleClass('hidden');
 		$('#openFilterUnitIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
-		if(!!cookie && !!cookie.filter) {
+		if(!!cookie && cookie.filter) {
 			$('#openFilterUnitButton').removeClass('btn-default').addClass('btn-warning');
 
-			unitsTableObj.bootstrapTable('refresh');
+			$table.bootstrapTable('refresh');
 		}
 	});
 	filterUnitFormObj.on('reset', function(e) {
@@ -362,6 +364,6 @@ $(function() {
 		$('#openFilterUnitIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
 		$('#openFilterUnitButton').removeClass('btn-warning').addClass('btn-default');
 
-		unitsTableObj.bootstrapTable('refresh');
+		$table.bootstrapTable('refresh');
 	});
 });

@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2017 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ package ru.insagent.dao;
 
 import org.hibernate.query.Query;
 import org.hibernate.transform.Transformers;
+import org.springframework.stereotype.Repository;
 import ru.insagent.management.model.UnitFilter;
 import ru.insagent.management.model.UnitType;
 import ru.insagent.management.unit.model.UnitDTO;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Repository
 public class UnitDao extends SimpleHDao<Unit> {
 	{
 		clazz = Unit.class;
@@ -92,50 +94,6 @@ public class UnitDao extends SimpleHDao<Unit> {
 		return listByWhere(null, null, sortBy, sortDir, limitRows, limitOffset);
 	}
 
-	public List<UnitDTO> listByUser(User user, String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		StringBuilder sb = new StringBuilder(""
-				+ " SELECT"
-				+ "     u.id AS id,"
-				+ "     u.name AS name,"
-				+ "     u.comment AS comment,"
-				+ "     u.removed AS removed,"
-				+ "     u.city.id AS cityId,"
-				+ "     u.city.name AS cityName,"
-				+ "     u.type.id AS typeId,"
-				+ "     u.type.name AS typeName"
-				+ " FROM"
-				+ "     Unit u"
-		);
-
-		Map<String, Object> objects = new HashMap<>();
-		if (search != null && !search.trim().isEmpty()) {
-			search = "%" + search + "%";
-
-			sb.append(" WHERE");
-			sb.append(" u.name LIKE :search OR");
-			sb.append(" t.name LIKE :search OR");
-			sb.append(" c.name LIKE :search OR");
-			sb.append(" 0 = 1");
-			objects.put("search", search);
-		}
-		if (sortBy != null && sortDir != null) {
-			sb.append(" ORDER BY ");
-			sb.append(sortByMap.get(sortBy));
-			sb.append(" ");
-			sb.append(sortDir);
-		}
-
-		Query query = Hibernate.getCurrentSession().createQuery(sb.toString());
-		objects.forEach(query::setParameter);
-		if (limitRows > 0) {
-			query.setFirstResult(limitOffset);
-			query.setMaxResults(limitRows);
-		}
-
-		count = 0L;
-		return query.setResultTransformer(Transformers.aliasToBean(UnitDTO.class)).getResultList();
-	}
-
 	public List<UnitDTO> listByUser(User user, UnitFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
 		StringBuilder sb = new StringBuilder(""
 				+ " SELECT"
@@ -151,7 +109,7 @@ public class UnitDao extends SimpleHDao<Unit> {
 				+ "     Unit u"
 		);
 
-		Map<String, Object> objects = new HashMap<String, Object>();
+		Map<String, Object> objects = new HashMap<>();
 		if (filter != null) {
 			sb.append(" WHERE");
 			sb.append(" 1 = 1");
@@ -167,6 +125,14 @@ public class UnitDao extends SimpleHDao<Unit> {
 				sb.append(" AND u.city.id IN :cityIds");
 				objects.put("cityIds", filter.getCities().stream().map(City::getId).collect(Collectors.toList()));
 			}
+            if (filter.getSearch() != null && !filter.getSearch().trim().isEmpty()) {
+                sb.append(" AND (");
+                sb.append(" u.name LIKE :search OR");
+                sb.append(" u.type.name LIKE :search OR");
+                sb.append(" u.city.name LIKE :search");
+                sb.append(" )");
+                objects.put("search", "%" + filter.getSearch().trim() + "%");
+            }
 		}
 		if (sortBy != null && sortDir != null) {
 			sb.append(" ORDER BY ");

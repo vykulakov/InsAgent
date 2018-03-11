@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2018 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 package ru.insagent.dao;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ru.insagent.management.model.UserFilter;
 import ru.insagent.model.Unit;
 import ru.insagent.model.User;
@@ -78,35 +77,12 @@ public class UserDao extends SimpleHDao<User> {
     }
 
     public List<User> listByUser(User user, String sortBy, String sortDir, int limitRows, int limitOffset) {
-        return listByUser(user, (String) null, sortBy, sortDir, limitRows, limitOffset);
-    }
-
-    public List<User> listByUser(User user, String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
-        StringBuilder sb = new StringBuilder();
-        Map<String, Object> objects = new HashMap<String, Object>();
-
-        if (search != null && !search.trim().isEmpty()) {
-            search = "%" + search + "%";
-
-            sb.append("u.username LIKE :search OR");
-            sb.append("u.firstName LIKE :search OR");
-            sb.append("u.lastName LIKE :search");
-            objects.put("search", search);
-        }
-
-        String where = null;
-        if (objects.size() > 0) {
-            where = sb.toString();
-        } else {
-            objects = null;
-        }
-
-        return listByWhere(where, objects, sortBy, sortDir, limitRows, limitOffset);
+        return listByUser(user, null, sortBy, sortDir, limitRows, limitOffset);
     }
 
     public List<User> listByUser(User user, UserFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
         StringBuilder sb = new StringBuilder();
-        Map<String, Object> objects = new HashMap<String, Object>();
+        Map<String, Object> objects = new HashMap<>();
 
         if (filter != null) {
             sb.append("1 = 1");
@@ -121,6 +97,14 @@ public class UserDao extends SimpleHDao<User> {
             if (filter.getUnits() != null && !filter.getUnits().isEmpty()) {
                 sb.append(" AND u.unitId IN :unitIds");
                 objects.put("unitIds", filter.getUnits().stream().map(Unit::getId).collect(Collectors.toList()));
+            }
+            if (filter.getSearch() != null && !filter.getSearch().trim().isEmpty()) {
+                sb.append(" AND (");
+                sb.append(" u.username LIKE :search OR");
+                sb.append(" u.firstName LIKE :search OR");
+                sb.append(" u.lastName LIKE :search");
+                sb.append(" )");
+                objects.put("search", "%" + filter.getSearch().trim() + "%");
             }
         }
 
