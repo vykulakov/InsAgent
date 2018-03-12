@@ -141,7 +141,7 @@
 				<div class="form-group">
 					<label for="filterUserUnitsInput" class="col-sm-2 control-label">Подразделения:</label>
 					<div class="col-sm-10">
-						<select id="filterUserUnitsInput" name="units" class="form-control" multiple>
+						<select id="filterUserUnitsInput" name="unitIds" class="form-control" multiple>
 							<c:forEach var="unit" items="${ units }">
 								<option value="${ unit.id }">${ unit.name }</option>
 							</c:forEach>

@@ -37,11 +37,9 @@ public class UserDao extends SimpleHDao<User> {
         clazz = User.class;
 
         sortByMap.put("id", "u.id");
-        sortByMap.put("username", "u.username");
-        sortByMap.put("firstName", "u.firstName");
-        sortByMap.put("lastName", "u.lastName");
-        sortByMap.put("lastAuth", "u.lastAuth");
-        sortByMap.put("unit", "u.unit.name");
+        sortByMap.put("login", "u.username");
+        sortByMap.put("name", "CONCAT(u.firstName, u.lastName)");
+        sortByMap.put("unitName", "u.unit.name");
 
         countQueryPrefix = ""
                 + " SELECT"
@@ -94,9 +92,9 @@ public class UserDao extends SimpleHDao<User> {
                 sb.append(" AND CONCAT(u.firstName, ' ', u.lastName) LIKE :name OR CONCAT(u.lastName, ' ', u.firstName) LIKE :name");
                 objects.put("name", "%" + filter.getName().replace("*", "%") + "%");
             }
-            if (filter.getUnits() != null && !filter.getUnits().isEmpty()) {
-                sb.append(" AND u.unitId IN :unitIds");
-                objects.put("unitIds", filter.getUnits().stream().map(Unit::getId).collect(Collectors.toList()));
+            if (filter.getUnitIds() != null && !filter.getUnitIds().isEmpty()) {
+                sb.append(" AND u.unit.id IN :unitIds");
+                objects.put("unitIds", filter.getUnitIds());
             }
             if (filter.getSearch() != null && !filter.getSearch().trim().isEmpty()) {
                 sb.append(" AND (");

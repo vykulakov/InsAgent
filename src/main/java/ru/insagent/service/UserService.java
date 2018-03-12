@@ -32,6 +32,7 @@ import ru.insagent.dao.UnitDao;
 import ru.insagent.dao.UserDao;
 import ru.insagent.exception.AppException;
 import ru.insagent.management.model.UserFilter;
+import ru.insagent.management.user.model.UserDTO;
 import ru.insagent.model.*;
 import ru.insagent.util.Hibernate;
 
@@ -112,13 +113,14 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public List<User> listByUser(User user, UserFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
-        List<User> users;
+    public List<UserDTO> listByUser(User user, UserFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
+        List<UserDTO> users;
 
         Hibernate.beginTransaction();
         try {
-            users = userDao.listByUser(user, filter, sortBy, sortDir, limitRows, limitOffset);
-            users.forEach(u -> org.hibernate.Hibernate.initialize(u.getUnit().getCity()));
+            users = userDao.listByUser(user, filter, sortBy, sortDir, limitRows, limitOffset).stream()
+                    .map(UserDTO::new)
+                    .collect(Collectors.toList());
 
             Hibernate.commit();
         } catch (Exception e) {

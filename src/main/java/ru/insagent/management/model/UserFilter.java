@@ -19,7 +19,6 @@
 package ru.insagent.management.model;
 
 import ru.insagent.model.Filter;
-import ru.insagent.model.Unit;
 
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class UserFilter extends Filter {
     private String name;
     private String login;
     private String search;
-    private List<Unit> units;
+    private List<Integer> unitIds;
     private Boolean removed;
 
     public String getName() {
@@ -48,11 +47,11 @@ public class UserFilter extends Filter {
     public void setSearch(String search) {
         this.search = search;
     }
-    public List<Unit> getUnits() {
-        return units;
+    public List<Integer> getUnitIds() {
+        return unitIds;
     }
-    public void setUnits(List<Unit> units) {
-        this.units = units;
+    public void setUnitIds(List<Integer> unitIds) {
+        this.unitIds = unitIds;
     }
     public boolean getRemoved() {
         return removed;

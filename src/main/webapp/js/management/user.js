@@ -43,27 +43,16 @@ $(function() {
 			title: 'id',
 			sortable: true
 		}, {
-			field: 'username',
+			field: 'login',
 			title: 'Логин',
 			sortable: true
 		}, {
-			field: 'firstName',
+			field: 'name',
 			title: 'Имя',
 			sortable: true
 		}, {
-			field: 'lastName',
-			title: 'Фамилия',
-			sortable: true
-		}, {
-			field: 'unit',
+			field: 'unitName',
 			title: 'Подразделение',
-			sortable: true,
-			formatter: function(unit) {
-				return unit.name;
-			}
-		}, {
-			field: 'lastAuth',
-			title: 'Последний вход',
 			sortable: true
 		}],
 		rowStyle: function(row) {
@@ -279,7 +268,7 @@ $(function() {
 		filterUserFormObj.find(':input').each(function() {
 			if(this.name && cookie[this.name]) {
 				$(this).val(cookie[this.name]);
-				if(this.name === 'units') {
+				if(this.name === 'unitIds') {
 					$(this).multiselect('refresh');
 				}
 			}
@@ -287,8 +276,8 @@ $(function() {
 
 		var unitIndex = 0;
 		filterUserFormObj.serializeArray().map(function(param) {
-			if(param.name === 'units') {
-				filter['units[' + (unitIndex++) + '].id'] = param.value;
+			if(param.name === 'unitIds') {
+				filter['unitIds[' + (unitIndex++) + ']'] = param.value;
 				return;
 			}
 			if(param.value !== '') {
@@ -312,14 +301,14 @@ $(function() {
 		var cookie = {};
 		var unitIndex = 0;
 		filterUserFormObj.serializeArray().map(function(param) {
-			if(param.name === 'units') {
+			if(param.name === 'unitIds') {
 				cookie.filter = true;
 
-				filter['units[' + (unitIndex++) + '].id'] = param.value;
-				if(cookie['units'] === undefined) {
-					cookie['units'] = [param.value];
+				filter['unitIds[' + (unitIndex++) + ']'] = param.value;
+				if(cookie['unitIds'] === undefined) {
+					cookie['unitIds'] = [param.value];
 				} else {
-					cookie['units'].push(param.value);
+					cookie['unitIds'].push(param.value);
 				}
 
 				return;
