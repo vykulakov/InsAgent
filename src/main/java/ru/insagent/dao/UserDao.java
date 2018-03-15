@@ -19,14 +19,12 @@
 package ru.insagent.dao;
 
 import org.springframework.stereotype.Repository;
-import ru.insagent.management.model.UserFilter;
-import ru.insagent.model.Unit;
+import ru.insagent.management.user.model.UserFilter;
 import ru.insagent.model.User;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * User DAO.

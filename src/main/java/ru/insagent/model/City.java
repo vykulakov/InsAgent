@@ -53,4 +53,14 @@ public class City extends IdBase {
 	public String toString() {
 		return "City [id=" + id + ", name=" + name + ", comment=" + comment + ", removed=" + removed + "]";
 	}
+
+    public static City makeEditableCopy(City orig) {
+        City city = new City();
+        city.id = orig.id;
+        city.name = orig.name;
+        city.comment = orig.comment;
+        city.removed = orig.removed;
+
+        return city;
+    }
 }

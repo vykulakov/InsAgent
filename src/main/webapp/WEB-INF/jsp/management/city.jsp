@@ -26,8 +26,8 @@
              aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form id="editCityForm" method="post" action="<c:url value='/updateCityJson.action'/>">
-                        <input id="cityIdInput" name="city.id" type="hidden" value="0"/>
+                    <form id="editCityForm">
+                        <input id="cityIdInput" name="id" type="hidden" value="0"/>
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                     aria-hidden="true">&times;</span></button>
@@ -36,12 +36,12 @@
                         <div id="editCityBody" class="modal-body">
                             <div class="form-group">
                                 <label for="cityNameInput" class="control-label">Название:</label>
-                                <input id="cityNameInput" name="city.name" type="text" class="form-control"
+                                <input id="cityNameInput" name="name" type="text" class="form-control"
                                        placeholder="Название" required>
                             </div>
                             <div class="form-group">
                                 <label for="cityCommentInput" class="control-label">Комментарий:</label>
-                                <textarea id="cityCommentInput" name="city.comment" class="form-control"></textarea>
+                                <textarea id="cityCommentInput" name="comment" class="form-control"></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -59,8 +59,7 @@
              aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form id="removeCityForm" method="post" action="<c:url value='/removeCityJson.action'/>">
-                        <input id="removeCityIdInput" name="cityId" type="hidden" value="0"/>
+                    <form id="removeCityForm"/>">
                         <div class="modal-header alert alert-danger">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                     aria-hidden="true">&times;</span></button>

@@ -19,7 +19,7 @@
 package ru.insagent.dao;
 
 import org.springframework.stereotype.Repository;
-import ru.insagent.management.model.UnitType;
+import ru.insagent.model.UnitType;
 
 @Repository
 public class UnitTypeDao extends SimpleHDao<UnitType> {

@@ -15,6 +15,9 @@
     <meta name="description" content="">
     <meta name="author" content="Kulakov Vyacheclav &lt;kulakov.home@gmail.com&gt;">
 
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
+
     <link rel="stylesheet" type="text/css" href="<c:url value='/css/bootstrap.min.css'/>"/>
     <c:out value="${ param.link }" escapeXml="false"/>
     <link rel="stylesheet" type="text/css" href="<c:url value='/css/main.css?v=BUILD_NUMBER'/>"/>

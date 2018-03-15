@@ -19,18 +19,21 @@
 package ru.insagent.management;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import ru.insagent.management.model.CityFilter;
-import ru.insagent.management.model.UnitFilter;
-import ru.insagent.management.model.UserFilter;
+import org.springframework.web.bind.annotation.*;
+import ru.insagent.management.city.model.CityFilter;
+import ru.insagent.management.unit.model.UnitFilter;
+import ru.insagent.management.user.model.UserFilter;
+import ru.insagent.model.City;
 import ru.insagent.model.Response;
 import ru.insagent.service.CityService;
 import ru.insagent.service.UnitService;
 import ru.insagent.service.UserService;
+
+import javax.websocket.server.PathParam;
 
 @Controller
 public class ManagementController {
@@ -53,13 +56,13 @@ public class ManagementController {
         this.userService = userService;
     }
 
-    @RequestMapping("/management/city")
+    @GetMapping("/management/city")
     public String city() {
         return "management/city";
     }
 
     @ResponseBody
-    @RequestMapping("/management/cities")
+    @GetMapping("/management/cities")
     public Response cities(
             CityFilter filter,
             @RequestParam(name = "sort", required = false) String sort,
@@ -74,7 +77,35 @@ public class ManagementController {
         return response;
     }
 
-    @RequestMapping("/management/unit")
+    @ResponseBody
+    @GetMapping("/management/city/{id}")
+    public City getCity(
+            @PathVariable(name = "id") int id
+    ) {
+        return cityService.getEditable(id);
+    }
+
+    @ResponseStatus
+    @PostMapping("/management/city")
+    public ResponseEntity updateCity(
+            City city
+    ) {
+        cityService.update(city);
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @ResponseStatus
+    @PostMapping("/management/city/{id}")
+    public ResponseEntity removeCity(
+            @PathVariable(name = "id") int id
+    ) {
+        cityService.remove(id);
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping("/management/unit")
     public String unit(Model model) {
         model.addAttribute("types", unitService.types());
         model.addAttribute("cities", cityService.list());
@@ -83,7 +114,7 @@ public class ManagementController {
     }
 
     @ResponseBody
-    @RequestMapping("/management/units")
+    @GetMapping("/management/units")
     public Response units(
             UnitFilter filter,
             @RequestParam(name = "sort", required = false) String sort,
@@ -98,7 +129,7 @@ public class ManagementController {
         return response;
     }
 
-    @RequestMapping("/management/user")
+    @GetMapping("/management/user")
     public String user(Model model) {
         model.addAttribute("roles", userService.roles());
         model.addAttribute("units", userService.units());
@@ -107,7 +138,7 @@ public class ManagementController {
     }
 
     @ResponseBody
-    @RequestMapping("/management/users")
+    @GetMapping("/management/users")
     public Response users(
             UserFilter filter,
             @RequestParam(name = "sort", required = false) String sort,

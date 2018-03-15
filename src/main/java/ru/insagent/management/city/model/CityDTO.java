@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2017-2018 Vyacheslav Kulakov
+ * Copyright 2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,44 +16,31 @@
  * limitations under the License.
  */
 
-package ru.insagent.management.model;
+package ru.insagent.management.city.model;
 
-import org.springframework.web.bind.annotation.RequestParam;
-import ru.insagent.model.Filter;
+import ru.insagent.model.City;
 
-public class CityFilter extends Filter {
+/**
+ *
+ */
+public class CityDTO {
+    private int id;
     private String name;
-    private String search;
     private boolean removed;
 
-    public CityFilter() {
+    public CityDTO(City city) {
+        this.id = city.getId();
+        this.name = city.getName();
+        this.removed = city.isRemoved();
     }
 
-    public CityFilter(String search) {
-        this.search = search;
+    public int getId() {
+        return id;
     }
-
     public String getName() {
         return name;
     }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSearch() {
-        return search;
-    }
-
-    public void setSearch(String search) {
-        this.search = search;
-    }
-
-    public boolean getRemoved() {
+    public boolean isRemoved() {
         return removed;
-    }
-
-    public void setRemoved(boolean removed) {
-        this.removed = removed;
     }
 }

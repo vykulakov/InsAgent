@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
-import ru.insagent.management.model.CityFilter;
+import ru.insagent.management.city.model.CityFilter;
 import ru.insagent.model.City;
 import ru.insagent.model.User;
 

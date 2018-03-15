@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package ru.insagent.management.model;
+package ru.insagent.model;
 
 import ru.insagent.model.IdBase;
 

@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import ru.insagent.dao.SimpleDao;
-import ru.insagent.management.model.UnitType;
+import ru.insagent.model.UnitType;
 import ru.insagent.workflow.model.Node;
 import ru.insagent.workflow.model.NodeType;
 

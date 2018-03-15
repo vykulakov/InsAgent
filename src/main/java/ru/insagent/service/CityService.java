@@ -19,12 +19,14 @@
 package ru.insagent.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.insagent.dao.CityDao;
 import ru.insagent.exception.AppException;
-import ru.insagent.management.model.CityFilter;
+import ru.insagent.management.city.model.CityDTO;
+import ru.insagent.management.city.model.CityFilter;
 import ru.insagent.model.City;
 import ru.insagent.model.User;
 import ru.insagent.util.Hibernate;
@@ -63,12 +65,32 @@ public class CityService {
 		return cities;
 	}
 
-	public List<City> listByUser(User user, CityFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		List<City> cities;
+	public City getEditable(int id) {
+	    City city;
+
+        Hibernate.beginTransaction();
+        try {
+            city = City.makeEditableCopy(cityDao.get(id));
+
+            Hibernate.commit();
+        } catch(Exception e) {
+            Hibernate.rollback();
+
+            throw new AppException("Cannot get city", e);
+        }
+
+        return city;
+    }
+
+	public List<CityDTO> listByUser(User user, CityFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
+		List<CityDTO> cities;
 
 		Hibernate.beginTransaction();
 		try {
-			cities = cityDao.listByUser(user, filter, sortBy, sortDir, limitRows, limitOffset);
+			cities = cityDao
+                    .listByUser(user, filter, sortBy, sortDir, limitRows, limitOffset)
+                    .stream().map(CityDTO::new)
+                    .collect(Collectors.toList());
 
 			Hibernate.commit();
 		} catch(Exception e) {

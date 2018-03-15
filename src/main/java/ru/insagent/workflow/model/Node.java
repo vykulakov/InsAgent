@@ -3,7 +3,7 @@ package ru.insagent.workflow.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.insagent.management.model.UnitType;
+import ru.insagent.model.UnitType;
 import ru.insagent.model.IdBase;
 import ru.insagent.model.Unit;
 

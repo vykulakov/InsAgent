@@ -12,7 +12,7 @@ import ru.insagent.dao.SimpleDao;
 import ru.insagent.dao.UnitDao;
 import ru.insagent.document.model.Bso;
 import ru.insagent.document.model.BsoFilter;
-import ru.insagent.management.model.UnitType;
+import ru.insagent.model.UnitType;
 import ru.insagent.model.City;
 import ru.insagent.model.Filter;
 import ru.insagent.model.Unit;

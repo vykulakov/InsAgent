@@ -16,18 +16,20 @@
  * limitations under the License.
  */
 
-package ru.insagent.management.model;
+package ru.insagent.management.unit.model;
 
+import ru.insagent.model.City;
 import ru.insagent.model.Filter;
+import ru.insagent.model.UnitType;
 
 import java.util.List;
 
-public class UserFilter extends Filter {
+public class UnitFilter extends Filter {
     private String name;
-    private String login;
     private String search;
-    private List<Integer> unitIds;
-    private Boolean removed;
+    private List<UnitType> types;
+    private List<City> cities;
+    private boolean removed;
 
     public String getName() {
         return name;
@@ -35,23 +37,23 @@ public class UserFilter extends Filter {
     public void setName(String name) {
         this.name = name;
     }
-    public String getLogin() {
-        return login;
-    }
-    public void setLogin(String login) {
-        this.login = login;
-    }
     public String getSearch() {
         return search;
     }
     public void setSearch(String search) {
         this.search = search;
     }
-    public List<Integer> getUnitIds() {
-        return unitIds;
+    public List<UnitType> getTypes() {
+        return types;
     }
-    public void setUnitIds(List<Integer> unitIds) {
-        this.unitIds = unitIds;
+    public void setTypes(List<UnitType> types) {
+        this.types = types;
+    }
+    public List<City> getCities() {
+        return cities;
+    }
+    public void setCities(List<City> cities) {
+        this.cities = cities;
     }
     public boolean getRemoved() {
         return removed;

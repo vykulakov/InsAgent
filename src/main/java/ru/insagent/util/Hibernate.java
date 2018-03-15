@@ -25,7 +25,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import ru.insagent.management.model.UnitType;
+import ru.insagent.model.UnitType;
 import ru.insagent.model.*;
 
 /**

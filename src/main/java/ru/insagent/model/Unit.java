@@ -24,8 +24,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import ru.insagent.management.model.UnitType;
-
 @Entity
 @Table(name = "m_units")
 public class Unit extends IdBase {
