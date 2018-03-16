@@ -42,7 +42,7 @@ public class CityFilter extends Filter {
         this.search = search;
     }
 
-    public boolean getRemoved() {
+    public boolean isRemoved() {
         return removed;
     }
 

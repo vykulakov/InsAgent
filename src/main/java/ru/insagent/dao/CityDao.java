@@ -59,6 +59,9 @@ public class CityDao extends SimpleHDao<City> {
 
 		if(filter != null) {
 			sb.append("1 = 1");
+			if(!filter.isRemoved()) {
+				sb.append(" AND c.removed = 0");
+			}
 			if(StringUtils.isNotBlank(filter.getName())) {
 				sb.append(" AND c.name LIKE :name");
 				objects.put("name", "%" + filter.getName().replace("*", "%") + "%");
@@ -69,13 +72,6 @@ public class CityDao extends SimpleHDao<City> {
 			}
 		}
 
-		String where = null;
-		if(objects.size() > 0) {
-			where = sb.toString();
-		} else {
-			objects = null;
-		}
-
-		return listByWhere(where, objects, sortBy, sortDir, limitRows, limitOffset);
+		return listByWhere(sb.toString(), objects, sortBy, sortDir, limitRows, limitOffset);
 	}
 }

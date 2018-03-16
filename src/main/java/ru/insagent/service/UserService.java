@@ -25,13 +25,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.insagent.dao.MenuItemDao;
 import ru.insagent.dao.RoleDao;
 import ru.insagent.dao.UnitDao;
 import ru.insagent.dao.UserDao;
 import ru.insagent.exception.AppException;
-import ru.insagent.management.user.model.UserFilter;
 import ru.insagent.management.user.model.UserDTO;
+import ru.insagent.management.user.model.UserFilter;
 import ru.insagent.model.*;
 import ru.insagent.util.Hibernate;
 
@@ -192,32 +193,18 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserDetails userDetails = null;
-
-        Hibernate.beginTransaction();
-        try {
-            User user = userDao.getByUsername(username);
-            if (user != null) {
-                Set<String> roles = user.getRoles().stream().map(Role::getIdx).collect(Collectors.toSet());
-
-                List<MenuItem> items = menuItemDao.listByRoleIdxes(roles);
-                List<GrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-
-                userDetails = (UserDetails) new SpringUser(user, items, authorities);
-            }
-
-            Hibernate.commit();
-        } catch (Exception e) {
-            Hibernate.rollback();
-
-            throw new AppException("Cannot get user", e);
-        }
-
-        if (userDetails != null) {
-            return userDetails;
-        } else {
+        User user = userDao.getByUsername(username);
+        if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
+
+        Set<String> roles = user.getRoles().stream().map(Role::getIdx).collect(Collectors.toSet());
+
+        List<MenuItem> items = menuItemDao.listByRoleIdxes(roles);
+        List<GrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+
+        return new SpringUser(user, items, authorities);
     }
 }

@@ -21,13 +21,11 @@
 <body>
 <div class="container">
     <form class="form-signin" method="post" action="<c:url value='/login'/>">
-        <c:if test="${param.error != null}">
+        <c:if test="${SPRING_SECURITY_LAST_EXCEPTION != null}">
             <div class="alert alert-danger fade in">
                 <a href="#" class="close" data-dismiss="alert">&times;</a>
                 <strong>Ошибка авторизации:</strong>
-                <c:if test="${SPRING_SECURITY_LAST_EXCEPTION != null}">
-                    Reason: <c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}" />
-                </c:if>
+                Reason: <c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}" />
             </div>
         </c:if>
         <c:if test="${param.logout != null}">

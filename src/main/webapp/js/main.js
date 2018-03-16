@@ -1,50 +1,18 @@
 'use strict';
 
 $.ajaxSetup({
-	cache: false,
-	error: function(xhr, status, error) {
-		var alertMsg = '' +
-			'Ошибка выполнения запроса к серверу:\n' +
-			'    Статус: ' + status + '\n' +
-			'    Ошибка: ' + error;
-		alert(alertMsg);
-	}
+    cache: false
 });
 
 /**
  * Проверяет ответ от сервера на наличие ошибок
  * @param {object} response - JSON ответ от сервера
- * @returns {boolean} true, если
+ * @returns {*} true, если
+ * @deprecated При обработке Ajax ответов используются HTTP коды ошибок, поэтому,
+ * если был вызван error обработчик, то проверять уже нечего
  */
 function checkError(response) {
-	var n = 0;
-	var errors = [];
-
-	if(response.actionErrors !== undefined) {
-		for(var i = 0, l = response.actionErrors.length; i < l; i++) {
-			errors[n++] = response.actionErrors[i];
-		}
-	}
-
-	if(response.fieldErrors !== undefined) {
-		for(var key in response.fieldErrors) {
-			for(var i = 0, l = response.fieldErrors[key].length; i < l; i++) {
-				errors[n++] = response.fieldErrors[key][i];
-			}
-		}
-	}
-
-	if(response.exception !== undefined) {
-		errors[n++] = '<pre>';
-		errors[n++] = response.exceptionStack;
-		errors[n++] = '</pre>';
-	}
-
-	if(errors.length > 0) {
-		return errors;
-	} else {
-		return undefined;
-	}
+    return undefined;
 }
 
 /**
@@ -61,7 +29,7 @@ function getAlertElements(status, response) {
 
     elements += '<div class="alert alert-danger fade in">';
     elements += '<a href="#" class="close" data-dismiss="alert">&times;</a>';
-    switch(status) {
+    switch (status) {
         case 'timeout':
             elements += '<strong>Ошибка выполнения запроса</strong>: сервер не отвечает';
             break;

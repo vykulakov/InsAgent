@@ -18,113 +18,68 @@
 
 package ru.insagent.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.insagent.dao.CityDao;
-import ru.insagent.exception.AppException;
+import ru.insagent.exception.NotFoundException;
 import ru.insagent.management.city.model.CityDTO;
 import ru.insagent.management.city.model.CityFilter;
 import ru.insagent.model.City;
 import ru.insagent.model.User;
-import ru.insagent.util.Hibernate;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class CityService {
-	private CityDao cityDao;
+    private CityDao cityDao;
 
-	@Autowired
+    @Autowired
     public void setCityDao(CityDao cityDao) {
         this.cityDao = cityDao;
     }
 
-    /**
-	 * Get rows count for the last query.
-	 * @return Rows count for the last query.
-	 */
-	public Long getCount() {
-		return cityDao.getCount();
-	}
-
-	public List<City> list() {
-		List<City> cities;
-
-		Hibernate.beginTransaction();
-		try {
-			cities = cityDao.list();
-
-			Hibernate.commit();
-		} catch(Exception e) {
-			Hibernate.rollback();
-
-			throw new AppException("Cannot get cities", e);
-		}
-
-		return cities;
-	}
-
-	public City getEditable(int id) {
-	    City city;
-
-        Hibernate.beginTransaction();
-        try {
-            city = City.makeEditableCopy(cityDao.get(id));
-
-            Hibernate.commit();
-        } catch(Exception e) {
-            Hibernate.rollback();
-
-            throw new AppException("Cannot get city", e);
-        }
-
-        return city;
+    public Long getCount() {
+        return cityDao.getCount();
     }
 
-	public List<CityDTO> listByUser(User user, CityFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		List<CityDTO> cities;
+    public List<City> list() {
+        return cityDao.list();
+    }
 
-		Hibernate.beginTransaction();
-		try {
-			cities = cityDao
-                    .listByUser(user, filter, sortBy, sortDir, limitRows, limitOffset)
-                    .stream().map(CityDTO::new)
-                    .collect(Collectors.toList());
+    public City getEditable(int id) {
+        return City.makeEditableCopy(cityDao.get(id));
+    }
 
-			Hibernate.commit();
-		} catch(Exception e) {
-			Hibernate.rollback();
+    public List<CityDTO> listByUser(User user, CityFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
+        return cityDao
+                .listByUser(user, filter, sortBy, sortDir, limitRows, limitOffset)
+                .stream().map(CityDTO::new)
+                .collect(Collectors.toList());
+    }
 
-			throw new AppException("Cannot get cities", e);
-		}
+    public void update(City newCity) {
+        if (newCity.getId() == 0) {
+            cityDao.add(newCity);
+        } else {
+            City oldCity = cityDao.get(newCity.getId());
+            if (oldCity == null) {
+                throw new NotFoundException("City not found");
+            }
 
-		return cities;
-	}
+            oldCity.setName(newCity.getName());
+            oldCity.setComment(newCity.getComment());
+        }
+    }
 
-	public void update(City city) {
-		Hibernate.beginTransaction();
-		try {
-			cityDao.update(city);
+    public void remove(int id) {
+        City city = cityDao.get(id);
+        if (city == null) {
+            throw new NotFoundException("City not found");
+        }
 
-			Hibernate.commit();
-		} catch(Exception e) {
-			Hibernate.rollback();
-
-			throw new AppException("Cannot update city", e);
-		}
-	}
-
-	public void remove(int cityId) {
-		Hibernate.beginTransaction();
-		try {
-			cityDao.remove(cityId);
-
-			Hibernate.commit();
-		} catch(Exception e) {
-			Hibernate.rollback();
-
-			throw new AppException("Cannot remove city", e);
-		}
-	}
+        cityDao.remove(city);
+    }
 }

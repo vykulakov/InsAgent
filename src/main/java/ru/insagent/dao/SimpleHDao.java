@@ -55,7 +55,7 @@ public abstract class SimpleHDao<E extends IdBase> extends BaseHDao {
     protected Class<E> clazz;
 
     @PersistenceContext
-    private EntityManager entityManager;
+    protected EntityManager entityManager;
 
     protected Long count;
 
@@ -75,7 +75,7 @@ public abstract class SimpleHDao<E extends IdBase> extends BaseHDao {
      * @return Entity with the given id.
      */
     public E get(int id) {
-        return Hibernate.getCurrentSession().get(clazz, id);
+        return entityManager.find(clazz, id);
     }
 
     /**
@@ -171,8 +171,8 @@ public abstract class SimpleHDao<E extends IdBase> extends BaseHDao {
         }
 
         try {
-            if (countQueryPrefix != null) {
-                Query<Long> countQuery = Hibernate.getCurrentSession().createQuery(countQueryConstructed.toString(), Long.class);
+            if (countQueryConstructed != null) {
+                TypedQuery<Long> countQuery = entityManager.createQuery(countQueryConstructed.toString(), Long.class);
                 if (parameters != null) {
                     for (Entry<String, Object> entry : parameters.entrySet()) {
                         countQuery.setParameter(entry.getKey(), entry.getValue());
@@ -182,16 +182,16 @@ public abstract class SimpleHDao<E extends IdBase> extends BaseHDao {
                 count = countQuery.getSingleResult();
             }
 
-			Query<E> selectQuery = Hibernate.getCurrentSession().createQuery(selectQueryConstructed.toString(), clazz);
-			if(parameters != null) {
-				for(Entry<String, Object> entry : parameters.entrySet()) {
-					selectQuery.setParameter(entry.getKey(), entry.getValue());
-				}
-			}
-			if(limitRows > 0) {
-				selectQuery.setFirstResult(limitOffset);
-				selectQuery.setMaxResults(limitRows);
-			}
+            TypedQuery<E> selectQuery = entityManager.createQuery(selectQueryConstructed.toString(), clazz);
+            if (parameters != null) {
+                for (Entry<String, Object> entry : parameters.entrySet()) {
+                    selectQuery.setParameter(entry.getKey(), entry.getValue());
+                }
+            }
+            if (limitRows > 0) {
+                selectQuery.setFirstResult(limitOffset);
+                selectQuery.setMaxResults(limitRows);
+            }
 
             return selectQuery.getResultList();
         } catch (Exception e) {
@@ -200,21 +200,21 @@ public abstract class SimpleHDao<E extends IdBase> extends BaseHDao {
     }
 
     /**
+     * Add entity
+     *
+     * @param o - entity to add.
+     */
+    public void add(E o) {
+        entityManager.persist(o);
+    }
+
+    /**
      * Update entity
      *
      * @param o - entity to update.
-     * @throws AppException if passed entity is {@code null}.
      */
-    public void update(E o) throws AppException {
-        if (o == null) {
-            throw new AppException("Passed null-object");
-        }
-
-        try {
-            Hibernate.getCurrentSession().update(o);
-        } catch (Exception e) {
-            throw new AppException("Cannot update object in DB", e);
-        }
+    @Deprecated
+    public void update(E o) {
     }
 
     /**
@@ -222,13 +222,9 @@ public abstract class SimpleHDao<E extends IdBase> extends BaseHDao {
      *
      * @param id - entity id.
      */
+    @Deprecated
     public void remove(int id) {
-        E o = Hibernate.getCurrentSession().get(clazz, id);
-        if (o == null) {
-            return;
-        }
-
-        removeImpl(o);
+        throw new AppException("Not yet implemented");
     }
 
     /**
@@ -241,6 +237,6 @@ public abstract class SimpleHDao<E extends IdBase> extends BaseHDao {
     }
 
     private void removeImpl(E o) {
-        Hibernate.getCurrentSession().delete(o);
+        entityManager.remove(o);
     }
 }

@@ -18,9 +18,12 @@
 
 package ru.insagent.dao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import ru.insagent.management.user.model.UserFilter;
 import ru.insagent.model.User;
+import ru.insagent.util.Hibernate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,15 +59,21 @@ public class UserDao extends SimpleHDao<User> {
                 + "     1 = 1";
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
+
     public User getByUsername(String username) {
         Map<String, Object> objects = new HashMap<>();
         objects.put("username", username);
 
         List<User> users = listByWhere("u.username = :username", objects);
+
+        logger.error("User X: {}", User.class.getClassLoader());
+        logger.error("User Y: {}", Hibernate.class.getClassLoader());
+
         if (users.isEmpty()) {
             return null;
         } else {
-            return users.get(0);
+            return (User) users.get(0);
         }
     }
 

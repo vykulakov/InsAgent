@@ -27,67 +27,59 @@ import ru.insagent.exception.AppException;
 import ru.insagent.model.ShiroUser;
 import ru.insagent.model.User;
 import ru.insagent.service.UserService;
-import ru.insagent.util.JdbcUtils;
-import ru.insagent.util.Setup;
 
 import java.sql.Connection;
 import java.util.List;
 
 public abstract class BaseAction extends ActionSupport implements Preparable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	protected Connection conn;
+    @Deprecated
+    protected Connection conn;
 
-	protected User baseUser;
-	protected ShiroUser shiroUser;
+    protected User baseUser;
+    protected ShiroUser shiroUser;
 
-	/**
-	 * Список ролей, которым разрешено выполнение данного действия
-	 */
-	protected List<String> ALLOW_ROLES;
-	/**
-	 * Сообщение пользователю, если у него нет прав для на выполнение данного действия
-	 */
-	protected String ALLOW_MSG = "У вас нет прав для выполнения данного действия";
+    /**
+     * Список ролей, которым разрешено выполнение данного действия
+     */
+    protected List<String> ALLOW_ROLES;
+    /**
+     * Сообщение пользователю, если у него нет прав для на выполнение данного действия
+     */
+    protected String ALLOW_MSG = "У вас нет прав для выполнения данного действия";
 
-	protected final static Logger logger = LoggerFactory.getLogger(BaseAction.class);
+    protected final static Logger logger = LoggerFactory.getLogger(BaseAction.class);
 
-	/**
-	 * Пустой метод для получения фиктивной переменной из запроса,
-	 * отвечающей за отключение кеширования.
-	 */
-	public void set_(String ignore) {
-	}
+    /**
+     * Пустой метод для получения фиктивной переменной из запроса,
+     * отвечающей за отключение кеширования.
+     */
+    public void set_(String ignore) {
+    }
 
-	@Override
-	public void prepare() {
-		conn = Setup.getConnection();
-		if(conn == null) {
-			logger.error("Bad connection");
-		}
+    @Override
+    public void prepare() {
+        shiroUser = (ShiroUser) SecurityUtils.getSubject().getPrincipal();
+        if (shiroUser == null) {
+            logger.error("Bad user");
+        } else {
+            baseUser = new UserService().get(shiroUser.getId());
+        }
+    }
 
-		shiroUser = (ShiroUser) SecurityUtils.getSubject().getPrincipal();
-		if(shiroUser == null) {
-			logger.error("Bad user");
-		} else {
-			baseUser = new UserService().get(shiroUser.getId());
-		}
-	}
+    @Override
+    public String execute() {
+        try {
+            return executeImpl();
+        } catch (AppException e) {
+            addActionError(e.getMessage());
+            logger.error("Cannot execute action", e);
+            return ERROR;
+        }
+    }
 
-	@Override
-	public String execute() {
-		try {
-			return executeImpl();
-		} catch(AppException e) {
-			addActionError(e.getMessage());
-			logger.error("Cannot execute action", e);
-			return ERROR;
-		} finally {
-			JdbcUtils.closeConnection(conn);
-		}
-	}
-
-	public String executeImpl() throws AppException {
-		return SUCCESS;
-	}
+    public String executeImpl() throws AppException {
+        return SUCCESS;
+    }
 }
