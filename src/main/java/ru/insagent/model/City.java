@@ -49,18 +49,18 @@ public class City extends IdBase {
 		this.removed = removed;
 	}
 
+	public City makeEditableCopy() {
+		City city = new City();
+		city.id = this.id;
+		city.name = this.name;
+		city.comment = this.comment;
+		city.removed = this.removed;
+
+		return city;
+	}
+
 	@Override
 	public String toString() {
 		return "City [id=" + id + ", name=" + name + ", comment=" + comment + ", removed=" + removed + "]";
 	}
-
-    public static City makeEditableCopy(City orig) {
-        City city = new City();
-        city.id = orig.id;
-        city.name = orig.name;
-        city.comment = orig.comment;
-        city.removed = orig.removed;
-
-        return city;
-    }
 }

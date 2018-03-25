@@ -67,9 +67,6 @@ public class UserDao extends SimpleHDao<User> {
 
         List<User> users = listByWhere("u.username = :username", objects);
 
-        logger.error("User X: {}", User.class.getClassLoader());
-        logger.error("User Y: {}", Hibernate.class.getClassLoader());
-
         if (users.isEmpty()) {
             return null;
         } else {

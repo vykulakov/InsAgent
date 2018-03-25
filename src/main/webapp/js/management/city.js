@@ -10,32 +10,15 @@ $(function () {
     var $editForm = $('#editCityForm');
     var $editBody = $('#editCityBody');
 
+    var $removeForm = $('#removeCityForm');
+    var $removeBody = $('#removeCityBody');
+
     $table.bootstrapTable({
         url: '',
         queryParams: function (params) {
             $.extend(params, filter);
 
             return params;
-        },
-        responseHandler: function (response) {
-
-            var errors = checkError(response);
-            if (errors !== undefined) {
-                var alertMsg = '' +
-                    '<div class="alert alert-danger fade in">' +
-                    '    <a href="#" class="close" data-dismiss="alert">&times;</a>' +
-                    '    <strong>При получении данных возникли ошибки:</strong><br/>';
-                for (var i = 0, l = errors.length; i < l; i++) {
-                    alertMsg += errors[i] + '<br/>';
-                }
-                alertMsg += '</div>';
-
-                $alert.append(alertMsg);
-
-                return [];
-            }
-
-            return response;
         },
         clickToSelect: true,
         singleSelect: true,
@@ -83,12 +66,8 @@ $(function () {
             $alert.children().remove();
         },
         onDblClickRow: function (row) {
-            openEditCity(row.id);
+            openEdit(row.id);
         }
-    });
-
-    $('#openAddCityButton').on('click', function () {
-        openEditCity();
     });
 
     /**
@@ -97,7 +76,7 @@ $(function () {
      *
      * @param {number} [id] - идентификатор сущности для редактирования.
      */
-    function openEditCity(id) {
+    function openEdit(id) {
         $editBody.find('.alert').remove();
 
         if (!id) {
@@ -132,6 +111,10 @@ $(function () {
         }
     }
 
+    $('#openAddCityButton').on('click', function () {
+        openEdit();
+    });
+
     $('#openEditCityButton').on('click', function () {
         var selections = $table.bootstrapTable('getSelections');
 
@@ -144,7 +127,7 @@ $(function () {
             return;
         }
 
-        openEditCity(selections[0].id);
+        openEdit(selections[0].id);
     });
 
     /**
@@ -152,16 +135,15 @@ $(function () {
      *
      * @param {number} id - идентификатор сущности для удаления.
      */
-    function openRemoveCity(id) {
-        $('#removeCityBody').find('.alert').remove();
-
-        $('#removeCityIdInput').val(id);
+    function openRemove(id) {
+        $removeBody.data('id', id);
+        $removeBody.find('.alert').remove();
 
         $('#removeCityModal').modal({});
     }
 
     $('#openRemoveCityButton').on('click', function () {
-        var selections = $('#citiesTable').bootstrapTable('getSelections');
+        var selections = $table.bootstrapTable('getSelections');
 
         if (selections.length < 1) {
             alert('Необходимо выбрать город.');
@@ -172,7 +154,7 @@ $(function () {
             return;
         }
 
-        openEditCity(selections[0].id);
+        openRemove(selections[0].id);
     });
 
     $editForm.validator({
@@ -203,14 +185,12 @@ $(function () {
         });
     });
 
-    var $removeForm = $('#removeCityForm');
-    var $removeBody = $('#removeCityBody');
     $removeForm.on('submit', function (e) {
         e.preventDefault();
 
         $removeBody.find('.alert').remove();
         $.ajax({
-            url: '/management/city/' + $removeForm.serialize().id,
+            url: '/management/city/' + $removeBody.data('id'),
             type: 'DELETE',
             headers: csrfHeaders,
             error: function (xhr) {
@@ -257,9 +237,9 @@ $(function () {
 
         $filterButton.removeClass('btn-default').addClass('btn-warning');
 
-        $table.bootstrapTable('refresh', {url: '/management/cities'});
+        $table.bootstrapTable('refresh', {url: '/management/city'});
     } else {
-        $table.bootstrapTable('refresh', {url: '/management/cities'});
+        $table.bootstrapTable('refresh', {url: '/management/city'});
     }
     $filter.on('submit', function (e) {
         e.preventDefault();

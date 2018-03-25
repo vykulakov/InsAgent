@@ -18,60 +18,60 @@
 
 package ru.insagent.dao;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import ru.insagent.management.city.model.CityFilter;
 import ru.insagent.model.City;
 import ru.insagent.model.User;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Repository
 public class CityDao extends SimpleHDao<City> {
-	{
-		clazz = City.class;
+    {
+        clazz = City.class;
 
-		sortByMap.put("id", "c.id");
-		sortByMap.put("name", "c.name");
+        sortByMap.put("id", "c.id");
+        sortByMap.put("name", "c.name");
 
-		countQueryPrefix = ""
-			+ " SELECT"
-			+ "     COUNT(*) AS count"
-			+ " FROM"
-			+ "     City c"
-			+ " WHERE"
-			+ "     1 = 1";
+        countQueryPrefix = ""
+                + " SELECT"
+                + "     COUNT(*) AS count"
+                + " FROM"
+                + "     City c"
+                + " WHERE"
+                + "     1 = 1";
 
-		selectQueryPrefix = ""
-			+ " SELECT"
-			+ "     c"
-			+ " FROM"
-			+ "     City c"
-			+ " WHERE"
-			+ "     1 = 1";
-	}
+        selectQueryPrefix = ""
+                + " SELECT"
+                + "     c"
+                + " FROM"
+                + "     City c"
+                + " WHERE"
+                + "     1 = 1";
+    }
 
-	public List<City> listByUser(User user, CityFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		StringBuilder sb = new StringBuilder();
-		Map<String, Object> objects = new HashMap<>();
+    public List<City> listByUser(User user, CityFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
+        StringBuilder sb = new StringBuilder();
+        Map<String, Object> objects = new HashMap<>();
 
-		if(filter != null) {
-			sb.append("1 = 1");
-			if(!filter.isRemoved()) {
-				sb.append(" AND c.removed = 0");
-			}
-			if(StringUtils.isNotBlank(filter.getName())) {
-				sb.append(" AND c.name LIKE :name");
-				objects.put("name", "%" + filter.getName().replace("*", "%") + "%");
-			}
-			if(StringUtils.isNotBlank(filter.getSearch())) {
-				sb.append(" AND c.name LIKE :search");
-				objects.put("search", "%" + filter.getSearch() + "%");
-			}
-		}
+        if (filter != null) {
+            sb.append("1 = 1");
+            if (!filter.isRemoved()) {
+                sb.append(" AND c.removed = 0");
+            }
+            if (StringUtils.isNotBlank(filter.getName())) {
+                sb.append(" AND c.name LIKE :name");
+                objects.put("name", "%" + filter.getName().replace("*", "%") + "%");
+            }
+            if (StringUtils.isNotBlank(filter.getSearch())) {
+                sb.append(" AND c.name LIKE :search");
+                objects.put("search", "%" + filter.getSearch() + "%");
+            }
+        }
 
-		return listByWhere(sb.toString(), objects, sortBy, sortDir, limitRows, limitOffset);
-	}
+        return listByWhere(sb.toString(), objects, sortBy, sortDir, limitRows, limitOffset);
+    }
 }

@@ -18,7 +18,6 @@
 
 package ru.insagent.management.city.model;
 
-import org.springframework.web.bind.annotation.RequestParam;
 import ru.insagent.model.Filter;
 
 public class CityFilter extends Filter {

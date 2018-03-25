@@ -37,9 +37,11 @@ public class CityDTO {
     public int getId() {
         return id;
     }
+
     public String getName() {
         return name;
     }
+
     public boolean isRemoved() {
         return removed;
     }

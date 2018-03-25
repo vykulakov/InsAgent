@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2018 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,62 +18,81 @@
 
 package ru.insagent.model;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "m_units")
 public class Unit extends IdBase {
-	private static final long serialVersionUID = -6544474496483192296L;
+    private static final long serialVersionUID = -6544474496483192296L;
 
-	private String name;
-	private String comment;
-	private boolean removed;
+    private String name;
+    private String comment;
+    private boolean removed;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "cityId")
-	private City city;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cityId")
+    private City city;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "typeId")
-	private UnitType type;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "typeId")
+    private UnitType type;
 
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public UnitType getType() {
-		return type;
-	}
-	public void setType(UnitType type) {
-		this.type = type;
-	}
-	public City getCity() {
-		return city;
-	}
-	public void setCity(City city) {
-		this.city = city;
-	}
-	public String getComment() {
-		return comment;
-	}
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-	public boolean isRemoved() {
-		return removed;
-	}
-	public void setRemoved(boolean removed) {
-		this.removed = removed;
-	}
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public String toString() {
-		return "Unit [id=" + id + ", name=" + name + ", type=" + type + ", city=" + city + ", comment=" + comment + ", removed=" + removed + "]";
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public UnitType getType() {
+        return type;
+    }
+
+    public void setType(UnitType type) {
+        this.type = type;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
+    }
+
+    public Unit makeEditableCopy() {
+        Unit unit = new Unit();
+        unit.id = this.id;
+        unit.name = this.name;
+        unit.city = new City();
+        unit.city.setId(this.city.getId());
+        unit.type = new UnitType();
+        unit.type.setId(this.type.getId());
+        unit.comment = this.comment;
+        unit.removed = this.removed;
+
+        return unit;
+    }
+
+    @Override
+    public String toString() {
+        return "Unit [id=" + id + ", name=" + name + ", type=" + type + ", city=" + city + ", comment=" + comment + ", removed=" + removed + "]";
+    }
 }

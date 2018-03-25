@@ -44,14 +44,6 @@ public abstract class SimpleHDao<E extends IdBase> extends BaseHDao {
     protected String selectQueryPrefix = null;
     protected String selectOrder = null;
 
-    protected String insertQuery = null;
-    protected String updateQuery = null;
-    protected String removeQuery = null;
-
-    protected String searchWhere = null;
-
-    protected String removedWhere = null;
-
     protected Class<E> clazz;
 
     @PersistenceContext
@@ -95,35 +87,6 @@ public abstract class SimpleHDao<E extends IdBase> extends BaseHDao {
      */
     public List<E> list(List<Integer> ids) {
         return Hibernate.getCurrentSession().byMultipleIds(clazz).multiLoad(ids);
-    }
-
-    /**
-     * Get entities with quick search, sorting and pagination.
-     *
-     * @param search      - keyword for quick search, {@code null} to disable quick search,
-     * @param sortBy      - field to sort by, {@code null} to disable sorting,
-     * @param sortDir     - sort direction,
-     * @param limitRows   - max number returned entities, {@code 0} to disable pagination,
-     * @param limitOffset - offset of the first entity.
-     * @return Filtered, sorted and paginated entities.
-     */
-    public List<E> list(String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
-        if (searchWhere == null) {
-            throw new AppException("Условие запроса поиска объекта не задано.");
-        }
-
-        String where = null;
-        Map<String, Object> parameters = null;
-        if (search != null && !search.trim().isEmpty() && searchWhere != null) {
-            search = "%" + search + "%";
-
-            where = searchWhere;
-
-            parameters = new HashMap<String, Object>();
-            parameters.put("search", search);
-        }
-
-        return listByWhere(where, parameters, sortBy, sortDir, limitRows, limitOffset);
     }
 
     protected List<E> listByWhere() throws AppException {

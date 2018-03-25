@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2018 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,44 +28,43 @@ import java.util.Set;
 
 /**
  * Menu item dao
- *
- * @author Kulakov Vyacheslav <kulakov.home@gmail.com>
  */
 @Repository
 public class MenuItemDao extends SimpleHDao<MenuItem> {
-	{
-		clazz = MenuItem.class;
+    {
+        clazz = MenuItem.class;
 
-		countQueryPrefix = ""
-			+ " SELECT"
-			+ "     COUNT(*) AS count"
-			+ " FROM"
-			+ "     MenuItem i"
-			+ "     LEFT JOIN i.roles r"
-			+ " WHERE"
-			+ "     1 = 1";
+        countQueryPrefix = ""
+                + " SELECT"
+                + "     COUNT(*) AS count"
+                + " FROM"
+                + "     MenuItem i"
+                + "     LEFT JOIN i.roles r"
+                + " WHERE"
+                + "     1 = 1";
 
-		selectQueryPrefix = ""
-			+ " SELECT"
-			+ "     i"
-			+ " FROM"
-			+ "     MenuItem i"
-			+ "     LEFT JOIN i.roles r"
-			+ " WHERE"
-			+ "     1 = 1";
+        selectQueryPrefix = ""
+                + " SELECT"
+                + "     i"
+                + " FROM"
+                + "     MenuItem i"
+                + "     LEFT JOIN i.roles r"
+                + " WHERE"
+                + "     1 = 1";
 
-		selectOrder = "i.order";
-	}
+        selectOrder = "i.order";
+    }
 
-	/**
-	 * Get menu items by roles idxes
-	 * @param roles - role idxes.
-	 * @return Menu items with given idxes.
-	 */
-	public List<MenuItem> listByRoleIdxes(Set<String> roles) {
-		Map<String, Object> parameters = new HashMap<>();
-		parameters.put("idxes", roles);
+    /**
+     * Get menu items by roles idxes
+     *
+     * @param roles - role idxes.
+     * @return Menu items with given idxes.
+     */
+    public List<MenuItem> listByRoleIdxes(Set<String> roles) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("idxes", roles);
 
-		return listByWhere(" r.idx IN (:idxes) ", parameters);
-	}
+        return listByWhere(" r.idx IN (:idxes) ", parameters);
+    }
 }

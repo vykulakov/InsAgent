@@ -59,7 +59,7 @@
              aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form id="removeCityForm"/>">
+                    <form id="removeCityForm">
                         <div class="modal-header alert alert-danger">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                     aria-hidden="true">&times;</span></button>

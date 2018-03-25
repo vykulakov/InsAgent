@@ -36,7 +36,7 @@
         </c:if>
 
         <h2 class="form-signin-heading">Вход в систему</h2>
-        <input type="hidden"  name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         <label for="username" class="sr-only">Имя пользователя</label>
         <input id="username" type="text" name="username" class="form-control" placeholder="Имя пользователя"
                value="${ param.username }" required autofocus/>

@@ -29,11 +29,6 @@ public class MainController {
         return "main";
     }
 
-    @RequestMapping("/user/")
-    public String userIndex() {
-        return "user/index";
-    }
-
     @RequestMapping("/login")
     public String login() {
         return "login";

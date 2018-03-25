@@ -34,30 +34,39 @@ public class UnitFilter extends Filter {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public String getSearch() {
         return search;
     }
+
     public void setSearch(String search) {
         this.search = search;
     }
+
     public List<UnitType> getTypes() {
         return types;
     }
+
     public void setTypes(List<UnitType> types) {
         this.types = types;
     }
+
     public List<City> getCities() {
         return cities;
     }
+
     public void setCities(List<City> cities) {
         this.cities = cities;
     }
-    public boolean getRemoved() {
+
+    public boolean isRemoved() {
         return removed;
     }
+
     public void setRemoved(boolean removed) {
         this.removed = removed;
     }

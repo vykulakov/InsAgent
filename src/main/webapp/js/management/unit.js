@@ -2,368 +2,378 @@
 
 var filter = {};
 
-$(function() {
-	var $table = $('#unitsTable');
-	var $alert = $('#unitsTableAlert');
+$(function () {
+    var $table = $('#unitsTable');
+    var $alert = $('#unitsTableAlert');
+    var $filter = $('#filterUnitForm');
 
-	$table.bootstrapTable({
-		url: '',
-		queryParams: function(params) {
-			$.extend(params, filter);
+    var $editForm = $('#editUnitForm');
+    var $editBody = $('#editUnitBody');
 
-			return params;
-		},
-		responseHandler: function(response) {
+    var $removeForm = $('#removeUnitForm');
+    var $removeBody = $('#removeUnitBody');
+
+    $table.bootstrapTable({
+        url: '',
+        queryParams: function (params) {
+            $.extend(params, filter);
+
+            return params;
+        },
+        clickToSelect: true,
+        singleSelect: true,
+        checkboxHeader: false,
+        columns: [{
+            checkbox: true
+        }, {
+            field: 'id',
+            title: 'id',
+            sortable: true
+        }, {
+            field: 'name',
+            title: 'Название',
+            sortable: true
+        }, {
+            field: 'typeName',
+            title: 'Тип',
+            sortable: true
+        }, {
+            field: 'cityName',
+            title: 'Город',
+            sortable: true
+        }],
+        rowStyle: function (row) {
+            if (row.removed) {
+                return {
+                    classes: 'danger'
+                };
+            }
+
+            return {};
+        },
+        search: true,
+        showRefresh: true,
+        toolbar: '#toolbar',
+        pagination: true,
+        sidePagination: 'server',
+        pageSize: 10,
+        pageList: [5, 10, 20, 50],
+        stateSave: true,
+        stateSaveIdTable: 'unitsTable',
+
+        onLoadError: function (status, response) {
+            $alert.prepend(getAlertElements(status, response));
+        },
+        onLoadSuccess: function () {
             $alert.children().remove();
+        },
+        onDblClickRow: function (row) {
+            openEdit(row.id);
+        }
+    });
 
-			var errors = checkError(response);
-			if(errors !== undefined) {
-				var alertMsg = '' +
-				'<div class="alert alert-danger fade in">' +
-				'    <a href="#" class="close" data-dismiss="alert">&times;</a>' +
-				'    <strong>При получении данных возникли ошибки:</strong><br/>';
-				for(var i = 0, l = errors.length; i < l; i++) {
-					alertMsg += errors[i] + '<br/>';
-				}
-				alertMsg += '</div>';
+    /**
+     * Загружает сущность по идентификатору с сервера, заполняет форму параметрами загруженной сущности и
+     * открывает модальное окно для редактирования выбранной сущности.
+     *
+     * @param {number} [id] - идентификатор сущности для редактирования.
+     */
+    function openEdit(id) {
+        $editBody.find('.alert').remove();
 
-                $alert.append(alertMsg);
+        if (!id) {
+            $('#unitIdInput').val(0);
+            $('#unitNameInput').val('');
+            $('#unitTypeInput').val(0);
+            $('#unitCityInput').val(0);
+            $('#unitCommentInput').val('');
 
-				return [];
-			}
+            $('#editUnitLabel').text('Добавление подразделения');
+            $('#editUnitButton').text('Добавить');
 
-			return response;
-		},
-		clickToSelect: true,
-		singleSelect: true,
-		checkboxHeader: false,
-		columns: [{
-			checkbox: true
-		}, {
-			field: 'id',
-			title: 'id',
-			sortable: true
-		}, {
-			field: 'name',
-			title: 'Название',
-			sortable: true
-		}, {
-			field: 'typeName',
-			title: 'Тип',
-			sortable: true
-		}, {
-			field: 'cityName',
-			title: 'Город',
-			sortable: true
-		}],
-		rowStyle: function(row) {
-			if(row.removed) {
-				return {
-					classes: 'danger'
-				};
-			}
+            $('#editUnitModal').modal({});
+        } else {
+            $('#editUnitLabel').text('Редактирование подразделения');
+            $('#editUnitButton').text('Сохранить');
 
-			return {};
-		},
-		search: true,
-		showRefresh: true,
-		toolbar: '#toolbar',
-		pagination: true,
-		sidePagination: 'server',
-		pageSize: 10,
-		pageList: [5, 10, 20, 50],
-		stateSave: true,
-		stateSaveIdTable: 'unitsTable'
-	});
+            $.ajax({
+                url: '/management/unit/' + id,
+                type: 'GET',
+                error: function (xhr) {
+                    $editBody.prepend(getAlertElements(xhr.statusText, xhr.responseJSON));
 
-	$('#openAddUnitButton').on('click', function() {
-		$('#unitIdInput').val(0);
-		$('#unitNameInput').val('');
-		$('#unitTypeInput').val(0);
-		$('#unitCityInput').val(0);
-		$('#unitCommentInput').val('');
+                    $('#editCityModal').modal({});
+                },
+                success: function (response) {
+                    $('#unitIdInput').val(response.id);
+                    $('#unitNameInput').val(response.name);
+                    $('#unitTypeInput').val(response.type.id);
+                    $('#unitCityInput').val(response.city.id);
+                    $('#unitCommentInput').val(response.comment);
 
-		$('#editUnitLabel').text('Добавление подразделения');
-		$('#editUnitButton').text('Добавить');
+                    $('#editUnitModal').modal({});
+                }
+            });
+        }
+    }
 
-		$('#editUnitModal').modal({});
-	});
+    $('#openAddUnitButton').on('click', function () {
+        openEdit();
+    });
 
-	$('#openEditUnitButton').on('click', function() {
-		$('#editUnitBody').find('.alert').remove();
+    $('#openEditUnitButton').on('click', function () {
+        var selections = $table.bootstrapTable('getSelections');
 
-		var row = $('#unitsTable').bootstrapTable('getSelections');
+        if (selections.length < 1) {
+            alert('Необходимо выбрать подразделение.');
+            return;
+        }
+        if (selections.length > 1) {
+            alert('Для редактирования необходимо выбрать только одино подразделение.');
+            return;
+        }
 
-		var l = row.length;
-		if(l === 0) {
-			alert('Необходимо выбрать подразделение.');
-			return;
-		}
+        openEdit(selections[0].id);
+    });
 
-		var unit = row[0];
-		$('#unitIdInput').val(unit.id);
-		$('#unitNameInput').val(unit.name);
-		$('#unitTypeInput').val(unit.type.id);
-		$('#unitCityInput').val(unit.city.id);
-		$('#unitCommentInput').val(unit.comment);
+    /**
+     * Открывает диалог подтверждения удаления сущности.
+     *
+     * @param {number} id - идентификатор сущности для удаления.
+     */
+    function openRemove(id) {
+        $removeBody.data('id', id);
+        $removeBody.find('.alert').remove();
 
-		$('#editUnitLabel').text('Редактирование подразделения');
-		$('#editUnitButton').text('Сохранить');
+        $('#removeUnitModal').modal({});
+    }
 
-		$('#editUnitModal').modal({});
-	});
+    $('#openRemoveUnitButton').on('click', function () {
+        var selections = $table.bootstrapTable('getSelections');
 
-	$('#openRemoveUnitButton').on('click', function() {
-		$('#removeUnitBody').find('.alert').remove();
+        if (selections.length < 1) {
+            alert('Необходимо выбрать подразделение.');
+            return;
+        }
+        if (selections.length > 1) {
+            alert('Для удаления необходимо выбрать только одино подразделение.');
+            return;
+        }
 
-		var row = $('#unitsTable').bootstrapTable('getSelections');
+        openRemove(selections[0].id);
+    });
 
-		var l = row.length;
-		if(l === 0) {
-			alert('Необходимо выбрать пользователя.');
-			return;
-		}
+    $editForm.validator({
+        custom: {
+            selected: function (element) {
+                return element.val() !== 0;
 
-		var unit = row[0];
-		$('#removeUnitIdInput').val(unit.id);
+            }
+        },
+        errors: {
+            match: "Значения полей не совпадают",
+            minlength: "Значение слишком короткое",
+            selected: "Значение не выбрано"
+        }
+    }).on('submit', function (e) {
+        if (e.isDefaultPrevented()) {
+            return;
+        }
 
-		$('#removeUnitModal').modal({});
-	});
+        e.preventDefault();
 
-	$('#editUnitForm').validator({
-		custom: {
-			selected: function(element) {
-				if(element.val() == 0) {
-					return false;
-				}
+        $editBody.find('.alert').remove();
+        $.ajax({
+            url: '/management/unit',
+            type: 'POST',
+            data: $editForm.serialize(),
+            headers: csrfHeaders,
+            error: function (xhr) {
+                $editBody.prepend(getAlertElements(xhr.statusText, xhr.responseJSON));
+            },
+            success: function (response) {
+                $('#editUnitModal').modal('hide');
+                $table.bootstrapTable('refresh');
+            }
+        });
+    });
 
-				return true;
-			}
-		},
-		errors: {
-			match: "Значения полей не совпадают",
-			minlength: "Значение слишком короткое",
-			selected: "Значение не выбрано"
-		}
-	}).on('submit', function(e) {
-		if(e.isDefaultPrevented()) {
-			return;
-		}
+    $removeForm.on('submit', function (e) {
+        e.preventDefault();
 
-		// Форма отправляется через AJAX, поэтому стандартную отправку нужно отключить.
-		e.preventDefault();
+        $removeBody.find('.alert').remove();
+        $.ajax({
+            url: '/management/unit/' + $removeBody.data('id'),
+            type: 'DELETE',
+            headers: csrfHeaders,
+            error: function (xhr) {
+                $removeBody.prepend(getAlertElements(xhr.statusText, xhr.responseJSON));
+            },
+            success: function (response) {
+                $('#removeUnitModal').modal('hide');
+                $table.bootstrapTable('refresh');
+            }
+        });
+    });
 
-		var $form = $('#editUnitForm');
-		var $body = $('#editUnitBody');
-		$.getJSON($form.attr('action'), $form.serialize(), function(response) {
-			$body.find('.alert').remove();
+    /**
+     * Добавляем фильтр к таблице.
+     */
+    $table.parents('.bootstrap-table').find('.fixed-table-toolbar').append('' +
+        '<div class="columns columns-left btn-group pull-right">' +
+        '    <button id="openFilterUnitButton" title="Фильтр подразделений" name="filter" type="button" class="btn btn-default">' +
+        '        <i id="openFilterUnitIcon" class="glyphicon glyphicon-menu-up icon-menu-up"></i>' +
+        '    </button>' +
+        '</div>');
 
-			var errors = checkError(response);
-			if(errors !== undefined) {
-				var alert = '' +
-				'<div class="alert alert-danger fade in">' +
-				'    <a href="#" class="close" data-dismiss="alert">&times;</a>' +
-				'    <strong>При добавлении/обновлении подразделения возникли ошибки:</strong><br/>';
-				for(var i = 0, l = errors.length; i < l; i++) {
-					alert += errors[i] + '<br/>';
-				}
-				alert += '</div>';
+    var $filterButton = $('#openFilterUnitButton');
+    $filterButton.on('click', function () {
+        $('#filterUnitDiv').toggleClass('hidden');
+        $('#openFilterUnitIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
+    });
+    $('#filterUnitTypesInput').multiselect({
+        buttonWidth: '100%',
+        numberDisplayed: 10,
+        allSelectedText: 'Выбраны все доступные типы',
+        nonSelectedText: 'Не выбраны',
+        includeSelectAllOption: true,
+        selectAllText: 'Выбрать всё'
+    });
+    $('#filterUnitCitiesInput').multiselect({
+        buttonWidth: '100%',
+        numberDisplayed: 10,
+        allSelectedText: 'Выбраны все доступные города',
+        nonSelectedText: 'Не выбраны',
+        includeSelectAllOption: true,
+        selectAllText: 'Выбрать всё'
+    });
 
-                $body.prepend(alert);
+    var cookie = Cookies.getJSON('unitsFilter');
+    if (!!cookie && cookie.filter) {
+        filter = {};
 
-				return;
-			}
+        $filter.find(':input').each(function () {
+            if (this.name && cookie[this.name]) {
+                $(this).val(cookie[this.name]);
+                if (this.name === 'types' || this.name === 'cities') {
+                    $(this).multiselect('refresh');
+                }
+            }
+        });
 
-			$('#editUnitModal').modal('hide');
-			$('#unitsTable').bootstrapTable('refresh');
-		});
-	});
+        var typeIndex = 0;
+        var cityIndex = 0;
+        $filter.serializeArray().map(function (param) {
+            if (param.name === 'types') {
+                filter['types[' + (typeIndex++) + '].id'] = param.value;
+                return;
+            }
+            if (param.name === 'cities') {
+                filter['cities[' + (cityIndex++) + '].id'] = param.value;
+                return;
+            }
+            if (param.value !== '') {
+                filter[param.name] = param.value;
+                return;
+            }
+        });
 
-	$('#removeUnitForm').on('submit', function(e) {
-		// Форма отправляется через AJAX, поэтому стандартную отправку нужно отключить.
-		e.preventDefault();
+        $filterButton.removeClass('btn-default').addClass('btn-warning');
 
-		var form = $('#removeUnitForm');
-		$.getJSON(form.attr('action'), form.serialize(), function(response) {
-			$('#removeUnitBody').find('.alert').remove();
+        $table.bootstrapTable('refresh', {url: '/management/unit'});
+    } else {
+        $table.bootstrapTable('refresh', {url: '/management/unit'});
+    }
+    $filter.on('submit', function (e) {
+        e.preventDefault();
 
-			var errors = checkError(response);
-			if(errors !== undefined) {
-				var alert = '' +
-				'<div class="alert alert-danger fade in">' +
-				'    <a href="#" class="close" data-dismiss="alert">&times;</a>' +
-				'    <strong>При удалении подразделения возникли ошибки:</strong><br/>';
-				for(var i = 0, l = errors.length; i < l; i++) {
-					alert += errors[i] + '<br/>';
-				}
-				alert += '</div>';
+        filter = {};
 
-				$('#removeUnitBody').prepend(alert);
+        var cookie = {};
+        var typeIndex = 0;
+        var cityIndex = 0;
+        $filter.serializeArray().map(function (param) {
+            if (param.name === 'types') {
+                cookie.filter = true;
 
-				return;
-			}
+                filter['types[' + (typeIndex++) + '].id'] = param.value;
+                if (cookie['types'] === undefined) {
+                    cookie['types'] = [param.value];
+                } else {
+                    cookie['types'].push(param.value);
+                }
 
-			$('#removeUnitModal').modal('hide');
-			$('#unitsTable').bootstrapTable('refresh');
-		});
-	});
+                return;
+            }
+            if (param.name === 'cities') {
+                cookie.filter = true;
 
-	/**
-	 * Добавляем фильтр к таблице.
-	 */
-	$table.parents('.bootstrap-table').find('.fixed-table-toolbar').append('' +
-			'<div class="columns columns-left btn-group pull-right">' +
-			'    <button id="openFilterUnitButton" title="Фильтр подразделений" name="filter" type="button" class="btn btn-default">' +
-			'        <i id="openFilterUnitIcon" class="glyphicon glyphicon-menu-up icon-menu-up"></i>' +
-			'    </button>' +
-			'</div>');
-	$('#openFilterUnitButton').on('click', function() {
-		$('#filterUnitDiv').toggleClass('hidden');
-		$('#openFilterUnitIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
-	});
-	$('#filterUnitTypesInput').multiselect({
-		buttonWidth: '100%',
-		numberDisplayed: 10,
-		allSelectedText: 'Выбраны все доступные типы',
-		nonSelectedText: 'Не выбраны',
-		includeSelectAllOption: true,
-		selectAllText: 'Выбрать всё'
-	});
-	$('#filterUnitCitiesInput').multiselect({
-		buttonWidth: '100%',
-		numberDisplayed: 10,
-		allSelectedText: 'Выбраны все доступные города',
-		nonSelectedText: 'Не выбраны',
-		includeSelectAllOption: true,
-		selectAllText: 'Выбрать всё'
-	});
-	var filterUnitFormObj = $('#filterUnitForm');
-	var cookie = Cookies.getJSON('unitsFilter');
-	if(!!cookie && cookie.filter) {
-		filter = {};
+                filter['cities[' + (cityIndex++) + '].id'] = param.value;
+                if (cookie['cities'] === undefined) {
+                    cookie['cities'] = [param.value];
+                } else {
+                    cookie['cities'].push(param.value);
+                }
 
-		filterUnitFormObj.find(':input').each(function() {
-			if(this.name && cookie[this.name]) {
-				$(this).val(cookie[this.name]);
-				if(this.name === 'types' || this.name === 'cities') {
-					$(this).multiselect('refresh');
-				}
-			}
-    	});
+                return;
+            }
+            if (param.name === 'removed' && param.value === 'true') {
+                cookie.filter = true;
 
-		var typeIndex = 0;
-		var cityIndex = 0;
-		filterUnitFormObj.serializeArray().map(function(param) {
-			if(param.name === 'types') {
-				filter['types[' + (typeIndex++) + '].id'] = param.value;
-				return;
-			}
-			if(param.name === 'cities') {
-				filter['cities[' + (cityIndex++) + '].id'] = param.value;
-				return;
-			}
-			if(param.value !== '') {
-				filter[param.name] = param.value;
-				return;
-			}
-		});
+                filter[param.name] = param.value;
+                cookie[param.name] = param.value;
 
-		$('#openFilterUnitButton').removeClass('btn-default').addClass('btn-warning');
+                return;
+            }
+            if (param.value !== '') {
+                cookie.filter = true;
 
-		$table.bootstrapTable('refresh', {url: '/management/units'});
-	} else {
-		$table.bootstrapTable('refresh', {url: '/management/units'});
-	}
-	filterUnitFormObj.on('submit', function(e) {
-		e.preventDefault();
+                filter[param.name] = param.value;
+                cookie[param.name] = param.value;
 
-		filter = {};
+                return;
+            }
+        });
 
-		var cookie = {};
-		var typeIndex = 0;
-		var cityIndex = 0;
-		filterUnitFormObj.serializeArray().map(function(param) {
-			if(param.name === 'types') {
-				cookie.filter = true;
+        Cookies.set('unitsFilter', cookie);
 
-				filter['types[' + (typeIndex++) + '].id'] = param.value;
-				if(cookie['types'] === undefined) {
-					cookie['types'] = [param.value];
-				} else {
-					cookie['types'].push(param.value);
-				}
+        $('#filterUnitDiv').toggleClass('hidden');
+        $('#openFilterUnitIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
+        if (!!cookie && cookie.filter) {
+            $filterButton.removeClass('btn-default').addClass('btn-warning');
 
-				return;
-			}
-			if(param.name === 'cities') {
-				cookie.filter = true;
+            $table.bootstrapTable('refresh');
+        }
+    });
+    $filter.on('reset', function (e) {
+        // Форму отправлять не нужно.
+        e.preventDefault();
 
-				filter['cities[' + (cityIndex++) + '].id'] = param.value;
-				if(cookie['cities'] === undefined) {
-					cookie['cities'] = [param.value];
-				} else {
-					cookie['cities'].push(param.value);
-				}
+        filter = {};
+        $filter.find(':input').each(function () {
+            switch (this.type) {
+                case 'password':
+                case 'select-multiple':
+                case 'select-one':
+                case 'text':
+                case 'textarea':
+                    $(this).val('');
+                    break;
+                case 'checkbox':
+                case 'radio':
+                    this.checked = false;
+            }
+            $('#filterUnitTypesInput').multiselect('refresh');
+            $('#filterUnitCitiesInput').multiselect('refresh');
+            $('#filterUnitRemovedInput').val('false');
+        });
 
-				return;
-			}
-			if(param.name === 'removed' && param.value === 'true') {
-				cookie.filter = true;
+        Cookies.remove('unitsFilter');
 
-				filter[param.name] = param.value;
-				cookie[param.name] = param.value;
+        $('#filterUnitDiv').toggleClass('hidden');
+        $('#openFilterUnitIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
+        $filterButton.removeClass('btn-warning').addClass('btn-default');
 
-				return;
-			}
-			if(param.value !== '') {
-				cookie.filter = true;
-
-				filter[param.name] = param.value;
-				cookie[param.name] = param.value;
-
-				return;
-			}
-		});
-
-		Cookies.set('unitsFilter', cookie);
-
-		$('#filterUnitDiv').toggleClass('hidden');
-		$('#openFilterUnitIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
-		if(!!cookie && cookie.filter) {
-			$('#openFilterUnitButton').removeClass('btn-default').addClass('btn-warning');
-
-			$table.bootstrapTable('refresh');
-		}
-	});
-	filterUnitFormObj.on('reset', function(e) {
-		// Форму отправлять не нужно.
-		e.preventDefault();
-
-		filter = {};
-		filterUnitFormObj.find(':input').each(function() {
-			switch(this.type) {
-				case 'password':
-				case 'select-multiple':
-				case 'select-one':
-				case 'text':
-				case 'textarea':
-					$(this).val('');
-					break;
-				case 'checkbox':
-				case 'radio':
-					this.checked = false;
-			}
-			$('#filterUnitTypesInput').multiselect('refresh');
-			$('#filterUnitCitiesInput').multiselect('refresh');
-			$('#filterUnitRemovedInput').val('false');
-		});
-
-		Cookies.remove('unitsFilter');
-
-		$('#filterUnitDiv').toggleClass('hidden');
-		$('#openFilterUnitIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
-		$('#openFilterUnitButton').removeClass('btn-warning').addClass('btn-default');
-
-		$table.bootstrapTable('refresh');
-	});
+        $table.bootstrapTable('refresh');
+    });
 });

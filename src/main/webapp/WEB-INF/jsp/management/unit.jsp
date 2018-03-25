@@ -26,8 +26,8 @@
              aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form id="editUnitForm" method="post" action="<c:url value='/updateUnitJson.action'/>">
-                        <input id="unitIdInput" name="unit.id" type="hidden" value="0"/>
+                    <form id="editUnitForm">
+                        <input id="unitIdInput" name="id" type="hidden" value="0"/>
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                     aria-hidden="true">&times;</span></button>
@@ -36,12 +36,12 @@
                         <div id="editUnitBody" class="modal-body">
                             <div class="form-group">
                                 <label for="unitNameInput" class="control-label">Название:</label>
-                                <input id="unitNameInput" name="unit.name" type="text" class="form-control"
+                                <input id="unitNameInput" name="name" type="text" class="form-control"
                                        placeholder="Название" required>
                             </div>
                             <div class="form-group">
                                 <label for="unitTypeInput" class="control-label">Тип:</label>
-                                <select id="unitTypeInput" name="unit.type.id" class="form-control" data-selected="bar"
+                                <select id="unitTypeInput" name="type.id" class="form-control" data-selected="bar"
                                         data-selected-error="Необходимо выбрать тип" required>
                                     <option value="0">--- Не выбран ---</option>
                                     <c:forEach var="type" items="${ types }">
@@ -52,7 +52,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="unitCityInput" class="control-label">Город:</label>
-                                <select id="unitCityInput" name="unit.city.id" class="form-control" data-selected="bar"
+                                <select id="unitCityInput" name="city.id" class="form-control" data-selected="bar"
                                         data-selected-error="Необходимо выбрать город" required>
                                     <option value="0">--- Не выбрано ---</option>
                                     <c:forEach var="city" items="${ cities }">
@@ -63,7 +63,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="unitCommentInput" class="control-label">Комментарий:</label>
-                                <textarea id="unitCommentInput" name="unit.comment" class="form-control"></textarea>
+                                <textarea id="unitCommentInput" name="comment" class="form-control"></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -81,8 +81,7 @@
              aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form id="removeUnitForm" method="post" action="<c:url value='/removeUnitJson.action'/>">
-                        <input id="removeUnitIdInput" name="unitId" type="hidden" value="0"/>
+                    <form id="removeUnitForm">
                         <div class="modal-header alert alert-danger">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                     aria-hidden="true">&times;</span></button>

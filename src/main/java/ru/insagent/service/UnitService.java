@@ -20,22 +20,33 @@ package ru.insagent.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.insagent.dao.CityDao;
 import ru.insagent.dao.UnitDao;
 import ru.insagent.dao.UnitTypeDao;
-import ru.insagent.exception.AppException;
-import ru.insagent.management.unit.model.UnitFilter;
-import ru.insagent.model.UnitType;
+import ru.insagent.exception.NotFoundException;
+import ru.insagent.management.city.model.CityDTO;
 import ru.insagent.management.unit.model.UnitDTO;
+import ru.insagent.management.unit.model.UnitFilter;
+import ru.insagent.model.City;
 import ru.insagent.model.Unit;
+import ru.insagent.model.UnitType;
 import ru.insagent.model.User;
-import ru.insagent.util.Hibernate;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class UnitService {
+    private CityDao cityDao;
     private UnitDao unitDao;
     private UnitTypeDao unitTypeDao;
+
+    @Autowired
+    public void setCityDao(CityDao cityDao) {
+        this.cityDao = cityDao;
+    }
 
     @Autowired
     public void setUnitDao(UnitDao unitDao) {
@@ -47,6 +58,10 @@ public class UnitService {
         this.unitTypeDao = unitTypeDao;
     }
 
+    public List<UnitType> types() {
+        return unitTypeDao.list();
+    }
+
     /**
      * Get rows count for the last query.
      *
@@ -56,63 +71,54 @@ public class UnitService {
         return unitDao.getCount();
     }
 
+    public Unit getEditable(int id) {
+        Unit unit = unitDao.get(id);
+        if (unit == null) {
+            throw new NotFoundException("Unit not found");
+        }
+
+        return unit.makeEditableCopy();
+    }
+
     public List<UnitDTO> listByUser(User user, UnitFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
-        List<UnitDTO> units;
-
-        Hibernate.beginTransaction();
-        try {
-            units = unitDao.listByUser(user, filter, sortBy, sortDir, limitRows, limitOffset);
-
-            Hibernate.commit();
-        } catch (Exception e) {
-            Hibernate.rollback();
-
-            throw new AppException("Cannot get units", e);
-        }
-
-        return units;
+        return unitDao
+                .listByUser(user, filter, sortBy, sortDir, limitRows, limitOffset)
+                .stream().map(UnitDTO::new)
+                .collect(Collectors.toList());
     }
 
-    public void update(Unit unit) {
-        Hibernate.beginTransaction();
-        try {
-            unitDao.update(unit);
-
-            Hibernate.commit();
-        } catch (Exception e) {
-            Hibernate.rollback();
-
-            throw new AppException("Cannot update unit", e);
+    public void update(Unit newUnit) {
+        City city = cityDao.get(newUnit.getCity().getId());
+        if (city == null) {
+            throw new NotFoundException("City not found");
         }
-    }
 
-    public void remove(int unitId) {
-        Hibernate.beginTransaction();
-        try {
-            unitDao.remove(unitId);
+        UnitType type = unitTypeDao.get(newUnit.getType().getId());
+        if (type == null) {
+            throw new NotFoundException("Type not found");
+        }
 
-            Hibernate.commit();
-        } catch (Exception e) {
-            Hibernate.rollback();
+        newUnit.setCity(city);
+        newUnit.setType(type);
+        if (newUnit.getId() == 0) {
+            unitDao.add(newUnit);
+        } else {
+            Unit oldUnit = unitDao.get(newUnit.getId());
+            if (oldUnit == null) {
+                throw new NotFoundException("Unit not found");
+            }
 
-            throw new AppException("Cannot remove unit", e);
+            oldUnit.setName(newUnit.getName());
+            oldUnit.setComment(newUnit.getComment());
         }
     }
 
-    public List<UnitType> types() {
-        List<UnitType> result;
-
-        Hibernate.beginTransaction();
-        try {
-            result = unitTypeDao.list();
-
-            Hibernate.commit();
-        } catch (Exception e) {
-            Hibernate.rollback();
-
-            throw new AppException("Cannot get unit types", e);
+    public void remove(int id) {
+        Unit unit = unitDao.get(id);
+        if (unit == null) {
+            throw new NotFoundException("Unit not found");
         }
 
-        return result;
+        unit.setRemoved(true);
     }
 }

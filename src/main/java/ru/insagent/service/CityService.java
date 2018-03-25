@@ -50,7 +50,12 @@ public class CityService {
     }
 
     public City getEditable(int id) {
-        return City.makeEditableCopy(cityDao.get(id));
+        City city = cityDao.get(id);
+        if (city == null) {
+            throw new NotFoundException("City not found");
+        }
+
+        return city.makeEditableCopy();
     }
 
     public List<CityDTO> listByUser(User user, CityFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
@@ -79,7 +84,6 @@ public class CityService {
         if (city == null) {
             throw new NotFoundException("City not found");
         }
-
-        cityDao.remove(city);
+        city.setRemoved(true);
     }
 }
