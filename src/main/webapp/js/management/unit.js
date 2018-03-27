@@ -102,7 +102,7 @@ $(function () {
                 error: function (xhr) {
                     $editBody.prepend(getAlertElements(xhr.statusText, xhr.responseJSON));
 
-                    $('#editCityModal').modal({});
+                    $('#editUnitModal').modal({});
                 },
                 success: function (response) {
                     $('#unitIdInput').val(response.id);
@@ -129,7 +129,7 @@ $(function () {
             return;
         }
         if (selections.length > 1) {
-            alert('Для редактирования необходимо выбрать только одино подразделение.');
+            alert('Для редактирования необходимо выбрать только одно подразделение.');
             return;
         }
 
@@ -156,7 +156,7 @@ $(function () {
             return;
         }
         if (selections.length > 1) {
-            alert('Для удаления необходимо выбрать только одино подразделение.');
+            alert('Для удаления необходимо выбрать только одно подразделение.');
             return;
         }
 

@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2017 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ package ru.insagent.model;
 import org.apache.struts2.json.annotations.JSON;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 /**
  * User entity
@@ -52,7 +52,7 @@ public class User extends IdBase {
             joinColumns = @JoinColumn(name = "userId", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "roleId", referencedColumnName = "id")
     )
-    private Set<Role> roles = new HashSet<>();
+    private List<Role> roles = new ArrayList<>();
 
     public String getUsername() {
         return username;
@@ -120,11 +120,11 @@ public class User extends IdBase {
         this.unit = unit;
     }
 
-    public Set<Role> getRoles() {
+    public List<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(List<Role> roles) {
         this.roles = roles;
     }
 
@@ -134,6 +134,27 @@ public class User extends IdBase {
 
     public void setRemoved(boolean removed) {
         this.removed = removed;
+    }
+
+    public User makeEditableCopy() {
+        User user = new User();
+        user.id = this.id;
+        user.unit = new Unit();
+        user.unit.setId(this.unit.getId());
+        user.username = this.username;
+        user.firstName = this.firstName;
+        user.lastName = this.lastName;
+        user.comment = this.comment;
+        user.removed = this.removed;
+
+        this.getRoles().forEach(r -> {
+            Role role = new Role();
+            role.setId(r.getId());
+
+            user.roles.add(role);
+        });
+
+        return user;
     }
 
     @Override

@@ -51,6 +51,7 @@ public class CityControllerIT extends ControllerIT {
         ReadContext ctx = JsonPath.parse(body);
         City city = ctx.read("$", City.class);
 
+        assertThat(city).isNotNull();
         assertThat(city.getId()).isEqualTo(1);
         assertThat(city.getName()).isEqualTo("Воронеж");
     }

@@ -25,8 +25,8 @@
 	<div id="editUserModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form id="editUserForm" method="post" action="<c:url value='/updateUserJson.action'/>">
-					<input id="userIdInput" name="user.id" type="hidden" value="0"/>
+				<form id="editUserForm">
+					<input id="userIdInput" name="id" type="hidden" value="0"/>
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 						<h4 class="modal-title" id="editUserLabel">Добавление пользователя</h4>
@@ -34,13 +34,13 @@
 					<div id="editUserBody" class="modal-body">
 						<div class="form-group">
 							<label for="userUsernameInput" class="control-label">Логин:</label>
-							<input id="userUsernameInput" name="user.username" type="text" class="form-control" placeholder="Логин" required>
+							<input id="userUsernameInput" name="username" type="text" class="form-control" placeholder="Логин" required>
 						</div>
 						<div class="row">
 							<div class="col-xs-6">
 								<div class="form-group">
 									<label for="userPasswordInput" class="control-label">Пароль:</label>
-									<input id="userPasswordInput" name="user.password" type="password" class="form-control" data-password="#userIdInput" data-password-error="Необходимо ввести пароль" data-passwordminlength="#userIdInput" data-passwordminlength-error="Пароль слишком короткий" placeholder="Пароль">
+									<input id="userPasswordInput" name="password" type="password" class="form-control" data-password="#userIdInput" data-password-error="Необходимо ввести пароль" data-passwordminlength="#userIdInput" data-passwordminlength-error="Пароль слишком короткий" placeholder="Пароль">
 									<span class="help-block">Минимум 6 символов</span>
 								</div>
 							</div>
@@ -56,26 +56,26 @@
 							<label for="userFirstNameInput" class="control-label">Имя и фамилия:</label>
 							<div class="row">
 								<div class="col-xs-6">
-									<input id="userFirstNameInput" name="user.firstName" type="text" class="form-control" placeholder="Имя" required>
+									<input id="userFirstNameInput" name="firstName" type="text" class="form-control" placeholder="Имя" required>
 								</div>
 								<div class="col-xs-6">
-									<input id="userLastNameInput" name="user.lastName" type="text" class="form-control" placeholder="Фамилия" required>
+									<input id="userLastNameInput" name="lastName" type="text" class="form-control" placeholder="Фамилия" required>
 								</div>
 							</div>
 						</div>
 						<div class="form-group">
 							<label for="userRoleInput" class="control-label">Роль:</label>
-							<select id="userRoleInput" name="user.roles" class="form-control" data-selected="foo" data-selected-error="Необходимо выбрать роль" required>
+							<select id="userRoleInput" name="roles[0].id" class="form-control" data-selected="foo" data-selected-error="Необходимо выбрать роль" required>
 								<option value="0">--- Не выбрана ---</option>
 								<c:forEach var="role" items="${ roles }">
-									<option value="${ role.idx }"><c:out value="${ role.name }"/></option>
+									<option value="${ role.id }"><c:out value="${ role.name }"/></option>
 								</c:forEach>
 							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 						<div class="form-group">
 							<label for="userUnitInput" class="control-label">Подразделение:</label>
-							<select id="userUnitInput" name="user.unit.id" class="form-control" data-selected="bar" data-selected-error="Необходимо выбрать подразделение" required>
+							<select id="userUnitInput" name="unit.id" class="form-control" data-selected="bar" data-selected-error="Необходимо выбрать подразделение" required>
 								<option value="0">--- Не выбрано ---</option>
 								<c:forEach var="unit" items="${ units }">
 									<option value="${ unit.id }"><c:out value="${ unit.name }"/></option>
@@ -85,7 +85,7 @@
 						</div>
 						<div class="form-group">
 							<label for="userCommentInput" class="control-label">Комментарий:</label>
-							<textarea id="userCommentInput" name="user.comment" class="form-control"></textarea>
+							<textarea id="userCommentInput" name="comment" class="form-control"></textarea>
 						</div>
 					</div>
 					<div class="modal-footer">
@@ -100,8 +100,7 @@
 	<div id="removeUserModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form id="removeUserForm" method="post" action="<c:url value='/removeUserJson.action'/>">
-					<input id="removeUserIdInput" name="userId" type="hidden" value="0"/>
+				<form id="removeUserForm">
 					<div class="modal-header alert alert-danger">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 						<h4 class="modal-title" id="removeUserLabel">Удаление пользователя</h4>

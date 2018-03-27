@@ -19,13 +19,15 @@
 package ru.insagent.management.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import ru.insagent.management.user.model.UserFilter;
 import ru.insagent.model.Response;
+import ru.insagent.model.Unit;
+import ru.insagent.model.User;
 import ru.insagent.service.UserService;
 
 @Controller
@@ -37,7 +39,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/management/user")
+    @GetMapping("/management/user.html")
     public String user(Model model) {
         model.addAttribute("roles", userService.roles());
         model.addAttribute("units", userService.units());
@@ -46,8 +48,16 @@ public class UserController {
     }
 
     @ResponseBody
-    @GetMapping("/management/users")
-    public Response users(
+    @GetMapping("/management/user/{id}")
+    public User get(
+            @PathVariable(name = "id") int id
+    ) {
+        return userService.getEditable(id);
+    }
+
+    @ResponseBody
+    @GetMapping("/management/user")
+    public Response list(
             UserFilter filter,
             @RequestParam(name = "sort", required = false) String sort,
             @RequestParam(name = "order", required = false) String order,
@@ -59,5 +69,25 @@ public class UserController {
         response.setTotal(userService.getCount());
 
         return response;
+    }
+
+    @ResponseStatus
+    @PostMapping("/management/user")
+    public ResponseEntity update(
+            User user
+    ) {
+        userService.update(user);
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @ResponseStatus
+    @DeleteMapping("/management/user/{id}")
+    public ResponseEntity remove(
+            @PathVariable(name = "id") int id
+    ) {
+        userService.remove(id);
+
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

@@ -26,22 +26,22 @@ import ru.insagent.model.Unit;
 public class UnitDTO {
     private int id;
     private String name;
-    private String comment;
-    private boolean removed;
     private int cityId;
     private String cityName;
     private int typeId;
     private String typeName;
+    private String comment;
+    private boolean removed;
 
     public UnitDTO(Unit unit) {
         this.id = unit.getId();
         this.name = unit.getName();
-        this.comment = unit.getComment();
-        this.removed = unit.isRemoved();
         this.cityId = unit.getCity().getId();
         this.cityName = unit.getCity().getName();
         this.typeId = unit.getType().getId();
         this.typeName = unit.getType().getName();
+        this.removed = unit.isRemoved();
+        this.comment = unit.getComment();
     }
 
     public int getId() {
@@ -50,14 +50,6 @@ public class UnitDTO {
 
     public String getName() {
         return name;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public boolean isRemoved() {
-        return removed;
     }
 
     public int getCityId() {
@@ -74,5 +66,13 @@ public class UnitDTO {
 
     public String getTypeName() {
         return typeName;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public boolean isRemoved() {
+        return removed;
     }
 }

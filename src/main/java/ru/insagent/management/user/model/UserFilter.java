@@ -27,35 +27,44 @@ public class UserFilter extends Filter {
     private String login;
     private String search;
     private List<Integer> unitIds;
-    private Boolean removed;
+    private boolean removed;
 
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public String getLogin() {
         return login;
     }
+
     public void setLogin(String login) {
         this.login = login;
     }
+
     public String getSearch() {
         return search;
     }
+
     public void setSearch(String search) {
         this.search = search;
     }
+
     public List<Integer> getUnitIds() {
         return unitIds;
     }
+
     public void setUnitIds(List<Integer> unitIds) {
         this.unitIds = unitIds;
     }
-    public boolean getRemoved() {
+
+    public boolean isRemoved() {
         return removed;
     }
+
     public void setRemoved(boolean removed) {
         this.removed = removed;
     }

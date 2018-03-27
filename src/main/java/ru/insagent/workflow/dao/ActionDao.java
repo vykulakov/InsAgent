@@ -30,6 +30,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -108,12 +109,8 @@ public class ActionDao extends SimpleDao<Action> {
 		return nodeIds;
 	}
 
-	private List<Integer> getActionIdByRoles(Set<Role> roles) throws AppException {
+	private List<Integer> getActionIdByRoles(Iterable<Role> roles) throws AppException {
 		List<Integer> actionIds = new ArrayList<>();
-
-		if (roles == null || roles.isEmpty()) {
-			throw new AppException("Передан пустой список ролей.");
-		}
 
 		StringBuilder query = new StringBuilder(""
 				+ " SELECT"
@@ -124,7 +121,7 @@ public class ActionDao extends SimpleDao<Action> {
 				+ " WHERE"
 				+ "     r.id = a.roleId AND"
 				+ "     r.idx IN (");
-		for (int i = 0; i < roles.size(); i++) {
+		for (Role role : roles) {
 			query.append("?");
 			query.append(",");
 		}

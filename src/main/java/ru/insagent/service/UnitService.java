@@ -109,6 +109,8 @@ public class UnitService {
             }
 
             oldUnit.setName(newUnit.getName());
+            oldUnit.setCity(newUnit.getCity());
+            oldUnit.setType(newUnit.getType());
             oldUnit.setComment(newUnit.getComment());
         }
     }

@@ -29,11 +29,13 @@ public class UserDTO {
     private String name;
     private int unitId;
     private String unitName;
+    private boolean removed;
 
     public UserDTO(User user) {
         this.id = user.getId();
         this.login = user.getUsername();
         this.name = user.getFirstName() + " " + user.getLastName();
+        this.removed = user.isRemoved();
         if (user.getUnit() != null) {
             this.unitId = user.getUnit().getId();
             this.unitName = user.getUnit().getName();
@@ -58,5 +60,9 @@ public class UserDTO {
 
     public String getUnitName() {
         return unitName;
+    }
+
+    public boolean isRemoved() {
+        return removed;
     }
 }

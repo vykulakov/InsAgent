@@ -88,6 +88,9 @@ public class UserDao extends SimpleHDao<User> {
 
         if (filter != null) {
             sb.append("1 = 1");
+            if (!filter.isRemoved()) {
+                sb.append(" AND u.removed = 0");
+            }
             if (filter.getLogin() != null) {
                 sb.append(" AND u.username LIKE :username");
                 objects.put("username", "%" + filter.getLogin().replace("*", "%") + "%");
@@ -110,13 +113,6 @@ public class UserDao extends SimpleHDao<User> {
             }
         }
 
-        String where = null;
-        if (objects.size() > 0) {
-            where = sb.toString();
-        } else {
-            objects = null;
-        }
-
-        return listByWhere(where, objects, sortBy, sortDir, limitRows, limitOffset);
+        return listByWhere(sb.toString(), objects, sortBy, sortDir, limitRows, limitOffset);
     }
 }

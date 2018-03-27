@@ -18,12 +18,14 @@
 
 package ru.insagent.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.insagent.dao.MenuItemDao;
@@ -31,6 +33,7 @@ import ru.insagent.dao.RoleDao;
 import ru.insagent.dao.UnitDao;
 import ru.insagent.dao.UserDao;
 import ru.insagent.exception.AppException;
+import ru.insagent.exception.NotFoundException;
 import ru.insagent.management.user.model.UserDTO;
 import ru.insagent.management.user.model.UserFilter;
 import ru.insagent.model.*;
@@ -41,11 +44,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class UserService implements UserDetailsService {
     private UserDao userDao;
     private UnitDao unitDao;
     private RoleDao roleDao;
     private MenuItemDao menuItemDao;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public void setUserDao(UserDao userDao) {
@@ -67,6 +72,19 @@ public class UserService implements UserDetailsService {
         this.menuItemDao = menuItemDao;
     }
 
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public List<Role> roles() {
+        return roleDao.list();
+    }
+
+    public List<Unit> units() {
+        return unitDao.list();
+    }
+
     /**
      * Get rows count for the last query.
      *
@@ -74,26 +92,6 @@ public class UserService implements UserDetailsService {
      */
     public Long getCount() {
         return userDao.getCount();
-    }
-
-    public ShiroUser getByUsername(String username) {
-        ShiroUser authUser = null;
-
-        Hibernate.beginTransaction();
-        try {
-            User user = userDao.getByUsername(username);
-            if (user != null) {
-                authUser = ShiroUser.of(user);
-            }
-
-            Hibernate.commit();
-        } catch (Exception e) {
-            Hibernate.rollback();
-
-            throw new AppException("Cannot get user", e);
-        }
-
-        return authUser;
     }
 
     public User get(int id) {
@@ -113,87 +111,63 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
+    public User getEditable(int id) {
+        User user = userDao.get(id);
+        if (user == null) {
+            throw new NotFoundException("User not found");
+        }
+
+        return user.makeEditableCopy();
+    }
+
     public List<UserDTO> listByUser(User user, UserFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
-        List<UserDTO> users;
-
-        Hibernate.beginTransaction();
-        try {
-            users = userDao.listByUser(user, filter, sortBy, sortDir, limitRows, limitOffset).stream()
-                    .map(UserDTO::new)
-                    .collect(Collectors.toList());
-
-            Hibernate.commit();
-        } catch (Exception e) {
-            Hibernate.rollback();
-
-            throw new AppException("Cannot get users", e);
-        }
-
-        return users;
+        return userDao
+                .listByUser(user, filter, sortBy, sortDir, limitRows, limitOffset)
+                .stream().map(UserDTO::new)
+                .collect(Collectors.toList());
     }
 
-    public void update(User user) {
-        Hibernate.beginTransaction();
-        try {
-            userDao.update(user);
-
-            Hibernate.commit();
-        } catch (Exception e) {
-            Hibernate.rollback();
-
-            throw new AppException("Cannot update user", e);
+    public void update(User newUser) {
+        Unit unit = unitDao.get(newUser.getUnit().getId());
+        if (unit == null) {
+            throw new NotFoundException("Unit not found");
         }
-    }
 
-    public void remove(int userId) {
-        Hibernate.beginTransaction();
-        try {
-            userDao.remove(userId);
+        newUser.setUnit(unit);
+        if (StringUtils.isNotBlank(newUser.getPassword())) {
+            newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        }
+        if (newUser.getId() == 0) {
+            userDao.add(newUser);
+        } else {
+            User oldUser = userDao.get(newUser.getId());
+            if (oldUser == null) {
+                throw new NotFoundException("User not found");
+            }
 
-            Hibernate.commit();
-        } catch (Exception e) {
-            Hibernate.rollback();
-
-            throw new AppException("Cannot remove user", e);
+            oldUser.setUnit(newUser.getUnit());
+            oldUser.setRoles(newUser.getRoles());
+            oldUser.setUsername(newUser.getUsername());
+            if (StringUtils.isNotBlank(newUser.getPassword())) {
+                oldUser.setPassword(newUser.getPassword());
+            }
+            oldUser.setPassword(newUser.getPassword());
+            oldUser.setFirstName(newUser.getFirstName());
+            oldUser.setLastName(newUser.getLastName());
+            oldUser.setComment(newUser.getComment());
         }
     }
 
-    public List<Role> roles() {
-        List<Role> roles = null;
-
-        Hibernate.beginTransaction();
-        try {
-            roles = roleDao.list();
-
-            Hibernate.commit();
-        } catch (Exception e) {
-            Hibernate.rollback();
-
-            throw new AppException("Cannot get roles", e);
+    public void remove(int id) {
+        User user = userDao.get(id);
+        if (user == null) {
+            throw new NotFoundException("User not found");
         }
 
-        return roles;
-    }
-
-    public List<Unit> units() {
-        List<Unit> units = null;
-
-        Hibernate.beginTransaction();
-        try {
-            units = unitDao.list();
-
-            Hibernate.commit();
-        } catch (Exception e) {
-            Hibernate.rollback();
-
-            throw new AppException("Cannot get units", e);
-        }
-
-        return units;
+        user.setRemoved(true);
     }
 
     @Override
-    @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userDao.getByUsername(username);
         if (user == null) {

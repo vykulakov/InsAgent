@@ -52,6 +52,7 @@ public class UnitControllerIT extends ControllerIT {
         ReadContext ctx = JsonPath.parse(body);
         Unit unit = ctx.read("$", Unit.class);
 
+        assertThat(unit).isNotNull();
         assertThat(unit.getId()).isEqualTo(2);
         assertThat(unit.getName()).isEqualTo("Филиал Воронеж");
     }

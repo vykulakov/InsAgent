@@ -43,6 +43,11 @@ public abstract class ControllerIT {
     private final static Pattern pattern = Pattern.compile("name=\"_csrf\" (value|content)=\"([^\"]+)\"/>");
 
     @Before
+    public void prepare() {
+        this.transactionTemplate = new TransactionTemplate(this.platformTransactionManager);
+    }
+
+    @Before
     public void authorize() {
         LinkedMultiValueMap<String, String> form = new LinkedMultiValueMap<>();
         form.add("username", "vkulakov");
@@ -56,7 +61,7 @@ public abstract class ControllerIT {
         assertThat(response.getHeaders().getLocation().toString()).isEqualTo("http://localhost:" + localServerPort + "/");
     }
 
-    public HttpHeaders getHeaders() {
+    private HttpHeaders getHeaders() {
         HttpHeaders headers;
 
         headers = new HttpHeaders();
@@ -81,7 +86,7 @@ public abstract class ControllerIT {
         return headers;
     }
 
-    public String executeWithBody(String url, LinkedMultiValueMap<String, String> form, HttpMethod method) {
+    protected String executeWithBody(String url, LinkedMultiValueMap<String, String> form, HttpMethod method) {
         HttpEntity<?> request = new HttpEntity<>(form, getHeaders());
         ResponseEntity<String> response = template.exchange(url, method, request, String.class);
 
@@ -91,7 +96,7 @@ public abstract class ControllerIT {
         return response.getBody();
     }
 
-    public void executeWithoutBody(String url, LinkedMultiValueMap<String, String> form, HttpMethod method) {
+    protected void executeWithoutBody(String url, LinkedMultiValueMap<String, String> form, HttpMethod method) {
         HttpEntity<?> request = new HttpEntity<>(form, getHeaders());
         ResponseEntity<String> response = template.exchange(url, method, request, String.class);
 
@@ -99,12 +104,7 @@ public abstract class ControllerIT {
         assertThat(response.getBody()).isNull();
     }
 
-    @Before
-    public void prepare() {
-        this.transactionTemplate = new TransactionTemplate(this.platformTransactionManager);
-    }
-
-    public <T> T getEntity(Class<T> clazz, Object key) {
+    protected <T> T getEntity(Class<T> clazz, Object key) {
         return transactionTemplate.execute(status -> entityManager.find(clazz, key));
     }
 
@@ -118,7 +118,7 @@ public abstract class ControllerIT {
         });
     }
 
-    public void createEntity(Object entity) {
+    protected void createEntity(Object entity) {
         transactionTemplate.execute(status -> entityManager.persist(entity));
     }
 }

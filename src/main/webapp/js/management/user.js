@@ -2,372 +2,375 @@
 
 var filter = {};
 
-$(function() {
-	var $table = $('#usersTable');
-	var $alert = $('#usersTableAlert');
-	$table.bootstrapTable({
-		url: '',
-		queryParams: function(params) {
-			$.extend(params, filter);
+$(function () {
+    var $table = $('#usersTable');
+    var $alert = $('#usersTableAlert');
+    var $filter = $('#filterUserForm');
 
-			return params;
-		},
-		responseHandler: function(response) {
+    var $editForm = $('#editUserForm');
+    var $editBody = $('#editUserBody');
+
+    var $removeForm = $('#removeUserForm');
+    var $removeBody = $('#removeUserBody');
+
+    $table.bootstrapTable({
+        url: '',
+        queryParams: function (params) {
+            $.extend(params, filter);
+
+            return params;
+        },
+        clickToSelect: true,
+        singleSelect: true,
+        checkboxHeader: false,
+        columns: [{
+            checkbox: true
+        }, {
+            field: 'id',
+            title: 'id',
+            sortable: true
+        }, {
+            field: 'login',
+            title: 'Логин',
+            sortable: true
+        }, {
+            field: 'name',
+            title: 'Имя',
+            sortable: true
+        }, {
+            field: 'unitName',
+            title: 'Подразделение',
+            sortable: true
+        }],
+        rowStyle: function (row) {
+            if (row.removed) {
+                return {
+                    classes: 'danger'
+                };
+            }
+
+            return {};
+        },
+        search: true,
+        showRefresh: true,
+        toolbar: '#toolbar',
+        pagination: true,
+        sidePagination: 'server',
+        pageSize: 10,
+        pageList: [5, 10, 20, 50],
+        stateSave: true,
+        stateSaveIdTable: 'usersTable',
+
+        onLoadError: function (status, response) {
+            $alert.prepend(getAlertElements(status, response));
+        },
+        onLoadSuccess: function () {
             $alert.children().remove();
+        },
+        onDblClickRow: function (row) {
+            openEdit(row.id);
+        }
+    });
 
-			var errors = checkError(response);
-			if(errors !== undefined) {
-				var alertMsg = '' +
-				'<div class="alert alert-danger fade in">' +
-				'    <a href="#" class="close" data-dismiss="alert">&times;</a>' +
-				'    <strong>При получении данных возникли ошибки:</strong><br/>';
-				for(var i = 0, l = errors.length; i < l; i++) {
-					alertMsg += errors[i] + '<br/>';
-				}
-				alertMsg += '</div>';
+    /**
+     * Загружает сущность по идентификатору с сервера, заполняет форму параметрами загруженной сущности и
+     * открывает модальное окно для редактирования выбранной сущности.
+     *
+     * @param {number} [id] - идентификатор сущности для редактирования.
+     */
+    function openEdit(id) {
+        $editBody.find('.alert').remove();
 
-                $alert.append(alertMsg);
+        if (!id) {
+            $('#userIdInput').val(0);
+            $('#userUsernameInput').val('');
+            $('#userPasswordInput').val('');
+            $('#userPasswordConfirmInput').val('');
+            $('#userFirstNameInput').val('');
+            $('#userLastNameInput').val('');
+            $('#userRoleInput').val(0);
+            $('#userUnitInput').val(0);
+            $('#userCommentInput').val('');
 
-				return [];
-			}
+            $('#editUserLabel').text('Добавление пользователя');
+            $('#editUserButton').text('Добавить');
 
-			return response;
-		},
-		clickToSelect: true,
-		singleSelect: true,
-		checkboxHeader: false,
-		columns: [{
-			checkbox: true
-		}, {
-			field: 'id',
-			title: 'id',
-			sortable: true
-		}, {
-			field: 'login',
-			title: 'Логин',
-			sortable: true
-		}, {
-			field: 'name',
-			title: 'Имя',
-			sortable: true
-		}, {
-			field: 'unitName',
-			title: 'Подразделение',
-			sortable: true
-		}],
-		rowStyle: function(row) {
-			if(row.removed) {
-				return {
-					classes: 'danger'
-				};
-			}
+            $('#editUserModal').modal({});
+        } else {
+            $('#editUserLabel').text('Редактирование пользователя');
+            $('#editUserButton').text('Сохранить');
 
-			return {};
-		},
-		search: true,
-		showRefresh: true,
-		toolbar: '#toolbar',
-		pagination: true,
-		sidePagination: 'server',
-		pageSize: 10,
-		pageList: [5, 10, 20, 50],
-		stateSave: true,
-		stateSaveIdTable: 'usersTable'
-	});
+            $.ajax({
+                url: '/management/user/' + id,
+                type: 'GET',
+                error: function (xhr) {
+                    $editBody.prepend(getAlertElements(xhr.statusText, xhr.responseJSON));
 
-	$('#openAddUserButton').on('click', function() {
-		$('#userIdInput').val(0);
-		$('#userUsernameInput').val('');
-		$('#userPasswordInput').val('');
-		$('#userPasswordConfirmInput').val('');
-		$('#userFirstNameInput').val('');
-		$('#userLastNameInput').val('');
-		$('#userRoleInput').val(0);
-		$('#userUnitInput').val(0);
-		$('#userCommentInput').val('');
+                    $('#editUserModal').modal({});
+                },
+                success: function (response) {
+                    $('#userIdInput').val(response.id);
+                    $('#userUsernameInput').val(response.username);
+                    $('#userFirstNameInput').val(response.firstName);
+                    $('#userLastNameInput').val(response.lastName);
+                    $('#userRoleInput').val(!!response.roles[0] ? response.roles[0].id : 0);
+                    $('#userUnitInput').val(response.unit.id);
+                    $('#userCommentInput').val(response.comment);
 
-		$('#editUserLabel').text('Добавление пользователя');
-		$('#editUserButton').text('Добавить');
+                    $('#editUserModal').modal({});
+                }
+            });
+        }
+    }
 
-		$('#editUserModal').modal({});
-	});
+    $('#openAddUserButton').on('click', function () {
+        openEdit()
+    });
 
-	$('#openEditUserButton').on('click', function() {
-		$('#editUserBody').find('.alert').remove();
+    $('#openEditUserButton').on('click', function () {
+        var selections = $table.bootstrapTable('getSelections');
 
-		var row = $('#usersTable').bootstrapTable('getSelections');
+        if (selections.length < 1) {
+            alert('Необходимо выбрать пользователя.');
+            return;
+        }
+        if (selections.length > 1) {
+            alert('Для редактирования необходимо выбрать только одного пользователя.');
+            return;
+        }
 
-		var l = row.length;
-		if(l === 0) {
-			alert('Необходимо выбрать пользователя.');
-			return;
-		}
+        openEdit(selections[0].id);
+    });
 
-		var user = row[0];
-		$('#userIdInput').val(user.id);
-		$('#userUsernameInput').val(user.username);
-		$('#userFirstNameInput').val(user.firstName);
-		$('#userLastNameInput').val(user.lastName);
-		$('#userRoleInput').val(user.roles[0]);
-		$('#userUnitInput').val(user.unit.id);
-		$('#userCommentInput').val(user.comment);
+    /**
+     * Открывает диалог подтверждения удаления сущности.
+     *
+     * @param {number} id - идентификатор сущности для удаления.
+     */
+    function openRemove(id) {
+        $removeBody.data('id', id);
+        $removeBody.find('.alert').remove();
 
-		$('#editUserLabel').text('Редактирование пользователя');
-		$('#editUserButton').text('Сохранить');
+        $('#removeUserModal').modal({});
+    }
 
-		$('#editUserModal').modal({});
-	});
+    $('#openRemoveUserButton').on('click', function () {
+        var selections = $table.bootstrapTable('getSelections');
 
-	$('#openRemoveUserButton').on('click', function() {
-		$('#removeUserBody').find('.alert').remove();
+        if (selections.length < 1) {
+            alert('Необходимо выбрать пользователя.');
+            return;
+        }
+        if (selections.length > 1) {
+            alert('Для удаления необходимо выбрать только одного пользователя.');
+            return;
+        }
 
-		var row = $('#usersTable').bootstrapTable('getSelections');
+        openRemove(selections[0].id);
+    });
 
-		var l = row.length;
-		if(l === 0) {
-			alert('Необходимо выбрать пользователя.');
-			return;
-		}
+    $editForm.validator({
+        custom: {
+            password: function (element) {
+                var target = element.data('password');
+                return !(parseInt($(target).val()) === 0 && element.val().trim().length === 0);
 
-		var user = row[0];
-		$('#removeUserIdInput').val(user.id);
 
-		$('#removeUserModal').modal({});
-	});
+            },
+            passwordminlength: function (element) {
+                var target = element.data('passwordminlength');
+                return !(parseInt($(target).val()) === 0 && element.val().trim().length !== 0 && element.val().trim().length < 6);
 
-	$('#editUserForm').validator({
-		custom: {
-			password: function(element) {
-				var target = element.data('password');
-				if(parseInt($(target).val()) === 0 && element.val().trim().length === 0) {
-					return false;
-				}
 
-				return true;
-			},
-			passwordminlength: function(element) {
-				var target = element.data('passwordminlength');
-				if(parseInt($(target).val()) === 0 && element.val().trim().length !== 0 && element.val().trim().length < 6) {
-					return false;
-				}
+            },
+            passwordmatch: function (element) {
+                var target = element.data('passwordmatch');
+                return $(target).val() === element.val();
+            },
+            selected: function (element) {
+                return element.val() != 0;
 
-				return true;
-			},
-			passwordmatch: function(element) {
-				var target = element.data('passwordmatch');
-				if($(target).val() !== element.val()) {
-					return false;
-				}
 
-				return true;
-			},
-			selected: function(element) {
-				if(element.val() == 0) {
-					return false;
-				}
-	
-				return true;
-			}
-		},
-		errors: {
-			match: "Значения полей не совпадают",
-			minlength: "Значение слишком короткое",
-			password: "Пароль не указан",
-			passwordminlength: "Пароль слишком короткий",
-			passwordmatch: "Пароли должны совпадать",
-			selected: "Значение не выбрано"
-		}
-	}).on('submit', function(e) {
-		if(e.isDefaultPrevented()) {
-			return;
-		}
+            }
+        },
+        errors: {
+            match: "Значения полей не совпадают",
+            minlength: "Значение слишком короткое",
+            password: "Пароль не указан",
+            passwordminlength: "Пароль слишком короткий",
+            passwordmatch: "Пароли должны совпадать",
+            selected: "Значение не выбрано"
+        }
+    }).on('submit', function (e) {
+        if (e.isDefaultPrevented()) {
+            return;
+        }
 
-		// Форма отправляется через AJAX, поэтому стандартную отправку нужно отключить.
-		e.preventDefault();
-		
-		var form = $('#editUserForm');
-		$.getJSON(form.attr('action'), form.serialize(), function(response) {
-			$('#editUserBody').find('.alert').remove();
+        e.preventDefault();
 
-			var errors = checkError(response);
-			if(errors !== undefined) {
-				var alert = '' +
-				'<div class="alert alert-danger fade in">' +
-				'    <a href="#" class="close" data-dismiss="alert">&times;</a>' +
-				'    <strong>При добавлении/обновлении пользователя возникли ошибки:</strong><br/>';
-				for(var i = 0, l = errors.length; i < l; i++) {
-					alert += errors[i] + '<br/>';
-				}
-				alert += '</div>';
-				
-				$('#editUserBody').prepend(alert);
-				
-				return;
-			}
+        $editBody.find('.alert').remove();
+        $.ajax({
+            url: '/management/user',
+            type: 'POST',
+            data: $editForm.serialize(),
+            headers: csrfHeaders,
+            error: function (xhr) {
+                $editBody.prepend(getAlertElements(xhr.statusText, xhr.responseJSON));
+            },
+            success: function (response) {
+                $('#editUserModal').modal('hide');
+                $table.bootstrapTable('refresh');
+            }
+        });
+    });
 
-			$('#editUserModal').modal('hide');
-			$('#usersTable').bootstrapTable('refresh');
-		});
-	});
+    $removeForm.on('submit', function (e) {
+        e.preventDefault();
 
-	$('#removeUserForm').on('submit', function(e) {
-		// Форма отправляется через AJAX, поэтому стандартную отправку нужно отключить.
-		e.preventDefault();
-		
-		var form = $('#removeUserForm');
-		$.getJSON(form.attr('action'), form.serialize(), function(response) {
-			$('#removeUserBody').find('.alert').remove();
+        $removeBody.find('.alert').remove();
+        $.ajax({
+            url: '/management/user/' + $removeBody.data('id'),
+            type: 'DELETE',
+            headers: csrfHeaders,
+            error: function (xhr) {
+                $removeBody.prepend(getAlertElements(xhr.statusText, xhr.responseJSON));
+            },
+            success: function (response) {
+                $('#removeUserModal').modal('hide');
+                $table.bootstrapTable('refresh');
+            }
+        });
+    });
 
-			var errors = checkError(response);
-			if(errors !== undefined) {
-				var alert = '' +
-				'<div class="alert alert-danger fade in">' +
-				'    <a href="#" class="close" data-dismiss="alert">&times;</a>' +
-				'    <strong>При удалении пользователя возникли ошибки:</strong><br/>';
-				for(var i = 0, l = errors.length; i < l; i++) {
-					alert += errors[i] + '<br/>';
-				}
-				alert += '</div>';
-				
-				$('#removeUserBody').prepend(alert);
-				
-				return;
-			}
+    /**
+     * Добавляем фильтр к таблице.
+     */
+    $table.parents('.bootstrap-table').find('.fixed-table-toolbar').append('' +
+        '<div class="columns columns-left btn-group pull-right">' +
+        '    <button id="openFilterUserButton" title="Фильтр пользователей" name="filter" type="button" class="btn btn-default">' +
+        '        <i id="openFilterUserIcon" class="glyphicon glyphicon-menu-up icon-menu-up"></i>' +
+        '    </button>' +
+        '</div>');
+    var $filterButton = $('#openFilterUserButton');
+    $filterButton.on('click', function () {
+        $('#filterUserDiv').toggleClass('hidden');
+        $('#openFilterUserIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
+    });
+    $('#filterUserUnitsInput').multiselect({
+        buttonWidth: '100%',
+        numberDisplayed: 10,
+        allSelectedText: 'Выбраны все доступные подразделения',
+        nonSelectedText: 'Не выбраны',
+        includeSelectAllOption: true,
+        selectAllText: 'Выбрать всё'
+    });
 
-			$('#removeUserModal').modal('hide');
-			$('#usersTable').bootstrapTable('refresh');
-		});
-	});
+    var cookie = Cookies.getJSON('usersFilter');
+    if (!!cookie && cookie.filter) {
+        filter = {};
 
-	/**
-	 * Добавляем фильтр к таблице.
-	 */
-	$table.parents('.bootstrap-table').find('.fixed-table-toolbar').append('' +
-			'<div class="columns columns-left btn-group pull-right">' + 
-			'    <button id="openFilterUserButton" title="Фильтр пользователей" name="filter" type="button" class="btn btn-default">' + 
-			'        <i id="openFilterUserIcon" class="glyphicon glyphicon-menu-up icon-menu-up"></i>' +
-			'    </button>' +
-			'</div>');
-	$('#openFilterUserButton').on('click', function() {
-		$('#filterUserDiv').toggleClass('hidden');
-		$('#openFilterUserIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
-	});
-	$('#filterUserUnitsInput').multiselect({
-		buttonWidth: '100%',
-		numberDisplayed: 10,
-		allSelectedText: 'Выбраны все доступные подразделения',
-		nonSelectedText: 'Не выбраны',
-		includeSelectAllOption: true,
-		selectAllText: 'Выбрать всё'
-	});
-	var filterUserFormObj = $('#filterUserForm');
-	var cookie = Cookies.getJSON('usersFilter');
-	if(!!cookie && cookie.filter) {
-		filter = {};
+        $filter.find(':input').each(function () {
+            if (this.name && cookie[this.name]) {
+                $(this).val(cookie[this.name]);
+                if (this.name === 'unitIds') {
+                    $(this).multiselect('refresh');
+                }
+            }
+        });
 
-		filterUserFormObj.find(':input').each(function() {
-			if(this.name && cookie[this.name]) {
-				$(this).val(cookie[this.name]);
-				if(this.name === 'unitIds') {
-					$(this).multiselect('refresh');
-				}
-			}
-    	});
+        var unitIndex = 0;
+        $filter.serializeArray().map(function (param) {
+            if (param.name === 'unitIds') {
+                filter['unitIds[' + (unitIndex++) + ']'] = param.value;
+                return;
+            }
+            if (param.value !== '') {
+                filter[param.name] = param.value;
+                return;
+            }
+        });
 
-		var unitIndex = 0;
-		filterUserFormObj.serializeArray().map(function(param) {
-			if(param.name === 'unitIds') {
-				filter['unitIds[' + (unitIndex++) + ']'] = param.value;
-				return;
-			}
-			if(param.value !== '') {
-				filter[param.name] = param.value;
-				return;
-			}
-		});
+        $filterButton.removeClass('btn-default').addClass('btn-warning');
 
-		$('#openFilterUserButton').removeClass('btn-default').addClass('btn-warning');
+        $table.bootstrapTable('refresh', {url: '/management/user'});
+    } else {
+        $table.bootstrapTable('refresh', {url: '/management/user'});
+    }
+    $filter.on('submit', function (e) {
+        e.preventDefault();
 
-		$table.bootstrapTable('refresh', {url: '/management/users'});
-	} else {
-		$table.bootstrapTable('refresh', {url: '/management/users'});
-	}
-	filterUserFormObj.on('submit', function(e) {
-		// Форму отправлять не нужно.
-		e.preventDefault();
+        filter = {};
 
-		filter = {};
+        var cookie = {};
+        var unitIndex = 0;
+        $filter.serializeArray().map(function (param) {
+            if (param.name === 'unitIds') {
+                cookie.filter = true;
 
-		var cookie = {};
-		var unitIndex = 0;
-		filterUserFormObj.serializeArray().map(function(param) {
-			if(param.name === 'unitIds') {
-				cookie.filter = true;
+                filter['unitIds[' + (unitIndex++) + ']'] = param.value;
+                if (cookie['unitIds'] === undefined) {
+                    cookie['unitIds'] = [param.value];
+                } else {
+                    cookie['unitIds'].push(param.value);
+                }
 
-				filter['unitIds[' + (unitIndex++) + ']'] = param.value;
-				if(cookie['unitIds'] === undefined) {
-					cookie['unitIds'] = [param.value];
-				} else {
-					cookie['unitIds'].push(param.value);
-				}
+                return;
+            }
+            if (param.name === 'removed' && param.value === 'true') {
+                cookie.filter = true;
 
-				return;
-			}
-			if(param.name === 'removed' && param.value === 'true') {
-				cookie.filter = true;
+                filter[param.name] = param.value;
+                cookie[param.name] = param.value;
 
-				filter[param.name] = param.value;
-				cookie[param.name] = param.value;
+                return;
+            }
+            if (param.value !== '') {
+                cookie.filter = true;
 
-				return;
-			}
-			if(param.value !== '') {
-				cookie.filter = true;
+                filter[param.name] = param.value;
+                cookie[param.name] = param.value;
 
-				filter[param.name] = param.value;
-				cookie[param.name] = param.value;
+                return;
+            }
+        });
 
-				return;
-			}
-		});
+        Cookies.set('usersFilter', cookie);
 
-		Cookies.set('usersFilter', cookie);
+        $('#filterUserDiv').toggleClass('hidden');
+        $('#openFilterUserIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
+        if (!!cookie && cookie.filter) {
+            $filterButton.removeClass('btn-default').addClass('btn-warning');
 
-		$('#filterUserDiv').toggleClass('hidden');
-		$('#openFilterUserIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
-		if(!!cookie && cookie.filter) {
-			$('#openFilterUserButton').removeClass('btn-default').addClass('btn-warning');
-			
-			$table.bootstrapTable('refresh');
-		}
-	});
-	filterUserFormObj.on('reset', function(e) {
-		e.preventDefault();
+            $table.bootstrapTable('refresh');
+        }
+    });
+    $filter.on('reset', function (e) {
+        e.preventDefault();
 
-		filter = {};
-		filterUserFormObj.find(':input').each(function() {
-			switch(this.type) {
-				case 'password':
-				case 'select-multiple':
-				case 'select-one':
-				case 'text':
-				case 'textarea':
-					$(this).val('');
-					break;
-				case 'checkbox':
-				case 'radio':
-					this.checked = false;
-			}
-			$('#filterUserUnitsInput').multiselect('refresh');
-			$('#filterUserRemovedInput').val('false');
-		});
+        filter = {};
+        $filter.find(':input').each(function () {
+            switch (this.type) {
+                case 'password':
+                case 'select-multiple':
+                case 'select-one':
+                case 'text':
+                case 'textarea':
+                    $(this).val('');
+                    break;
+                case 'checkbox':
+                case 'radio':
+                    this.checked = false;
+            }
+            $('#filterUserUnitsInput').multiselect('refresh');
+            $('#filterUserRemovedInput').val('false');
+        });
 
-		Cookies.remove('usersFilter');
+        Cookies.remove('usersFilter');
 
-		$('#filterUserDiv').toggleClass('hidden');
-		$('#openFilterUserIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
-		$('#openFilterUserButton').removeClass('btn-warning').addClass('btn-default');
+        $('#filterUserDiv').toggleClass('hidden');
+        $('#openFilterUserIcon').toggleClass('glyphicon-menu-up glyphicon-menu-down');
+        $filterButton.removeClass('btn-warning').addClass('btn-default');
 
-		$table.bootstrapTable('refresh');
-	});
+        $table.bootstrapTable('refresh');
+    });
 });
