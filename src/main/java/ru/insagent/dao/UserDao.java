@@ -59,8 +59,6 @@ public class UserDao extends SimpleHDao<User> {
                 + "     1 = 1";
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
-
     public User getByUsername(String username) {
         Map<String, Object> objects = new HashMap<>();
         objects.put("username", username);

@@ -21,10 +21,7 @@ package ru.insagent.dao;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import ru.insagent.management.unit.model.UnitFilter;
-import ru.insagent.model.City;
-import ru.insagent.model.Unit;
-import ru.insagent.model.UnitType;
-import ru.insagent.model.User;
+import ru.insagent.model.*;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -78,15 +75,15 @@ public class UnitDao extends SimpleHDao<Unit> {
      */
     public static final int POINT_TYPE_ID = 3;
 
-    public List<Unit> listByUser(User user) {
+    public List<Unit> listByRoles(Roles roles) {
         return listByWhere(null, null, null, null, 0, 0);
     }
 
-    public List<Unit> listByUser(User user, String sortBy, String sortDir, int limitRows, int limitOffset) {
+    public List<Unit> listByRoles(Roles roles, String sortBy, String sortDir, int limitRows, int limitOffset) {
         return listByWhere(null, null, sortBy, sortDir, limitRows, limitOffset);
     }
 
-    public List<Unit> listByUser(User user, UnitFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
+    public List<Unit> listByRoles(Roles roles, UnitFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
         StringBuilder sb = new StringBuilder();
         Map<String, Object> objects = new HashMap<>();
 
@@ -129,13 +126,6 @@ public class UnitDao extends SimpleHDao<Unit> {
             objects.put("typeIds", typeIds);
         }
 
-        String where = null;
-        if (objects.size() > 0) {
-            where = sb.toString();
-        } else {
-            objects = null;
-        }
-
-        return listByWhere(where, objects, null, null, 0, 0);
+        return listByWhere(sb.toString(), objects, null, null, 0, 0);
     }
 }

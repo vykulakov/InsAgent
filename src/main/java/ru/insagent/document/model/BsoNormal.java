@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2018 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,21 @@
  * limitations under the License.
  */
 
-package ru.insagent;
+package ru.insagent.document.model;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-@SpringBootApplication
-public class InsagentApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(InsagentApplication.class, args);
-	}
+/**
+ * Main bso entity
+ */
+@Entity
+@Table(name = "d_bsos")
+public class BsoNormal extends Bso {
+    private static final long serialVersionUID = -3893689810214482026L;
+
+    @Override
+    public String toString() {
+        return "BsoNormal [id=" + id + ", series=" + getSeries() + ", number=" + getNumber() + ", node=" + getNode() + ", unit=" + getUnit() + ", issued=" + isIssued() + ", corrupted=" + isCorrupted() + ", registered=" + isRegistered() + "]";
+    }
 }

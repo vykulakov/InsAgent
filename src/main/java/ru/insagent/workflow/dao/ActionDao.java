@@ -18,9 +18,13 @@
 
 package ru.insagent.workflow.dao;
 
+import org.springframework.stereotype.Repository;
 import ru.insagent.dao.SimpleDao;
+import ru.insagent.dao.SimpleHDao;
 import ru.insagent.exception.AppException;
+import ru.insagent.model.IdBase;
 import ru.insagent.model.Role;
+import ru.insagent.model.Roles;
 import ru.insagent.model.User;
 import ru.insagent.util.JdbcUtils;
 import ru.insagent.workflow.model.Action;
@@ -29,137 +33,45 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class ActionDao extends SimpleDao<Action> {
+
+@Repository
+public class ActionDao extends SimpleHDao<Action> {
 	{
+        clazz = Action.class;
+
 		countQueryPrefix = ""
 				+ " SELECT"
 				+ "     COUNT(*) AS count"
 				+ " FROM"
-				+ "     w_actions a"
+				+ "     Action a"
+				+ "     JOIN a.roles r"
 				+ " WHERE"
 				+ "     1 = 1";
 
 		selectQueryPrefix = ""
 				+ " SELECT"
-				+ "     a.id AS actionId,"
-				+ "     a.idx AS actionIdx,"
-				+ "     a.shortName AS actionShortName,"
-				+ "     a.fullName AS actionFullName"
+				+ "     a"
 				+ " FROM"
-				+ "     w_actions a"
+				+ "     Action a"
+				+ "     JOIN a.roles r"
 				+ " WHERE"
 				+ "     1 = 1";
-
-		idField = "a.id";
 	}
 
-	public ActionDao(Connection conn) {
-		super(conn);
-	}
+	public List<Action> listByRoles(Roles roles) {
+        StringBuilder sb = new StringBuilder();
+        Map<String, Object> objects = new HashMap<>();
 
-	@Override
-	public List<Action> listByUser(User user) {
-		StringBuilder where = new StringBuilder();
-		List<Object> objects = new ArrayList<>();
+        sb.append("r.idx IN :idxes");
+        objects.put("idxes", roles);
 
-		where.append("a.id IN (");
-		for (int actionId : getActionIdByRoles(user.getRoles())) {
-			where.append("?,");
-			objects.add(actionId);
-		}
-		where.setLength(where.length() - 1);
-		where.append(")");
-
-		return listByWhere(false, where.toString(), objects);
+		return listByWhere(sb.toString(), objects);
 	}
 
 	public List<Integer> listNodeIdsByActionId(int actionId) {
-		List<Integer> nodeIds = new ArrayList<>();
-
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			ps = conn.prepareStatement(""
-					+ " SELECT"
-					+ "     a.nodeId AS nodeId"
-					+ " FROM"
-					+ "     w_node_actions a"
-					+ " WHERE"
-					+ "     a.actionId = ?;");
-			ps.setInt(1, actionId);
-
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				nodeIds.add(rs.getInt("nodeId"));
-			}
-		} catch (SQLException e) {
-			logger.error("Cannot get node ids from DB: {}", e.getMessage());
-
-			throw new AppException("Ошибка получения идентификаторов узлов из базы данных.", e);
-		} finally {
-			JdbcUtils.closeResultSet(rs);
-			JdbcUtils.closeStatement(ps);
-		}
-
-		return nodeIds;
-	}
-
-	private List<Integer> getActionIdByRoles(Iterable<Role> roles) throws AppException {
-		List<Integer> actionIds = new ArrayList<>();
-
-		StringBuilder query = new StringBuilder(""
-				+ " SELECT"
-				+ "     a.actionId AS actionId"
-				+ " FROM"
-				+ "     m_roles r,"
-				+ "     w_action_roles a"
-				+ " WHERE"
-				+ "     r.id = a.roleId AND"
-				+ "     r.idx IN (");
-		for (Role role : roles) {
-			query.append("?");
-			query.append(",");
-		}
-		query.setLength(query.length() - 1);
-		query.append(");");
-
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			int index = 1;
-			ps = conn.prepareStatement(query.toString());
-			for (Role role : roles) {
-				ps.setString(index++, role.getIdx());
-			}
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				actionIds.add(rs.getInt("actionId"));
-			}
-		} catch (SQLException e) {
-			logger.error("Cannot get action ids from DB: {}", e.getMessage());
-
-			throw new AppException("Ошибка получения идентификаторов действий из базы данных.", e);
-		} finally {
-			JdbcUtils.closeResultSet(rs);
-			JdbcUtils.closeStatement(ps);
-		}
-
-		return actionIds;
-	}
-
-	@Override
-	protected Action getFromRs(ResultSet rs) throws SQLException {
-		Action action = new Action();
-		action.setId(rs.getInt("actionId"));
-		action.setIdx(rs.getString("actionIdx"));
-		action.setShortName(rs.getString("actionShortName"));
-		action.setFullName(rs.getString("actionFullName"));
-
-		return action;
+        return get(actionId).getNodes().stream().map(IdBase::getId).collect(Collectors.toList());
 	}
 }

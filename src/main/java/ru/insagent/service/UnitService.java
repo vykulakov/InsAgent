@@ -25,13 +25,9 @@ import ru.insagent.dao.CityDao;
 import ru.insagent.dao.UnitDao;
 import ru.insagent.dao.UnitTypeDao;
 import ru.insagent.exception.NotFoundException;
-import ru.insagent.management.city.model.CityDTO;
 import ru.insagent.management.unit.model.UnitDTO;
 import ru.insagent.management.unit.model.UnitFilter;
-import ru.insagent.model.City;
-import ru.insagent.model.Unit;
-import ru.insagent.model.UnitType;
-import ru.insagent.model.User;
+import ru.insagent.model.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,9 +76,16 @@ public class UnitService {
         return unit.makeEditableCopy();
     }
 
-    public List<UnitDTO> listByUser(User user, UnitFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
+    public List<UnitDTO> listByUser(Roles roles) {
         return unitDao
-                .listByUser(user, filter, sortBy, sortDir, limitRows, limitOffset)
+                .listByRoles(roles)
+                .stream().map(UnitDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<UnitDTO> listByUser(Roles roles, UnitFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
+        return unitDao
+                .listByRoles(roles, filter, sortBy, sortDir, limitRows, limitOffset)
                 .stream().map(UnitDTO::new)
                 .collect(Collectors.toList());
     }

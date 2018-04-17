@@ -1,520 +1,175 @@
+/*
+ * InsAgent - https://github.com/vykulakov/InsAgent
+ *
+ * Copyright 2017-2018 Vyacheslav Kulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.insagent.document.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
-
-import ru.insagent.dao.SimpleDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import ru.insagent.dao.SimpleHDao;
 import ru.insagent.dao.UnitDao;
 import ru.insagent.document.model.Bso;
 import ru.insagent.document.model.BsoFilter;
-import ru.insagent.model.UnitType;
-import ru.insagent.model.City;
-import ru.insagent.model.Filter;
+import ru.insagent.model.IdBase;
+import ru.insagent.model.Roles;
 import ru.insagent.model.Unit;
-import ru.insagent.model.User;
-import ru.insagent.util.TimeUtils;
 import ru.insagent.workflow.dao.LinkDao;
 import ru.insagent.workflow.model.Link;
-import ru.insagent.workflow.model.Node;
 
-public class BsoDao extends SimpleDao<Bso> {
-	{
-		sortByMap.put("created", "bsoCreated");
-		sortByMap.put("series", "bsoSeries");
-		sortByMap.put("number", "bsoNumber");
-		sortByMap.put("issuedDate", "bsoIssuedDate");
-		sortByMap.put("issuedBy", "CONCAT(bsoIssuedUserFirstName,bsoIssuedUserLastName)");
-		sortByMap.put("issuedUnit", "bsoIssuedUnitName");
-		sortByMap.put("corruptedDate", "bsoCorruptedDate");
-		sortByMap.put("corruptedBy", "CONCAT(bsoCorruptedUserFirstName,bsoCorruptedUserLastName)");
-		sortByMap.put("corruptedUnit", "bsoCorruptedUnitName");
-		sortByMap.put("corruptedDate", "bsoCorruptedDate");
-		sortByMap.put("registeredBy", "CONCAT(bsoRegisteredUserFirstName,bsoRegisteredUserLastName)");
-		sortByMap.put("registeredUnit", "bsoRegisteredUnitName");
-		sortByMap.put("insured", "bsoInsured");
-		sortByMap.put("premium", "bsoPremium");
-		sortByMap.put("node", "nodeName");
-		sortByMap.put("unit", "unitName");
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-		countQueryPrefix = ""
-			+ " SELECT"
-			+ "     COUNT(*) AS count"
-			+ " FROM"
-			+ "     d_bsos b"
-			+ "     LEFT JOIN m_users ui ON ui.id = b.issuedBy"
-			+ "     LEFT JOIN m_users uc ON uc.id = b.corruptedBy"
-			+ "     LEFT JOIN m_users ur ON ur.id = b.registeredBy"
-			+ "     LEFT JOIN m_units oi ON oi.id = b.issuedUnitId"
-			+ "     LEFT JOIN m_units oc ON oc.id = b.corruptedUnitId"
-			+ "     LEFT JOIN m_units ox ON ox.id = b.registeredUnitId"
-			+ "     LEFT JOIN m_units o ON o.id = b.unitId"
-			+ "     LEFT JOIN m_unit_types t ON t.id = o.typeId"
-			+ "     LEFT JOIN m_cities c ON c.id = o.cityId,"
-			+ "     w_nodes n"
-			+ " WHERE"
-			+ "     n.id = b.nodeId";
+@Repository
+public class BsoDao<T extends Bso> extends SimpleHDao<T> {
+    private LinkDao linkDao;
+    private UnitDao unitDao;
 
-		selectQueryPrefix = ""
-			+ " SELECT"
-			+ "     b.id AS bsoId,"
-			+ "     UNIX_TIMESTAMP(b.created) AS bsoCreated,"
-			+ "     b.series AS bsoSeries,"
-			+ "     b.number AS bsoNumber,"
-			+ "     b.issued AS bsoIssued,"
-			+ "     UNIX_TIMESTAMP(b.issuedDate) AS bsoIssuedDate,"
-			+ "     ui.id AS bsoIssuedUserId,"
-			+ "     ui.firstName AS bsoIssuedUserFirstName,"
-			+ "     ui.lastName AS bsoIssuedUserLastName,"
-			+ "     oi.id AS bsoIssuedUnitId,"
-			+ "     oi.name AS bsoIssuedUnitName,"
-			+ "     b.corrupted AS bsoCorrupted,"
-			+ "     UNIX_TIMESTAMP(b.corruptedDate) AS bsoCorruptedDate,"
-			+ "     uc.id AS bsoCorruptedUserId,"
-			+ "     uc.firstName AS bsoCorruptedUserFirstName,"
-			+ "     uc.lastName AS bsoCorruptedUserLastName,"
-			+ "     oc.id AS bsoCorruptedUnitId,"
-			+ "     oc.name AS bsoCorruptedUnitName,"
-			+ "     b.registered AS bsoRegistered,"
-			+ "     UNIX_TIMESTAMP(b.registeredDate) AS bsoRegisteredDate,"
-			+ "     ur.id AS bsoRegisteredUserId,"
-			+ "     ur.firstName AS bsoRegisteredUserFirstName,"
-			+ "     ur.lastName AS bsoRegisteredUserLastName,"
-			+ "     ox.id AS bsoRegisteredUnitId,"
-			+ "     ox.name AS bsoRegisteredUnitName,"
-			+ "     b.insured AS bsoInsured,"
-			+ "     b.premium AS bsoPremium,"
-			+ "     o.id AS unitId,"
-			+ "     o.name AS unitName,"
-			+ "     t.id AS unitTypeId,"
-			+ "     t.name AS unitTypeName,"
-			+ "     c.id AS unitCityId,"
-			+ "     c.name AS unitCityName,"
-			+ "     n.id AS nodeId,"
-			+ "     n.name AS nodeName"
-			+ " FROM"
-			+ "     d_bsos b"
-			+ "     LEFT JOIN m_users ui ON ui.id = b.issuedBy"
-			+ "     LEFT JOIN m_users uc ON uc.id = b.corruptedBy"
-			+ "     LEFT JOIN m_users ur ON ur.id = b.registeredBy"
-			+ "     LEFT JOIN m_units oi ON oi.id = b.issuedUnitId"
-			+ "     LEFT JOIN m_units oc ON oc.id = b.corruptedUnitId"
-			+ "     LEFT JOIN m_units ox ON ox.id = b.registeredUnitId"
-			+ "     LEFT JOIN m_units o ON o.id = b.unitId"
-			+ "     LEFT JOIN m_unit_types t ON t.id = o.typeId"
-			+ "     LEFT JOIN m_cities c ON c.id = o.cityId,"
-			+ "     w_nodes n"
-			+ " WHERE"
-			+ "     n.id = b.nodeId";
+    @Autowired
+    public void setLinkDao(LinkDao linkDao) {
+        this.linkDao = linkDao;
+    }
 
-		insertQuery = "";
+    @Autowired
+    public void setUnitDao(UnitDao unitDao) {
+        this.unitDao = unitDao;
+    }
 
-		updateQuery = ""
-			+ " UPDATE"
-			+ "     d_bsos"
-			+ " SET"
-			+ "     issued = ?,"
-			+ "     issuedDate = FROM_UNIXTIME(?),"
-			+ "     issuedBy = ?,"
-			+ "     issuedUnitId = ?,"
-			+ "     corrupted = ?,"
-			+ "     corruptedDate = FROM_UNIXTIME(?),"
-			+ "     corruptedBy = ?,"
-			+ "     corruptedUnitId = ?,"
-			+ "     registered = ?,"
-			+ "     registeredDate = FROM_UNIXTIME(?),"
-			+ "     registeredBy = ?,"
-			+ "     registeredUnitId = ?,"
-			+ "     insured = ?,"
-			+ "     premium = ?"
-			+ " WHERE"
-			+ "     id = ?";
+    public List<T> listByRoles(Roles roles, BsoFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
+        List<Link> links = linkDao.listByRoles(roles);
+        List<Unit> units = unitDao.listByRoles(roles);
 
-		idField = "b.id";
+        StringBuilder sb = new StringBuilder("");
+        Map<String, Object> objects = new HashMap<>();
 
-		searchCount = 5;
-		searchWhere = ""
-			+ " b.series LIKE ? OR"
-			+ " b.number LIKE ? OR"
-			+ " n.name LIKE ? OR"
-			+ " o.name LIKE ? OR"
-			+ " b.insured LIKE ?";
-	}
+        if (!units.isEmpty()) {
+            sb.append("(b.node.nodeType.id = 4 AND b.unit IS NOT NULL AND b.unit.id IN :unitIds)");
+            objects.put("unitIds", units.stream().map(IdBase::getId).collect(Collectors.toList()));
+        }
 
-	public BsoDao(Connection conn) {
-		super(conn);
-	}
+        if (!units.isEmpty() && !links.isEmpty()) {
+            sb.append(" OR ");
+        }
 
-	@Override
-	public List<Bso> listByUser(User user) {
-		return listByUser(user, null, null, 0, 0);
-	}
+        if (!links.isEmpty()) {
+            List<Integer> nodeIds = Stream.concat(
+                    links.stream().map(Link::getNodeTo).map(IdBase::getId),
+                    links.stream().map(Link::getNodeFrom).map(IdBase::getId)
+            ).collect(Collectors.toList());
 
-	@Override
-	public List<Bso> listByUser(User user, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		return listByUser(user, (String) null, sortBy, sortDir, limitRows, limitOffset);
-	}
+            sb.append("(b.node.nodeType.id != 4 AND b.unit IS NULL AND b.node.id IN :nodeIds)");
+            objects.put("nodeIds", nodeIds);
+        }
 
-	@Override
-	public List<Bso> listByUser(User user, String search, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		List<Unit> units = new UnitDao().listByUser(user);
-		List<Link> links = new LinkDao(conn).listByUser(user);
+        if (filter != null) {
+            sb.insert(0, "(");
+            sb.append(") AND (");
 
-		StringBuilder sb = new StringBuilder();
-		List<Object> objects = new ArrayList<Object>();
+            sb.append("1 = 1");
+            if (filter.getSearch() != null && !filter.getSearch().trim().isEmpty()) {
+                sb.append(" AND (");
+                sb.append(" b.series LIKE :search OR");
+                sb.append(" b.number LIKE :search OR");
+                sb.append(" n.name LIKE :search OR");
+                sb.append(" o.name LIKE :search");
+                sb.append(" )");
+                objects.put("search", "%" + filter.getSearch().trim() + "%");
+            }
+            if (filter.getSeries() != null) {
+                sb.append(" AND b.series LIKE :series");
+                objects.put("series", filter.getSeries().replace("*", "%"));
+            }
+            if (filter.getNumberFrom() != null) {
+                sb.append(" AND b.number >= :numberFrom");
+                objects.put("numberFrom", filter.getNumberFrom());
+            }
+            if (filter.getNumberTo() != null) {
+                sb.append(" AND b.number <= :numberTo");
+                objects.put("numberTo", filter.getNumberTo());
+            }
+            if (filter.getInsured() != null) {
+                sb.append(" AND b.insured LIKE :insured");
+                objects.put("insured", filter.getInsured().replace("*", "%"));
+            }
+            if (filter.getPremiumFrom() != null) {
+                sb.append(" AND b.premium >= :premiumFrom");
+                objects.put("premiumFrom", filter.getPremiumFrom());
+            }
+            if (filter.getPremiumTo() != null) {
+                sb.append(" AND b.premium <= :premiumTo");
+                objects.put("premiumTo", filter.getPremiumTo());
+            }
+            if (filter.getNodes() != null && !filter.getNodes().isEmpty()) {
+                sb.append(" AND b.nodeId IN :nodeIds");
+                objects.put("nodeIds", filter.getNodes().stream().map(IdBase::getId).collect(Collectors.toList()));
+            }
+            if (filter.getUnits() != null && !filter.getUnits().isEmpty()) {
+                sb.append(" AND b.unitId IN :unitIds");
+                objects.put("unitIds", filter.getUnits().stream().map(IdBase::getId).collect(Collectors.toList()));
+            }
+            if (filter.getCreatedFrom() != null) {
+                sb.append(" AND b.created >= :createdFrom");
+                objects.put("createdFrom", filter.getCreatedFrom());
+            }
+            if (filter.getCreatedTo() != null) {
+                sb.append(" AND b.created <= :createdTo");
+                objects.put("createdTo", filter.getCreatedTo());
+            }
+            if (filter.getIssuedFrom() != null) {
+                sb.append(" AND b.issuedDate >= :issuedFrom");
+                objects.put("issuedFrom", filter.getIssuedFrom());
+            }
+            if (filter.getIssuedTo() != null) {
+                sb.append(" AND b.issuedDate <= :issuedTo");
+                objects.put("issuedTo", filter.getIssuedTo());
+            }
+            if (filter.getCorruptedFrom() != null) {
+                sb.append(" AND b.corruptedDate >= :corruptedFrom");
+                objects.put("corruptedFrom", filter.getCorruptedFrom());
+            }
+            if (filter.getCorruptedTo() != null) {
+                sb.append(" AND b.corruptedDate <= :corruptedTo");
+                objects.put("corruptedTo", filter.getCorruptedTo());
+            }
+            if (filter.getRegisteredFrom() != null) {
+                sb.append(" AND b.registeredDate >= :registeredFrom");
+                objects.put("registeredFrom", filter.getRegisteredFrom());
+            }
+            if (filter.getRegisteredTo() != null) {
+                sb.append(" AND b.registeredDate <= :registeredTo");
+                objects.put("registeredTo", filter.getRegisteredTo());
+            }
 
-		if(!units.isEmpty()) {
-			sb.append("(n.nodeTypeId = 4 AND o.id IS NOT NULL AND o.id IN (");
-			for(Unit unit : units) {
-				sb.append("?,");
-				objects.add(unit.getId());
-			}
-			sb.setLength(sb.length() - 1);
-			sb.append("))");
-		}
+            sb.append(")");
+        }
 
-		if(!units.isEmpty() && !links.isEmpty()) {
-			sb.append(" OR ");
-		}
+        return listByWhere(sb.toString(), objects, sortBy, sortDir, limitRows, limitOffset);
+    }
 
-		if(!links.isEmpty()) {
-			sb.append("(n.nodeTypeId != 4 AND o.id IS NULL AND n.id IN (");
-			for(Link link : links) {
-				sb.append("?,");
-				objects.add(link.getNodeFrom().getId());
-				sb.append("?,");
-				objects.add(link.getNodeTo().getId());
-			}
-			sb.setLength(sb.length() - 1);
-			sb.append("))");
-		}
+    public List<T> listBySeriesAndNumbers(String series, long numberFrom, long numberTo) {
+        String where = "b.series = :series AND :numberFrom <= b.number AND b.number <= :numberTo";
+        Map<String, Object> objects = new HashMap<>();
+        objects.put("series", series);
+        objects.put("numberFrom", numberFrom);
+        objects.put("numberTo", numberTo);
 
-		if(search != null && !search.trim().isEmpty()) {
-			search = "%" + search + "%";
-
-			if(objects.size() > 0) {
-				sb.insert(0, "(");
-				sb.append(") AND (");
-			}
-			sb.append(searchWhere);
-			if(objects.size() > 0) {
-				sb.append(")");
-			}
-			for(int i = 0; i < searchCount; i++) {
-				objects.add(search);
-			}
-		}
-
-		String where = null;
-		if(objects.size() > 0) {
-			where = sb.toString();
-		} else {
-			objects = null;
-		}
-
-		return listByWhere(false, where, objects, sortBy, sortDir, limitRows, limitOffset);
-	}
-
-	@Override
-	public List<Bso> listByUser(User user, Filter f, String sortBy, String sortDir, int limitRows, int limitOffset) {
-		BsoFilter filter = (BsoFilter) f;
-
-		List<Unit> units = new UnitDao().listByUser(user);
-		List<Link> links = new LinkDao(conn).listByUser(user);
-
-		StringBuilder sb = new StringBuilder();
-		List<Object> objects = new ArrayList<Object>();
-
-		sb.append("(n.nodeTypeId = 4 AND o.id IS NOT NULL AND o.id IN (");
-		if(!units.isEmpty()) {
-			for(Unit unit : units) {
-				sb.append("?,");
-				objects.add(unit.getId());
-			}
-			sb.setLength(sb.length() - 1);
-		} else {
-			sb.append("-1");
-		}
-		sb.append("))");
-
-		sb.append(" OR ");
-
-		sb.append("(n.nodeTypeId != 4 AND o.id IS NULL AND n.id IN (");
-		if(!links.isEmpty()) {
-			for(Link link : links) {
-				sb.append("?,");
-				objects.add(link.getNodeFrom().getId());
-				sb.append("?,");
-				objects.add(link.getNodeTo().getId());
-			}
-			sb.setLength(sb.length() - 1);
-		} else {
-			sb.append("-1");
-		}
-		sb.append("))");
-
-		if(filter != null) {
-			sb.insert(0, "(");
-			sb.append(") AND (");
-
-			sb.append("1 = 1");
-			if(filter.getSeries() != null) {
-				sb.append(" AND b.series LIKE ?");
-				objects.add(filter.getSeries().replace("*", "%"));
-			}
-			if(filter.getNumberFrom() != null) {
-				sb.append(" AND ? <= b.number");
-				objects.add(filter.getNumberFrom());
-			}
-			if(filter.getNumberTo() != null) {
-				sb.append(" AND b.number <= ?");
-				objects.add(filter.getNumberTo());
-			}
-			if(filter.getInsured() != null) {
-				sb.append(" AND b.insured LIKE ?");
-				objects.add(filter.getInsured().replace("*", "%"));
-			}
-			if(filter.getPremiumFrom() != null) {
-				sb.append(" AND ? <= b.premium");
-				objects.add(filter.getPremiumFrom());
-			}
-			if(filter.getPremiumTo() != null) {
-				sb.append(" AND b.premium <= ?");
-				objects.add(filter.getPremiumTo());
-			}
-			if(filter.getNodes() != null && !filter.getNodes().isEmpty()) {
-				sb.append(" AND b.nodeId IN (");
-				for(Node node : filter.getNodes()) {
-					sb.append("?,");
-					objects.add(node.getId());
-				}
-				sb.setLength(sb.length() - 1);
-				sb.append(")");
-			}
-			if(filter.getUnits() != null && !filter.getUnits().isEmpty()) {
-				sb.append(" AND b.unitId IN (");
-				for(Unit unit : filter.getUnits()) {
-					sb.append("?,");
-					objects.add(unit.getId());
-				}
-				sb.setLength(sb.length() - 1);
-				sb.append(")");
-			}
-			if(filter.getCreatedFrom() != null) {
-				sb.append(" AND ? <= UNIX_TIMESTAMP(b.created)");
-				objects.add(TimeUtils.convertDateToTimestamp(filter.getCreatedFrom()));
-			}
-			if(filter.getCreatedTo() != null) {
-				sb.append(" AND UNIX_TIMESTAMP(b.created) <= ?");
-				objects.add(TimeUtils.convertDateToTimestamp(filter.getCreatedTo()));
-			}
-			if(filter.getIssuedFrom() != null) {
-				sb.append(" AND ? <= UNIX_TIMESTAMP(b.issuedDate)");
-				objects.add(TimeUtils.convertDateToTimestamp(filter.getIssuedFrom()));
-			}
-			if(filter.getIssuedTo() != null) {
-				sb.append(" AND UNIX_TIMESTAMP(b.issuedDate) <= ?");
-				objects.add(TimeUtils.convertDateToTimestamp(filter.getIssuedTo()));
-			}
-			if(filter.getCorruptedFrom() != null) {
-				sb.append(" AND ? <= UNIX_TIMESTAMP(b.corruptedDate)");
-				objects.add(TimeUtils.convertDateToTimestamp(filter.getCorruptedFrom()));
-			}
-			if(filter.getCorruptedTo() != null) {
-				sb.append(" AND UNIX_TIMESTAMP(b.corruptedDate) <= ?");
-				objects.add(TimeUtils.convertDateToTimestamp(filter.getCorruptedTo()));
-			}
-			if(filter.getRegisteredFrom() != null) {
-				sb.append(" AND ? <= UNIX_TIMESTAMP(b.registeredDate)");
-				objects.add(TimeUtils.convertDateToTimestamp(filter.getRegisteredFrom()));
-			}
-			if(filter.getRegisteredTo() != null) {
-				sb.append(" AND UNIX_TIMESTAMP(b.registeredDate) <= ?");
-				objects.add(TimeUtils.convertDateToTimestamp(filter.getRegisteredTo()));
-			}
-
-			sb.append(")");
-		}
-
-		String where = null;
-		if(objects.size() > 0) {
-			where = sb.toString();
-		} else {
-			objects = null;
-		}
-
-		return listByWhere(false, where, objects, sortBy, sortDir, limitRows, limitOffset);
-	}
-
-	public List<Bso> listBySeriesAndNumbers(String series, long numberFrom, long numberTo) {
-		String where = "b.series = ? AND ? <= b.number AND b.number <= ?";
-		List<Object> objects = new ArrayList<Object>();
-		objects.add(series);
-		objects.add(numberFrom);
-		objects.add(numberTo);
-
-		return listByWhere(false, where, objects);
-	}
-
-	@Override
-	protected Bso getFromRs(ResultSet rs) throws SQLException {
-		Node node = new Node();
-		node.setId(rs.getInt("nodeId"));
-		node.setName(rs.getString("nodeName"));
-
-		Unit unit = null;
-		if(rs.getInt("unitId") > 0) {
-			UnitType type = new UnitType();
-			type.setId(rs.getInt("unitTypeId"));
-			type.setName(rs.getString("unitTypeName"));
-
-			City city = new City();
-			city.setId(rs.getInt("unitCityId"));
-			city.setName(rs.getString("unitCityName"));
-
-			unit = new Unit();
-			unit.setId(rs.getInt("unitId"));
-			unit.setType(type);
-			unit.setCity(city);
-			unit.setName(rs.getString("unitName"));
-		}
-
-		User issuedUser = null;
-		if(rs.getInt("bsoIssuedUserId") > 0) {
-			issuedUser = new User();
-			issuedUser.setId(rs.getInt("bsoIssuedUserId"));
-			issuedUser.setFirstName(rs.getString("bsoIssuedUserFirstName"));
-			issuedUser.setLastName(rs.getString("bsoIssuedUserLastName"));
-		}
-
-		Unit issuedUnit = null;
-		if(rs.getInt("bsoIssuedUnitId") > 0) {
-			issuedUnit = new Unit();
-			issuedUnit.setId(rs.getInt("bsoIssuedUnitId"));
-			issuedUnit.setName(rs.getString("bsoIssuedUnitName"));
-		}
-
-		User corruptedUser = null;
-		if(rs.getInt("bsoCorruptedUserId") > 0) {
-			corruptedUser = new User();
-			corruptedUser.setId(rs.getInt("bsoCorruptedUserId"));
-			corruptedUser.setFirstName(rs.getString("bsoCorruptedUserFirstName"));
-			corruptedUser.setLastName(rs.getString("bsoCorruptedUserLastName"));
-		}
-
-		Unit corruptedUnit = null;
-		if(rs.getInt("bsoCorruptedUnitId") > 0) {
-			corruptedUnit = new Unit();
-			corruptedUnit.setId(rs.getInt("bsoCorruptedUnitId"));
-			corruptedUnit.setName(rs.getString("bsoCorruptedUnitName"));
-		}
-
-		User registeredUser = null;
-		if(rs.getInt("bsoRegisteredUserId") > 0) {
-			registeredUser = new User();
-			registeredUser.setId(rs.getInt("bsoRegisteredUserId"));
-			registeredUser.setFirstName(rs.getString("bsoRegisteredUserFirstName"));
-			registeredUser.setLastName(rs.getString("bsoRegisteredUserLastName"));
-		}
-
-		Unit registeredUnit = null;
-		if(rs.getInt("bsoRegisteredUnitId") > 0) {
-			registeredUnit = new Unit();
-			registeredUnit.setId(rs.getInt("bsoRegisteredUnitId"));
-			registeredUnit.setName(rs.getString("bsoRegisteredUnitName"));
-		}
-
-		Bso bso = new Bso();
-		bso.setId(rs.getInt("bsoId"));
-		bso.setCreated(TimeUtils.convertTimestampToDate(rs.getLong("bsoCreated")));
-		bso.setSeries(rs.getString("bsoSeries"));
-		bso.setNumber(rs.getLong("bsoNumber"));
-		bso.setIssued(rs.getBoolean("bsoIssued"));
-		bso.setIssuedDate(TimeUtils.convertTimestampToDate(rs.getLong("bsoIssuedDate")));
-		bso.setIssuedBy(issuedUser);
-		bso.setIssuedUnit(issuedUnit);
-		bso.setCorrupted(rs.getBoolean("bsoCorrupted"));
-		bso.setCorruptedDate(TimeUtils.convertTimestampToDate(rs.getLong("bsoCorruptedDate")));
-		bso.setCorruptedBy(corruptedUser);
-		bso.setCorruptedUnit(corruptedUnit);
-		bso.setRegistered(rs.getBoolean("bsoRegistered"));
-		bso.setRegisteredDate(TimeUtils.convertTimestampToDate(rs.getLong("bsoRegisteredDate")));
-		bso.setRegisteredBy(registeredUser);
-		bso.setRegisteredUnit(registeredUnit);
-		bso.setInsured(rs.getString("bsoInsured"));
-		bso.setPremium(rs.getBigDecimal("bsoPremium"));
-		bso.setUnit(unit);
-		bso.setNode(node);
-
-		return bso;
-	}
-
-	@Override
-	protected void setInsertPs(PreparedStatement ps, Bso bso) throws SQLException {
-	}
-
-	@Override
-	protected void setUpdatePs(PreparedStatement ps, Bso bso) throws SQLException {
-		int index = 1;
-
-		ps.setBoolean(index++, bso.isIssued());
-		if(bso.getIssuedDate() == null) {
-			ps.setNull(index++, Types.INTEGER);
-		} else {
-			ps.setLong(index++, TimeUtils.convertDateToTimestamp(bso.getIssuedDate()));
-		}
-		if(bso.getIssuedBy() == null) {
-			ps.setNull(index++, Types.INTEGER);
-		} else {
-			ps.setInt(index++, bso.getIssuedBy().getId());
-		}
-		if(bso.getIssuedUnit() == null) {
-			ps.setNull(index++, Types.INTEGER);
-		} else {
-			ps.setInt(index++, bso.getIssuedUnit().getId());
-		}
-
-		ps.setBoolean(index++, bso.isCorrupted());
-		if(bso.getCorruptedDate() == null) {
-			ps.setNull(index++, Types.INTEGER);
-		} else {
-			ps.setLong(index++, TimeUtils.convertDateToTimestamp(bso.getCorruptedDate()));
-		}
-		if(bso.getCorruptedBy() == null) {
-			ps.setNull(index++, Types.INTEGER);
-		} else {
-			ps.setInt(index++, bso.getCorruptedBy().getId());
-		}
-		if(bso.getCorruptedUnit() == null) {
-			ps.setNull(index++, Types.INTEGER);
-		} else {
-			ps.setInt(index++, bso.getCorruptedUnit().getId());
-		}
-
-		ps.setBoolean(index++, bso.isRegistered());
-		if(bso.getRegisteredDate() == null) {
-			ps.setNull(index++, Types.INTEGER);
-		} else {
-			ps.setLong(index++, TimeUtils.convertDateToTimestamp(bso.getRegisteredDate()));
-		}
-		if(bso.getRegisteredBy() == null) {
-			ps.setNull(index++, Types.INTEGER);
-		} else {
-			ps.setInt(index++, bso.getRegisteredBy().getId());
-		}
-		if(bso.getRegisteredUnit() == null) {
-			ps.setNull(index++, Types.INTEGER);
-		} else {
-			ps.setInt(index++, bso.getRegisteredUnit().getId());
-		}
-
-		ps.setString(index++, bso.getInsured());
-		ps.setBigDecimal(index++, bso.getPremium());
-
-		ps.setInt(index++, bso.getId());
-	}
+        return listByWhere(where, objects);
+    }
 }

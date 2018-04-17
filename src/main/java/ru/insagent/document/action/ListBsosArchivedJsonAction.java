@@ -23,7 +23,7 @@ import com.opensymphony.xwork2.conversion.annotations.TypeConversion;
 import org.apache.struts2.json.annotations.JSON;
 import ru.insagent.action.GetBaseAction;
 import ru.insagent.document.dao.BsoArchivedDao;
-import ru.insagent.document.model.Bso;
+import ru.insagent.document.model.BsoArchived;
 import ru.insagent.document.model.BsoFilter;
 
 import java.util.Arrays;
@@ -43,7 +43,7 @@ import java.util.List;
 				@TypeConversion(key = "filter.registerTo", converter = "ru.insagent.converter.StringToDateTimeConverter")
 		}
 )
-public class ListBsosArchivedJsonAction extends GetBaseAction<Bso> {
+public class ListBsosArchivedJsonAction extends GetBaseAction<BsoArchived> {
 	private static final long serialVersionUID = 1L;
 
 	private BsoFilter filter;
@@ -58,7 +58,7 @@ public class ListBsosArchivedJsonAction extends GetBaseAction<Bso> {
 	}
 
 	@Override
-	public List<Bso> getRows() {
+	public List<BsoArchived> getRows() {
 		return rows;
 	}
 
@@ -74,13 +74,9 @@ public class ListBsosArchivedJsonAction extends GetBaseAction<Bso> {
 
 	@Override
 	public String executeImpl() {
-		BsoArchivedDao dao = new BsoArchivedDao(conn);
+		BsoArchivedDao dao = new BsoArchivedDao();
 
-		if (filter == null) {
-			rows = dao.listByUser(baseUser, search, sort, order, limit, offset);
-		} else {
-			rows = dao.listByUser(baseUser, filter, sort, order, limit, offset);
-		}
+		rows = dao.listByRoles(null, filter, sort, order, limit, offset);
 		total = dao.getCount();
 
 		return SUCCESS;

@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2018 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,63 +22,59 @@ import com.opensymphony.xwork2.conversion.annotations.Conversion;
 import com.opensymphony.xwork2.conversion.annotations.TypeConversion;
 import org.apache.struts2.json.annotations.JSON;
 import ru.insagent.action.GetBaseAction;
-import ru.insagent.document.dao.BsoDao;
-import ru.insagent.document.model.Bso;
+import ru.insagent.document.dao.BsoNormalDao;
 import ru.insagent.document.model.BsoFilter;
+import ru.insagent.document.model.BsoNormal;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Conversion(
-		conversions = {
-				@TypeConversion(key = "filter.premiumFrom", converter = "ru.insagent.converter.StringToBigDecimalConverter"),
-				@TypeConversion(key = "filter.premiumTo", converter = "ru.insagent.converter.StringToBigDecimalConverter"),
-				@TypeConversion(key = "filter.createdFrom", converter = "ru.insagent.converter.StringToDateTimeConverter"),
-				@TypeConversion(key = "filter.createdTo", converter = "ru.insagent.converter.StringToDateTimeConverter"),
-				@TypeConversion(key = "filter.issuedFrom", converter = "ru.insagent.converter.StringToDateTimeConverter"),
-				@TypeConversion(key = "filter.issuedTo", converter = "ru.insagent.converter.StringToDateTimeConverter")
-		}
+        conversions = {
+                @TypeConversion(key = "filter.premiumFrom", converter = "ru.insagent.converter.StringToBigDecimalConverter"),
+                @TypeConversion(key = "filter.premiumTo", converter = "ru.insagent.converter.StringToBigDecimalConverter"),
+                @TypeConversion(key = "filter.createdFrom", converter = "ru.insagent.converter.StringToDateTimeConverter"),
+                @TypeConversion(key = "filter.createdTo", converter = "ru.insagent.converter.StringToDateTimeConverter"),
+                @TypeConversion(key = "filter.issuedFrom", converter = "ru.insagent.converter.StringToDateTimeConverter"),
+                @TypeConversion(key = "filter.issuedTo", converter = "ru.insagent.converter.StringToDateTimeConverter")
+        }
 )
-public class ListBsosJsonAction extends GetBaseAction<Bso> {
-	private static final long serialVersionUID = 1L;
+public class ListBsosJsonAction extends GetBaseAction<BsoNormal> {
+    private static final long serialVersionUID = 1L;
 
-	private BsoFilter filter;
+    private BsoFilter filter;
 
-	public void setFilter(BsoFilter filter) {
-		this.filter = filter;
-	}
+    public void setFilter(BsoFilter filter) {
+        this.filter = filter;
+    }
 
-	@JSON(serialize = false)
-	public BsoFilter getFilter() {
-		return filter;
-	}
+    @JSON(serialize = false)
+    public BsoFilter getFilter() {
+        return filter;
+    }
 
-	@Override
-	public List<Bso> getRows() {
-		return rows;
-	}
+    @Override
+    public List<BsoNormal> getRows() {
+        return rows;
+    }
 
-	@Override
-	public long getTotal() {
-		return total;
-	}
+    @Override
+    public long getTotal() {
+        return total;
+    }
 
-	{
-		ALLOW_ROLES = Arrays.asList("admin", "director", "manager", "register");
-		ALLOW_MSG = "У вас нет прав для просмотра журнала БСО";
-	}
+    {
+        ALLOW_ROLES = Arrays.asList("admin", "director", "manager", "register");
+        ALLOW_MSG = "У вас нет прав для просмотра журнала БСО";
+    }
 
-	@Override
-	public String executeImpl() {
-		BsoDao dao = new BsoDao(conn);
+    @Override
+    public String executeImpl() {
+        BsoNormalDao dao = new BsoNormalDao();
 
-		if (filter == null) {
-			rows = dao.listByUser(baseUser, search, sort, order, limit, offset);
-		} else {
-			rows = dao.listByUser(baseUser, filter, sort, order, limit, offset);
-		}
-		total = dao.getCount();
+        rows = dao.listByRoles(null, filter, sort, order, limit, offset);
+        total = dao.getCount();
 
-		return SUCCESS;
-	}
+        return SUCCESS;
+    }
 }

@@ -56,59 +56,31 @@ $(function() {
 			title: 'Номер',
 			sortable: true
 		}, {
-			field: 'node',
+			field: 'nodeName',
 			title: 'Узел',
 			titleTooltip: 'Этап, на котором в настоящее время находится БСО',
-			sortable: true,
-			formatter: function(node) {
-				if(node === null) {
-					return null;
-				} else {
-					return node.name;
-				}
-			}
+			sortable: true
 		}, {
-			field: 'unit',
+			field: 'unitName',
 			title: 'Подразд.',
 			titleTooltip: 'Подразделение, в котором в настоящее время находится БСО',
-			sortable: true,
-			formatter: function(unit) {
-				if(unit === null) {
-					return null;
-				} else {
-					return unit.name;
-				}
-			}
+			sortable: true
 		}, {
 			field: 'issuedDate',
 			title: 'Выдан',
 			titleTooltip: 'Дата и время выдачи БСО страхователю',
 			sortable: true
 		}, {
-			field: 'issuedBy',
+			field: 'issuedByName',
 			title: 'Выдал',
 			titleTooltip: 'Пользователь, который выдал БСО страхователю',
 			sortable: true,
-			formatter: function(issuedBy) {
-				if(issuedBy === null) {
-					return null;
-				} else {
-					return issuedBy.firstName + ' ' + issuedBy.lastName;
-				}
-			},
 			visible: false
 		}, {
-			field: 'issuedUnit',
+			field: 'issuedUnitName',
 			title: 'Выдал',
 			titleTooltip: 'Подразделение, в котором БСО был выдан страхователю',
 			sortable: true,
-			formatter: function(issuedUnit) {
-				if(issuedUnit === null) {
-					return null;
-				} else {
-					return issuedUnit.name;
-				}
-			},
 			visible: false
 		}, {
 			field: 'corruptedDate',
@@ -116,30 +88,16 @@ $(function() {
 			titleTooltip: 'Дата и время отметки БСО испорченным',
 			sortable: true
 		}, {
-			field: 'corruptedBy',
+			field: 'corruptedByName',
 			title: 'Испортил',
 			titleTooltip: 'Пользователь, который отметил БСО испорченным',
 			sortable: true,
-			formatter: function(corruptedBy) {
-				if(corruptedBy === null) {
-					return null;
-				} else {
-					return corruptedBy.firstName + ' ' + corruptedBy.lastName;
-				}
-			},
 			visible: false
 		}, {
-			field: 'corruptedUnit',
+			field: 'corruptedUnitName',
 			title: 'Испортил',
 			titleTooltip: 'Подразделение, в котором БСО был отмечен испорченным',
 			sortable: true,
-			formatter: function(corruptedUnit) {
-				if(corruptedUnit === null) {
-					return null;
-				} else {
-					return corruptedUnit.name;
-				}
-			},
 			visible: false
 		}, {
 			field: 'registeredDate',
@@ -147,30 +105,16 @@ $(function() {
 			titleTooltip: 'Дата и время регистрации БСО в системе',
 			sortable: true
 		}, {
-			field: 'registeredBy',
+			field: 'registeredByName',
 			title: 'Регистр.',
 			titleTooltip: 'Пользователь, который зарегистрировал БСО в системе',
 			sortable: true,
-			formatter: function(registeredBy) {
-				if(registeredBy === null) {
-					return null;
-				} else {
-					return registeredBy.firstName + ' ' + registeredBy.lastName;
-				}
-			},
 			visible: false
 		}, {
-			field: 'registeredUnit',
+			field: 'registeredUnitName',
 			title: 'Регистр.',
 			titleTooltip: 'Подразделение, в котором БСО был зарегистрирован в системе',
 			sortable: true,
-			formatter: function(registeredUnit) {
-				if(registeredUnit === null) {
-					return null;
-				} else {
-					return registeredUnit.name;
-				}
-			},
 			visible: false
 		}, {
 			field: 'insured',
@@ -805,9 +749,9 @@ $(function() {
 
 		$('#openFilterBsoButton').removeClass('btn-default').addClass('btn-warning');
 
-		bsosTableObj.bootstrapTable('refresh', {url: 'listBsosJson.action'});
+		bsosTableObj.bootstrapTable('refresh', {url: '/bso/bso'});
 	} else {
-		bsosTableObj.bootstrapTable('refresh', {url: 'listBsosJson.action'});
+		bsosTableObj.bootstrapTable('refresh', {url: '/bso/bso'});
 	}
 	filterBsoFormObj.on('submit', function(e) {
 		// Форму отправлять не нужно.

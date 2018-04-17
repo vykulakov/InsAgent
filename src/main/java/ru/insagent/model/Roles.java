@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2018 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,21 @@
  * limitations under the License.
  */
 
-package ru.insagent;
+package ru.insagent.model;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
-@SpringBootApplication
-public class InsagentApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(InsagentApplication.class, args);
-	}
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
+public class Roles extends ArrayList<String> {
+    public Roles() {
+    }
+
+    public Roles(Authentication authentication) {
+        authentication.getAuthorities().forEach(authority -> {
+            add(authority.getAuthority());
+        });
+    }
 }

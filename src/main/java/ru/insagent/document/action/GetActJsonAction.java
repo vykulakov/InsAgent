@@ -80,16 +80,16 @@ public class GetActJsonAction extends BaseAction {
 
 	@Override
 	public String executeImpl() {
-		NodeDao nd = new NodeDao(conn);
-		LinkDao ld = new LinkDao(conn);
+		NodeDao nd = new NodeDao();
+		LinkDao ld = new LinkDao();
 		UnitDao ud = new UnitDao();
 
-		List<Unit> units = ud.listByUser(baseUser);
+		List<Unit> units = ud.listByRoles(null);
 
-		for(Link link : ld.listByUser(baseUser)) {
+		for(Link link : ld.listByRoles(null)) {
 			if(link.getActType() != null && link.getActType().getId() == actTypeId) {
-				Node nodeFrom = nd.getById(link.getNodeFrom().getId());
-				Node nodeTo = nd.getById(link.getNodeTo().getId());
+				Node nodeFrom = nd.get(link.getNodeFrom().getId());
+				Node nodeTo = nd.get(link.getNodeTo().getId());
 
 				for(Unit unit : units) {
 					if(nodeFrom.getNodeType().getId() == 4 && nodeFrom.getUnitType().equals(unit.getType())) {

@@ -1,72 +1,69 @@
+/*
+ * InsAgent - https://github.com/vykulakov/InsAgent
+ *
+ * Copyright 2017-2018 Vyacheslav Kulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.insagent.workflow.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Repository;
 import ru.insagent.dao.SimpleDao;
+import ru.insagent.dao.SimpleHDao;
+import ru.insagent.model.IdBase;
 import ru.insagent.model.UnitType;
 import ru.insagent.workflow.model.Node;
 import ru.insagent.workflow.model.NodeType;
 
-public class NodeDao extends SimpleDao<Node> {
+@Repository
+public class NodeDao extends SimpleHDao<Node> {
 	{
-		countQueryPrefix = ""
+        clazz = Node.class;
+
+        countQueryPrefix = ""
 				+ " SELECT"
 				+ "     COUNT(*) AS count"
 				+ " FROM"
-				+ "     w_nodes n,"
-				+ "     w_node_types t"
+				+ "     Node n"
 				+ " WHERE"
-				+ "     t.id = n.nodeTypeId";
+				+ "     1 = 1";
 
 		selectQueryPrefix = ""
 				+ " SELECT"
-				+ "     n.id AS nodeId,"
-				+ "     n.name AS nodeName,"
-				+ "     n.issued AS nodeIssued,"
-				+ "     t.id AS nodeTypeId,"
-				+ "     t.name AS nodeTypeName,"
-				+ "     n.unitTypeId AS nodeUnitTypeId"
+				+ "     n"
 				+ " FROM"
-				+ "     w_nodes n,"
-				+ "     w_node_types t"
+				+ "     Node n"
 				+ " WHERE"
-				+ "     t.id = n.nodeTypeId";
-
-		selectOrder = "n.order ASC";
-
-		idField = "n.id";
+				+ "     1 = 1";
 	}
 
-	public NodeDao(Connection conn) {
-		super(conn);
-	}
+    public List<Node> listByIds(List<Integer> nodeIds) {
+        StringBuilder sb = new StringBuilder();
+        Map<String, Object> objects = new HashMap<>();
 
-	@Override
-	protected Node getFromRs(ResultSet rs) throws SQLException {
-		NodeType nodeType = new NodeType();
-		nodeType.setId(rs.getInt("nodeTypeId"));
-		nodeType.setName(rs.getString("nodeTypeName"));
+        sb.append("n.id IN :ids");
+        objects.put("ids", nodeIds);
 
-		UnitType unitType = new UnitType();
-		unitType.setId(rs.getInt("nodeUnitTypeId"));
-
-		Node node = new Node();
-		node.setId(rs.getInt("nodeId"));
-		node.setName(rs.getString("nodeName"));
-		node.setNodeType(nodeType);
-		node.setUnitType(unitType);
-
-		return node;
-	}
-
-	@Override
-	protected void setInsertPs(PreparedStatement ps, Node node) throws SQLException {
-	}
-
-	@Override
-	protected void setUpdatePs(PreparedStatement ps, Node node) throws SQLException {
-	}
+        return listByWhere(sb.toString(), objects);
+    }
 }

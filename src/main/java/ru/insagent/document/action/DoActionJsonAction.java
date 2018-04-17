@@ -23,8 +23,8 @@ import com.opensymphony.xwork2.conversion.annotations.TypeConversion;
 import com.opensymphony.xwork2.validator.annotations.ConversionErrorFieldValidator;
 import com.opensymphony.xwork2.validator.annotations.RequiredFieldValidator;
 import ru.insagent.action.BaseAction;
-import ru.insagent.document.dao.BsoDao;
-import ru.insagent.document.model.Bso;
+import ru.insagent.document.dao.BsoNormalDao;
+import ru.insagent.document.model.BsoNormal;
 import ru.insagent.workflow.dao.ActionDao;
 import ru.insagent.workflow.model.Action;
 
@@ -91,15 +91,15 @@ public class DoActionJsonAction extends BaseAction {
 	}
 
 	public String executeImpl() {
-		BsoDao bd = new BsoDao(conn);
-		ActionDao ad = new ActionDao(conn);
+		BsoNormalDao bd = new BsoNormalDao();
+		ActionDao ad = new ActionDao();
 
-		Bso bso = null;
+		BsoNormal bso = null;
 		Action action = null;
 		boolean result;
 
 		result = false;
-		for (Bso b : bd.listByUser(baseUser)) {
+		for (BsoNormal b : bd.listByRoles(null)) {
 			if (b.getId() == bsoId) {
 				bso = b;
 				result = true;
@@ -112,7 +112,7 @@ public class DoActionJsonAction extends BaseAction {
 		}
 
 		result = false;
-		for (Action a : ad.listByUser(baseUser)) {
+		for (Action a : ad.listByRoles(null)) {
 			if (a.getId() == actionId) {
 				action = a;
 				result = true;

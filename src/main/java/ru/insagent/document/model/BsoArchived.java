@@ -16,28 +16,29 @@
  * limitations under the License.
  */
 
-package ru.insagent.model;
+package ru.insagent.document.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * Archived bso entity
+ */
 @Entity
-@Table(name = "m_unit_types")
-public class UnitType extends IdBase {
-    private static final long serialVersionUID = 4580145163020300664L;
+@Table(name = "d_bsos_archived")
+public class BsoArchived extends Bso {
+    private static final long serialVersionUID = -3893689812214482027L;
 
-    private String name;
-
-    public String getName() {
-        return name;
+    public BsoArchived() {
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public BsoArchived(BsoNormal bso) {
+        super();
+        BsoNormal.copy(this, bso);
     }
 
     @Override
     public String toString() {
-        return "UnitType [id=" + id + ", name=" + name + "]";
+        return "BsoArchived [id=" + id + ", series=" + getSeries() + ", number=" + getNumber() + ", node=" + getNode() + ", unit=" + getUnit() + ", issued=" + isIssued() + ", corrupted=" + isCorrupted() + ", registered=" + isRegistered() + "]";
     }
 }

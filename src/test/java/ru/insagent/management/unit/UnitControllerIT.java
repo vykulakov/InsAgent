@@ -26,7 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
-import ru.insagent.management.ControllerIT;
+import ru.insagent.ControllerIT;
 import ru.insagent.model.City;
 import ru.insagent.model.Unit;
 import ru.insagent.model.UnitType;

@@ -46,12 +46,12 @@ public class ListActsJsonAction extends GetBaseAction<Act> {
 
 	@Override
 	public String executeImpl() {
-		ActDao dao = new ActDao(conn);
+		ActDao dao = new ActDao();
 
 		rows = dao.listByUser(baseUser, sort, order, limit, offset);
 		total = dao.getCount();
 
-		ActPackDao pd = new ActPackDao(conn);
+		ActPackDao pd = new ActPackDao();
 		for (Act act : rows) {
 			act.setPacks(pd.listByActId(act.getId()));
 		}

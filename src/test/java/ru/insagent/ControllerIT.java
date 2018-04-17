@@ -1,4 +1,4 @@
-package ru.insagent.management;
+package ru.insagent;
 
 import org.junit.Before;
 import org.junit.runner.RunWith;

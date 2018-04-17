@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2018 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.apache.struts2.json.annotations.JSON;
 import ru.insagent.action.GetBaseAction;
 import ru.insagent.document.dao.BsoArchivedDao;
 import ru.insagent.document.model.Bso;
+import ru.insagent.document.model.BsoNormal;
 import ru.insagent.document.model.BsoFilter;
 import ru.insagent.util.ExportToExcel;
 
@@ -33,7 +34,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ExportBsoArchivedJournalAction extends GetBaseAction<Bso> {
+public class ExportBsoArchivedJournalAction extends GetBaseAction<BsoNormal> {
 	private static final long serialVersionUID = 1L;
 
 	private BsoFilter filter;
@@ -66,7 +67,7 @@ public class ExportBsoArchivedJournalAction extends GetBaseAction<Bso> {
 
 	@Override
 	public String executeImpl() {
-		BsoArchivedDao dao = new BsoArchivedDao(conn);
+		BsoArchivedDao dao = new BsoArchivedDao();
 
 		ExportToExcel excel = new ExportToExcel();
 		excel.setHeaders(Arrays.asList(
@@ -102,7 +103,7 @@ public class ExportBsoArchivedJournalAction extends GetBaseAction<Bso> {
 
 		int index = 1;
 		SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-		for (Bso bso : dao.listByUser(baseUser, filter, sort, order, 0, 0)) {
+		for (Bso bso : dao.listByRoles(null, filter, sort, order, 0, 0)) {
 			List<Object> cells = new LinkedList<Object>();
 			cells.add(String.valueOf(index++));
 			cells.add(bso.getSeries());

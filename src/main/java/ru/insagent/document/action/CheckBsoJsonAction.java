@@ -54,10 +54,10 @@ public class CheckBsoJsonAction extends BaseAction {
 	}
 
 	public String executeImpl() {
-		ActionDao ad = new ActionDao(conn);
+		ActionDao ad = new ActionDao();
 
 		boolean result = false;
-		for(Action action : ad.listByUser(baseUser)) {
+		for(Action action : ad.listByRoles(null)) {
 			if(action.getId() == actionId) {
 				result = true;
 				break;

@@ -21,9 +21,11 @@ package ru.insagent.document.action;
 import com.opensymphony.xwork2.validator.annotations.*;
 import ru.insagent.action.BaseAction;
 import ru.insagent.document.dao.BsoArchivedDao;
-import ru.insagent.document.dao.BsoDao;
+import ru.insagent.document.dao.BsoNormalDao;
 import ru.insagent.document.model.ActPack;
 import ru.insagent.document.model.Bso;
+import ru.insagent.document.model.BsoArchived;
+import ru.insagent.document.model.BsoNormal;
 import ru.insagent.util.Utils;
 
 import java.util.Arrays;
@@ -83,8 +85,8 @@ public class CheckPackJsonAction extends BaseAction {
 	)
 	public String executeImpl() {
 		//TODO Нужно проверять, можно ли передать выбранное БСО из одного подразделения в другое. Может в выбранном подразделении этого БСО вообще нет.
-		BsoDao bd = new BsoDao(conn);
-		BsoArchivedDao bad = new BsoArchivedDao(conn);
+		BsoNormalDao bd = new BsoNormalDao();
+		BsoArchivedDao bad = new BsoArchivedDao();
 
 		Set<Long> numbers = null;
 		String ranges = null;
@@ -96,14 +98,14 @@ public class CheckPackJsonAction extends BaseAction {
 			}
 		}
 
-		List<Bso> bsos = bd.listBySeriesAndNumbers(pack.getSeries(), pack.getNumberFrom(), pack.getNumberTo());
-		List<Bso> bsosArchived = bad.listBySeriesAndNumbers(pack.getSeries(), pack.getNumberFrom(), pack.getNumberTo());
+		List<BsoNormal> bsos = bd.listBySeriesAndNumbers(pack.getSeries(), pack.getNumberFrom(), pack.getNumberTo());
+		List<BsoArchived> bsosArchived = bad.listBySeriesAndNumbers(pack.getSeries(), pack.getNumberFrom(), pack.getNumberTo());
 		if (mustExists != 0) {
 			for (Bso bso : bsos) {
 				numbers.remove(bso.getNumber());
 			}
-			for (Bso bsoArchived : bsosArchived) {
-				numbers.remove(bsoArchived.getNumber());
+			for (Bso bso : bsosArchived) {
+				numbers.remove(bso.getNumber());
 			}
 		} else {
 			for (Bso bso : bsos) {
@@ -122,8 +124,8 @@ public class CheckPackJsonAction extends BaseAction {
 		}
 
 		numbers = new TreeSet<Long>();
-		for (Bso bsoArchived : bsosArchived) {
-			numbers.add(bsoArchived.getNumber());
+		for (Bso bso : bsosArchived) {
+			numbers.add(bso.getNumber());
 		}
 
 		ranges = Utils.convertNumbersToRanges(numbers);

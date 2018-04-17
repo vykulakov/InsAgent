@@ -8,12 +8,6 @@
 	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
 
 	<package name="default" namespace="/" extends="struts-default">
-		<action name="bsoJournal" class="ru.insagent.document.action.BsoJournalAction">
-			<result name="error">/WEB-INF/jsp/journal/bso_error.jsp</result>
-			<result name="input">/WEB-INF/jsp/journal/bso_error.jsp</result>
-			<result name="*">/WEB-INF/jsp/journal/bso.jsp</result>
-		</action>
-
 		<action name="bsoArchivedJournal" class="ru.insagent.document.action.BsoArchivedJournalAction">
 			<result name="error">/WEB-INF/jsp/journal/bso_archived_error.jsp</result>
 			<result name="input">/WEB-INF/jsp/journal/bso_archived_error.jsp</result>

@@ -20,8 +20,8 @@ package ru.insagent.document.action;
 
 import org.apache.struts2.json.annotations.JSON;
 import ru.insagent.action.GetBaseAction;
-import ru.insagent.document.dao.BsoDao;
-import ru.insagent.document.model.Bso;
+import ru.insagent.document.dao.BsoNormalDao;
+import ru.insagent.document.model.BsoNormal;
 import ru.insagent.document.model.BsoFilter;
 import ru.insagent.util.ExportToExcel;
 
@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ExportBsoJournalAction extends GetBaseAction<Bso> {
+public class ExportBsoJournalAction extends GetBaseAction<BsoNormal> {
 	private static final long serialVersionUID = 1L;
 
 	private BsoFilter filter;
@@ -66,7 +66,7 @@ public class ExportBsoJournalAction extends GetBaseAction<Bso> {
 
 	@Override
 	public String executeImpl() {
-		BsoDao dao = new BsoDao(conn);
+		BsoNormalDao dao = new BsoNormalDao();
 
 		ExportToExcel excel = new ExportToExcel();
 		excel.setHeaders(Arrays.asList(
@@ -102,7 +102,7 @@ public class ExportBsoJournalAction extends GetBaseAction<Bso> {
 
 		int index = 1;
 		SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-		for (Bso bso : dao.listByUser(baseUser, filter, sort, order, 0, 0)) {
+		for (BsoNormal bso : dao.listByRoles(null, filter, sort, order, 0, 0)) {
 			List<Object> cells = new LinkedList<Object>();
 			cells.add(String.valueOf(index++));
 			cells.add(bso.getSeries());
