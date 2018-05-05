@@ -1,9 +1,11 @@
 .idea
 .settings
-sql/mysqldump.bat
 .classpath
 .project
-build.properties
-/target
+target
+sql/mysqldump.bat
 *.iml
 *.log
+build.properties
+application-*.properties
+git
