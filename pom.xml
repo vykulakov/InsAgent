@@ -46,6 +46,8 @@
         <hibernate.version>5.2.11.Final</hibernate.version>
 
         <lombook.version>1.16.20</lombook.version>
+        <commons-lang3.version>3.7</commons-lang3.version>
+        <jackson-datatype.version>2.9.5</jackson-datatype.version>
 
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -53,6 +55,12 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -200,6 +208,12 @@
             <artifactId>struts2-junit-plugin</artifactId>
             <version>${struts.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson-datatype.version}</version>
         </dependency>
 
         <dependency>

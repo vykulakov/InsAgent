@@ -18,60 +18,57 @@
 
 package ru.insagent.model;
 
-import java.io.Serializable;
-
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import java.io.Serializable;
 
 /**
  * Base class for entities with id field
  */
 @MappedSuperclass
 public abstract class IdBase implements Serializable {
-	private static final long serialVersionUID = -7939086479093714662L;
+    private static final long serialVersionUID = -7939086479093714662L;
 
-	@Id
-	@GeneratedValue
-	protected int id;
+    @Id
+    @GeneratedValue
+    protected int id;
 
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + id;
-		return result;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if(this == obj) {
-			return true;
-		}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + id;
+        return result;
+    }
 
-		if(obj == null) {
-			return false;
-		}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
 
-		if(getClass() != obj.getClass()) {
-			return false;
-		}
+        if (obj == null) {
+            return false;
+        }
 
-		IdBase other = (IdBase) obj;
-		if(id != other.id) {
-			return false;
-		}
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
 
-		return true;
-	}
+        IdBase other = (IdBase) obj;
+        if (id != other.id) {
+            return false;
+        }
 
-	@Override
-	public abstract String toString();
+        return true;
+    }
 }

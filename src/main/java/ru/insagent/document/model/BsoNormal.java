@@ -28,9 +28,4 @@ import javax.persistence.Table;
 @Table(name = "d_bsos")
 public class BsoNormal extends Bso {
     private static final long serialVersionUID = -3893689810214482026L;
-
-    @Override
-    public String toString() {
-        return "BsoNormal [id=" + id + ", series=" + getSeries() + ", number=" + getNumber() + ", node=" + getNode() + ", unit=" + getUnit() + ", issued=" + isIssued() + ", corrupted=" + isCorrupted() + ", registered=" + isRegistered() + "]";
-    }
 }

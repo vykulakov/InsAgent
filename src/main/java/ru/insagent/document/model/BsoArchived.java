@@ -18,6 +18,8 @@
 
 package ru.insagent.document.model;
 
+import lombok.ToString;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -34,11 +36,6 @@ public class BsoArchived extends Bso {
 
     public BsoArchived(BsoNormal bso) {
         super();
-        BsoNormal.copy(this, bso);
-    }
-
-    @Override
-    public String toString() {
-        return "BsoArchived [id=" + id + ", series=" + getSeries() + ", number=" + getNumber() + ", node=" + getNode() + ", unit=" + getUnit() + ", issued=" + isIssued() + ", corrupted=" + isCorrupted() + ", registered=" + isRegistered() + "]";
+        Bso.copy(this, bso);
     }
 }

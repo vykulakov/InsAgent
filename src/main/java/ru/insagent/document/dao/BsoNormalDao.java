@@ -31,22 +31,22 @@ public class BsoNormalDao extends BsoDao<BsoNormal> {
     {
         clazz = BsoNormal.class;
 
-        sortByMap.put("created", "bsoCreated");
-        sortByMap.put("series", "bsoSeries");
-        sortByMap.put("number", "bsoNumber");
-        sortByMap.put("issuedDate", "bsoIssuedDate");
-        sortByMap.put("issuedBy", "CONCAT(bsoIssuedUserFirstName,bsoIssuedUserLastName)");
-        sortByMap.put("issuedUnit", "bsoIssuedUnitName");
-        sortByMap.put("corruptedDate", "bsoCorruptedDate");
-        sortByMap.put("corruptedBy", "CONCAT(bsoCorruptedUserFirstName,bsoCorruptedUserLastName)");
-        sortByMap.put("corruptedUnit", "bsoCorruptedUnitName");
-        sortByMap.put("registeredDate", "bsoRegisteredDate");
-        sortByMap.put("registeredBy", "CONCAT(bsoRegisteredUserFirstName,bsoRegisteredUserLastName)");
-        sortByMap.put("registeredUnit", "bsoRegisteredUnitName");
-        sortByMap.put("insured", "bsoInsured");
-        sortByMap.put("premium", "bsoPremium");
-        sortByMap.put("node", "nodeName");
-        sortByMap.put("unit", "unitName");
+        sortByMap.put("created", "b.created");
+        sortByMap.put("series", "b.series");
+        sortByMap.put("number", "b.number");
+        sortByMap.put("issuedDate", "b.issuedDate");
+        sortByMap.put("issuedBy", "CONCAT(b.issuedBy.firstName, b.issuedBy.lastName)");
+        sortByMap.put("issuedUnit", "b.issuedUnit.name");
+        sortByMap.put("corruptedDate", "b.corruptedDate");
+        sortByMap.put("corruptedBy", "CONCAT(b.corruptedBy.firstName, b.corruptedBy.lastName)");
+        sortByMap.put("corruptedUnit", "b.corruptedUnit.name");
+        sortByMap.put("registeredDate", "b.registeredDate");
+        sortByMap.put("registeredBy", "CONCAT(b.registeredBy.firstName, b.registeredBy.lastName)");
+        sortByMap.put("registeredUnit", "b.registeredBy.name");
+        sortByMap.put("insured", "b.insured");
+        sortByMap.put("premium", "b.premium");
+        sortByMap.put("node", "b.node.name");
+        sortByMap.put("unit", "b.unit.name");
 
         countQueryPrefix = ""
                 + " SELECT"
@@ -64,7 +64,6 @@ public class BsoNormalDao extends BsoDao<BsoNormal> {
                 + " WHERE"
                 + "     1 = 1";
     }
-
 
     public BsoNormal get(String series, long number) {
         StringBuilder sb = new StringBuilder("");

@@ -18,6 +18,7 @@
 
 package ru.insagent.document.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -28,6 +29,7 @@ import ru.insagent.workflow.model.Node;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -35,18 +37,21 @@ import java.util.Date;
  */
 @Getter
 @Setter
-@ToString(callSuper = true, includeFieldNames = true)
 public class BsoDTO {
     private int id;
-    private Date created;
+    @JsonFormat(pattern = "dd.MM.yyyy HH:mm")
+    private LocalDateTime created;
     private String series;
     private long number;
     private boolean issued;
-    private Date issuedDate;
+    @JsonFormat(pattern = "dd.MM.yyyy HH:mm")
+    private LocalDateTime issuedDate;
     private boolean corrupted;
-    private Date corruptedDate;
+    @JsonFormat(pattern = "dd.MM.yyyy HH:mm")
+    private LocalDateTime corruptedDate;
     private boolean registered;
-    private Date registeredDate;
+    @JsonFormat(pattern = "dd.MM.yyyy HH:mm")
+    private LocalDateTime registeredDate;
     private String insured;
     private BigDecimal premium;
 

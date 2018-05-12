@@ -18,7 +18,8 @@
 
 package ru.insagent.document.model;
 
-import org.apache.struts2.json.annotations.JSON;
+import lombok.Getter;
+import lombok.Setter;
 import ru.insagent.model.IdBase;
 import ru.insagent.model.Unit;
 import ru.insagent.model.User;
@@ -28,22 +29,24 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * Abstract bso entity
  */
+@Setter
+@Getter
 @MappedSuperclass
 public abstract class Bso extends IdBase {
-    private Date created;
+    private LocalDateTime created;
     private String series;
     private long number;
     private boolean issued;
-    private Date issuedDate;
+    private LocalDateTime issuedDate;
     private boolean corrupted;
-    private Date corruptedDate;
+    private LocalDateTime corruptedDate;
     private boolean registered;
-    private Date registeredDate;
+    private LocalDateTime registeredDate;
     private String insured;
     private BigDecimal premium;
 
@@ -78,162 +81,6 @@ public abstract class Bso extends IdBase {
     @ManyToOne
     @JoinColumn(name = "registeredUnitId")
     private Unit registeredUnit;
-
-    @JSON(format = "dd.MM.yyyy HH:mm")
-    public Date getCreated() {
-        return created;
-    }
-
-    public void setCreated(Date created) {
-        this.created = created;
-    }
-
-    public String getSeries() {
-        return series;
-    }
-
-    public void setSeries(String series) {
-        this.series = series;
-    }
-
-    public long getNumber() {
-        return number;
-    }
-
-    public void setNumber(long l) {
-        this.number = l;
-    }
-
-    public boolean isIssued() {
-        return issued;
-    }
-
-    public void setIssued(boolean issued) {
-        this.issued = issued;
-    }
-
-    @JSON(format = "dd.MM.yyyy HH:mm")
-    public Date getIssuedDate() {
-        return issuedDate;
-    }
-
-    public void setIssuedDate(Date issuedDate) {
-        this.issuedDate = issuedDate;
-    }
-
-    public User getIssuedBy() {
-        return issuedBy;
-    }
-
-    public void setIssuedBy(User user) {
-        this.issuedBy = user;
-    }
-
-    public Unit getIssuedUnit() {
-        return issuedUnit;
-    }
-
-    public void setIssuedUnit(Unit issuedUnit) {
-        this.issuedUnit = issuedUnit;
-    }
-
-    public boolean isCorrupted() {
-        return corrupted;
-    }
-
-    public void setCorrupted(boolean corrupted) {
-        this.corrupted = corrupted;
-    }
-
-    @JSON(format = "dd.MM.yyyy HH:mm")
-    public Date getCorruptedDate() {
-        return corruptedDate;
-    }
-
-    public void setCorruptedDate(Date corruptedDate) {
-        this.corruptedDate = corruptedDate;
-    }
-
-    public User getCorruptedBy() {
-        return corruptedBy;
-    }
-
-    public void setCorruptedBy(User corruptedBy) {
-        this.corruptedBy = corruptedBy;
-    }
-
-    public Unit getCorruptedUnit() {
-        return corruptedUnit;
-    }
-
-    public void setCorruptedUnit(Unit corruptedUnit) {
-        this.corruptedUnit = corruptedUnit;
-    }
-
-    public boolean isRegistered() {
-        return registered;
-    }
-
-    public void setRegistered(boolean registered) {
-        this.registered = registered;
-    }
-
-    @JSON(format = "dd.MM.yyyy HH:mm")
-    public Date getRegisteredDate() {
-        return registeredDate;
-    }
-
-    public void setRegisteredDate(Date registeredDate) {
-        this.registeredDate = registeredDate;
-    }
-
-    public User getRegisteredBy() {
-        return registeredBy;
-    }
-
-    public void setRegisteredBy(User registeredBy) {
-        this.registeredBy = registeredBy;
-    }
-
-    public Unit getRegisteredUnit() {
-        return registeredUnit;
-    }
-
-    public void setRegisteredUnit(Unit registeredUnit) {
-        this.registeredUnit = registeredUnit;
-    }
-
-    public String getInsured() {
-        return insured;
-    }
-
-    public void setInsured(String insured) {
-        this.insured = insured;
-    }
-
-    public BigDecimal getPremium() {
-        return premium;
-    }
-
-    public void setPremium(BigDecimal premium) {
-        this.premium = premium;
-    }
-
-    public Unit getUnit() {
-        return unit;
-    }
-
-    public void setUnit(Unit unit) {
-        this.unit = unit;
-    }
-
-    public Node getNode() {
-        return node;
-    }
-
-    public void setNode(Node node) {
-        this.node = node;
-    }
 
     public static void copy(Bso to, Bso from) {
         to.id = from.id;

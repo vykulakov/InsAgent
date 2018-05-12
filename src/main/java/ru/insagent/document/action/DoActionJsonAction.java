@@ -29,6 +29,7 @@ import ru.insagent.workflow.dao.ActionDao;
 import ru.insagent.workflow.model.Action;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -153,7 +154,7 @@ public class DoActionJsonAction extends BaseAction {
 			bso.setIssued(true);
 			bso.setIssuedBy(baseUser);
 			bso.setIssuedUnit(bso.getUnit());
-			bso.setIssuedDate(new Date());
+			bso.setIssuedDate(LocalDateTime.now());
 			bso.setInsured(insured);
 			bso.setPremium(premium);
 		}
@@ -167,7 +168,7 @@ public class DoActionJsonAction extends BaseAction {
 			bso.setCorrupted(true);
 			bso.setCorruptedBy(baseUser);
 			bso.setCorruptedUnit(bso.getUnit());
-			bso.setCorruptedDate(new Date());
+			bso.setCorruptedDate(LocalDateTime.now());
 		}
 
 		if (action.getIdx().equals("register")) {
@@ -179,7 +180,7 @@ public class DoActionJsonAction extends BaseAction {
 			bso.setRegistered(true);
 			bso.setRegisteredBy(baseUser);
 			bso.setRegisteredUnit(bso.getUnit());
-			bso.setRegisteredDate(new Date());
+			bso.setRegisteredDate(LocalDateTime.now());
 		}
 
 		bd.update(bso);
