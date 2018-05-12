@@ -1,11 +1,7 @@
+.git
 .idea
-.settings
-.classpath
-.project
 target
 sql/mysqldump.bat
 *.iml
 *.log
-build.properties
 application-*.properties
-git

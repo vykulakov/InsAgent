@@ -8,13 +8,14 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.insagent.dao.UnitDao;
+import ru.insagent.document.dao.BsoNormalDao;
 import ru.insagent.workflow.dao.ActionDao;
 import ru.insagent.workflow.dao.LinkDao;
 import ru.insagent.workflow.dao.NodeDao;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-@Import({BsoService.class, UnitDao.class, NodeDao.class, LinkDao.class, ActionDao.class})
+@Import({BsoService.class, UnitDao.class, NodeDao.class, LinkDao.class, ActionDao.class, BsoNormalDao.class})
 public class BsoServiceTest {
     @Autowired
     private BsoService bsoService;

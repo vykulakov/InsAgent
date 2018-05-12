@@ -5,13 +5,14 @@
 >
     <modelVersion>4.0.0</modelVersion>
 
+    <version>0.0.1</version>
     <groupId>ru.insagent</groupId>
     <artifactId>insagent</artifactId>
-    <version>0.0.1</version>
-    <packaging>jar</packaging>
 
     <name>InsAgent</name>
     <description>Service for insurance agents</description>
+
+    <packaging>war</packaging>
 
     <scm>
         <tag>HEAD</tag>
@@ -46,9 +47,9 @@
 
         <lombook.version>1.16.20</lombook.version>
 
+        <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
     </properties>
 
     <dependencies>
@@ -82,15 +83,15 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
         <dependency>
@@ -225,92 +226,36 @@
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}##${buildNumber}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.0.0</version>
                 <executions>
                     <execution>
-                        <id>explode</id>
-                        <phase>prepare-package</phase>
                         <goals>
-                            <goal>exploded</goal>
-                        </goals>
-                        <configuration>
-                            <warSourceDirectory>src/main/webapp</warSourceDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>package</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>war</goal>
-                        </goals>
-                        <configuration>
-                            <warSourceDirectory>${project.artifactId}##${buildNumber}</warSourceDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>create</goal>
+                            <goal>repackage</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <items>
-                        <item>buildNumber</item>
-                    </items>
-                    <format>{0,number}</format>
-                    <revisionOnScmFailure>true</revisionOnScmFailure>
-                    <buildNumberPropertiesFileLocation>version.properties</buildNumberPropertiesFileLocation>
+                    <executable>true</executable>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.google.code.maven-replacer-plugin</groupId>
-                <artifactId>replacer</artifactId>
-                <version>1.5.3</version>
-                <executions>
-                    <execution>
-                        <id>build-number</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>replace</goal>
-                        </goals>
-                        <configuration>
-                            <file>target/${project.artifactId}##${buildNumber}/WEB-INF/jsp/main.jsp</file>
-                            <regex>false</regex>
-                            <replacements>
-                                <replacement>
-                                    <token>BUILD_NUMBER</token>
-                                    <value>${buildNumber}</value>
-                                </replacement>
-                            </replacements>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
+
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh-external</artifactId>
+                <version>1.0-beta-6</version>
+            </extension>
+        </extensions>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>ssh-repository</id>
+            <url>scpexe://ovz1.kulakovva.67m36.vps.myjino.ru:49244/repository</url>
+        </repository>
+    </distributionManagement>
 </project>
