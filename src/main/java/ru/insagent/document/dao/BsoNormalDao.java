@@ -45,8 +45,8 @@ public class BsoNormalDao extends BsoDao<BsoNormal> {
         sortByMap.put("registeredUnit", "b.registeredBy.name");
         sortByMap.put("insured", "b.insured");
         sortByMap.put("premium", "b.premium");
-        sortByMap.put("node", "b.node.name");
-        sortByMap.put("unit", "b.unit.name");
+        sortByMap.put("nodeName", "b.node.name");
+        sortByMap.put("unitName", "b.unit.name");
 
         countQueryPrefix = ""
                 + " SELECT"

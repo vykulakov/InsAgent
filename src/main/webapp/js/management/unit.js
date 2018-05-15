@@ -62,6 +62,7 @@ $(function () {
         stateSaveIdTable: 'unitsTable',
 
         onLoadError: function (status, response) {
+            $alert.children().remove();
             $alert.prepend(getAlertElements(status, response));
         },
         onLoadSuccess: function () {

@@ -26,6 +26,23 @@ public class BsoArchivedDao extends BsoDao<BsoArchived> {
     {
         clazz = BsoArchived.class;
 
+        sortByMap.put("created", "b.created");
+        sortByMap.put("series", "b.series");
+        sortByMap.put("number", "b.number");
+        sortByMap.put("nodeName", "b.node.name");
+        sortByMap.put("unitName", "b.unit.name");
+        sortByMap.put("issuedDate", "b.issuedDate");
+        sortByMap.put("issuedBy", "CONCAT(b.issuedBy.firstName, b.issuedBy.lastName)");
+        sortByMap.put("issuedUnitName", "b.issuedUnit.name");
+        sortByMap.put("corruptedDate", "b.corruptedDate");
+        sortByMap.put("corruptedBy", "CONCAT(b.corruptedBy.firstName, b.corruptedBy.lastName)");
+        sortByMap.put("corruptedUnitName", "b.corruptedUnit.name");
+        sortByMap.put("registeredDate", "b.registeredDate");
+        sortByMap.put("registeredBy", "CONCAT(b.registeredBy.firstName, b.registeredBy.lastName)");
+        sortByMap.put("registeredUnitName", "b.registeredBy.name");
+        sortByMap.put("insured", "b.insured");
+        sortByMap.put("premium", "b.premium");
+
         countQueryPrefix = ""
                 + " SELECT"
                 + "     COUNT(*) AS count"

@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2017-2018 Vyacheslav Kulakov
+ * Copyright 2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import ru.insagent.model.Roles;
 import ru.insagent.service.BsoService;
 
 @Controller
-public class BsoController {
+public class BsoNormalController {
     private BsoService bsoService;
 
     @Autowired
@@ -39,7 +39,7 @@ public class BsoController {
         this.bsoService = bsoService;
     }
 
-    @GetMapping("/bso/index.html")
+    @GetMapping("/bso.html")
     public String main(Model model, Authentication authentication) {
         Roles roles = new Roles(authentication);
 
@@ -69,6 +69,4 @@ public class BsoController {
 
         return response;
     }
-
-
 }

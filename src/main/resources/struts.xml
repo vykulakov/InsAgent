@@ -61,22 +61,11 @@
 			<exception-mapping exception="java.lang.Exception" result="Exception" />
 		</global-exception-mappings>
 
-		<action name="listBsosJson" class="ru.insagent.document.action.ListBsosJsonAction"/>
-		<action name="listBsosArchivedJson" class="ru.insagent.document.action.ListBsosArchivedJsonAction"/>
 		<action name="listActsJson" class="ru.insagent.document.action.ListActsJsonAction"/>
 		<action name="getActJson" class="ru.insagent.document.action.GetActJsonAction"/>
 		<action name="checkBsoJson" class="ru.insagent.document.action.CheckBsoJsonAction"/>
 		<action name="checkPackJson" class="ru.insagent.document.action.CheckPackJsonAction"/>
 		<action name="doActionJson" class="ru.insagent.document.action.DoActionJsonAction"/>
 		<action name="updateActJson" class="ru.insagent.document.action.UpdateActJsonAction"/>
-
-		<action name="updateCityJson" class="ru.insagent.management.city.action.UpdateCityJsonAction"/>
-		<action name="removeCityJson" class="ru.insagent.management.city.action.RemoveCityJsonAction"/>
-
-		<action name="updateUnitJson" class="ru.insagent.management.unit.action.UpdateUnitJsonAction"/>
-		<action name="removeUnitJson" class="ru.insagent.management.unit.action.RemoveUnitJsonAction"/>
-
-		<action name="updateUserJson" class="ru.insagent.management.user.action.UpdateUserJsonAction"/>
-		<action name="removeUserJson" class="ru.insagent.management.user.action.RemoveUserJsonAction"/>
 	</package>
 </struts>

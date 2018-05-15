@@ -87,7 +87,7 @@ public class BsoDao<T extends Bso> extends SimpleHDao<T> {
                 sb.append(" AND (");
                 sb.append(" b.series LIKE :search OR");
                 sb.append(" b.number LIKE :search OR");
-                sb.append(" n.name LIKE :search OR");
+                sb.append(" b.node.name LIKE :search OR");
                 sb.append(" o.name LIKE :search");
                 sb.append(" )");
                 objects.put("search", "%" + filter.getSearch().trim() + "%");

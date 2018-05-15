@@ -1,6 +1,5 @@
 <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@taglib prefix="l" uri="http://shiro.apache.org/tags"%>
 <%@taglib prefix="s" uri="/struts-tags"%>
 
 <c:import url="/WEB-INF/jsp/main.jsp">
@@ -8,7 +7,7 @@
 	<link rel="stylesheet" type="text/css" href="<c:url value='/css/bootstrap-table.css'/>"/>
 	<link rel="stylesheet" type="text/css" href="<c:url value='/css/bootstrap-multiselect.css'/>"/>
 	<link rel="stylesheet" type="text/css" href="<c:url value='/css/bootstrap-datetimepicker.css'/>"/>
-	<link rel="stylesheet" type="text/css" href="<c:url value='/css/journal/bso_archived.css'/>"/>
+	<link rel="stylesheet" type="text/css" href="<c:url value='/css/journal/archived.css'/>"/>
 </c:param>
 <c:param name="script">
 	<script type="application/javascript" src="<c:url value='/js/moment-with-locales.js'/>"></script>
@@ -19,7 +18,7 @@
 	<script type="application/javascript" src="<c:url value='/js/bootstrap-multiselect.js'/>"></script>
 	<script type="application/javascript" src="<c:url value='/js/bootstrap-datetimepicker.js'/>"></script>
 	<script type="application/javascript" src="<c:url value='/js/js.cookie.js'/>"></script>
-	<script type="application/javascript" src="<c:url value='/js/journal/bso_archived.js'/>"></script>
+	<script type="application/javascript" src="<c:url value='/js/journal/archived.js'/>"></script>
 </c:param>
 <c:param name="content">
 	<h2>Журнал БСО (архив)</h2>
