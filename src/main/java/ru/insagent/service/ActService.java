@@ -21,15 +21,15 @@ package ru.insagent.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.insagent.document.dao.ActDao;
+import ru.insagent.document.dao.ActPackDao;
 import ru.insagent.document.dao.BsoArchivedDao;
 import ru.insagent.document.dao.BsoNormalDao;
-import ru.insagent.document.model.Act;
-import ru.insagent.document.model.ActPack;
-import ru.insagent.document.model.BsoNormal;
-import ru.insagent.document.model.BsoArchived;
+import ru.insagent.document.model.*;
 import ru.insagent.exception.NotFoundException;
+import ru.insagent.model.Roles;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ActService {
@@ -40,6 +40,22 @@ public class ActService {
     @Autowired
     public void setActDao(ActDao actDao) {
         this.actDao = actDao;
+    }
+
+    /**
+     * Get rows count for the last query.
+     *
+     * @return Rows count for the last query.
+     */
+    public Long getCount() {
+        return actDao.getCount();
+    }
+
+    public List<ActDTO> list(Roles roles, ActFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
+        return actDao
+                .list(roles, filter, sortBy, sortDir, limitRows, limitOffset)
+                .stream().map(ActDTO::new)
+                .collect(Collectors.toList());
     }
 
     public void update(Act newAct) {

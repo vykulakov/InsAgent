@@ -4,22 +4,7 @@
 	"http://struts.apache.org/dtds/struts-2.3.dtd">
 
 <struts>
-	<constant name="struts.devMode" value="true" />
-	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
-
 	<package name="default" namespace="/" extends="struts-default">
-		<action name="bsoArchivedJournal" class="ru.insagent.document.action.BsoArchivedJournalAction">
-			<result name="error">/WEB-INF/jsp/journal/bso_archived_error.jsp</result>
-			<result name="input">/WEB-INF/jsp/journal/bso_archived_error.jsp</result>
-			<result name="*">/WEB-INF/jsp/journal/bso_archived.jsp</result>
-		</action>
-
-		<action name="actJournal" class="ru.insagent.document.action.ActJournalAction">
-			<result name="error">/WEB-INF/jsp/journal/act_error.jsp</result>
-			<result name="input">/WEB-INF/jsp/journal/act_error.jsp</result>
-			<result name="*">/WEB-INF/jsp/journal/act.jsp</result>
-		</action>
-
 		<action name="exportBsoJournal" class="ru.insagent.document.action.ExportBsoJournalAction">
 			<result name="success" type="stream">
 				<param name="contentType">application/vnd.xls</param>
@@ -36,32 +21,6 @@
 	</package>
 
 	<package name="clients-json" namespace="/" extends="json-default">
-		<default-interceptor-ref name="jsonValidationWorkflowStack"/>
-
-		<global-results>
-			<result name="input" type="json">
-				<param name="noCache">true</param>
-				<param name="ignoreHierarchy">false</param>
-				<param name="includeProperties">actionErrors\[\d+\], fieldErrors\..+$, actionMessages\[\d+\]</param>
-			</result>
-			<result name="error" type="json">
-				<param name="noCache">true</param>
-				<param name="ignoreHierarchy">false</param>
-				<param name="includeProperties">actionErrors\[\d+\], fieldErrors\..+$, actionMessages\[\d+\]</param>
-			</result>
-			<result name="success" type="json">
-				<param name="noCache">true</param>
-			</result>
-			<result name="Exception" type="json">
-				<param name="noCache">true</param>
-			</result>
-		</global-results>
-
-		<global-exception-mappings>
-			<exception-mapping exception="java.lang.Exception" result="Exception" />
-		</global-exception-mappings>
-
-		<action name="listActsJson" class="ru.insagent.document.action.ListActsJsonAction"/>
 		<action name="getActJson" class="ru.insagent.document.action.GetActJsonAction"/>
 		<action name="checkBsoJson" class="ru.insagent.document.action.CheckBsoJsonAction"/>
 		<action name="checkPackJson" class="ru.insagent.document.action.CheckPackJsonAction"/>

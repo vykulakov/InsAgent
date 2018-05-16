@@ -91,7 +91,6 @@ public class BsoService {
                 .collect(Collectors.toList());
     }
 
-
     public List<Unit> units(Roles roles) {
         return unitDao.listByRoles(roles);
     }

@@ -18,51 +18,45 @@
 
 package ru.insagent.document.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import org.springframework.stereotype.Repository;
+import ru.insagent.dao.SimpleHDao;
+import ru.insagent.document.model.ActPack;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.stereotype.Repository;
-import ru.insagent.dao.SimpleDao;
-import ru.insagent.dao.SimpleHDao;
-import ru.insagent.document.model.ActPack;
-
 @Repository
 public class ActPackDao extends SimpleHDao<ActPack> {
-	{
-		clazz = ActPack.class;
+    {
+        clazz = ActPack.class;
 
-		countQueryPrefix = ""
-				+ " SELECT"
-				+ "     COUNT(*) AS count"
-				+ " FROM"
-				+ "     d_act_packs p"
-				+ " WHERE"
-				+ "     1 = 1";
+        countQueryPrefix = ""
+                + " SELECT"
+                + "     COUNT(*) AS count"
+                + " FROM"
+                + "     d_act_packs p"
+                + " WHERE"
+                + "     1 = 1";
 
-		selectQueryPrefix = ""
-				+ " SELECT"
-				+ "     p.id AS packId,"
-				+ "     p.series AS packSeries,"
-				+ "     p.numberFrom AS packNumberFrom,"
-				+ "     p.numberTo AS packNumberTo,"
-				+ "     p.amount AS packAmount"
-				+ " FROM"
-				+ "     d_act_packs p"
-				+ " WHERE"
-				+ "     1 = 1";
-	}
+        selectQueryPrefix = ""
+                + " SELECT"
+                + "     p.id AS packId,"
+                + "     p.series AS packSeries,"
+                + "     p.numberFrom AS packNumberFrom,"
+                + "     p.numberTo AS packNumberTo,"
+                + "     p.amount AS packAmount"
+                + " FROM"
+                + "     d_act_packs p"
+                + " WHERE"
+                + "     1 = 1";
+    }
 
-	public List<ActPack> listByActId(int actId) {
-		String where = "p.actId = :actId";
-		Map<String, Object> objects = new HashMap<>();
-		objects.put("actId", actId);
+    public List<ActPack> listByActId(int actId) {
+        String where = "p.actId = :actId";
+        Map<String, Object> objects = new HashMap<>();
+        objects.put("actId", actId);
 
-		return listByWhere(where, objects, null, null, 0, 0);
-	}
+        return listByWhere(where, objects, null, null, 0, 0);
+    }
 }

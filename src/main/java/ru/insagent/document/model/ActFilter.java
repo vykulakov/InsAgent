@@ -1,7 +1,7 @@
 /*
  * InsAgent - https://github.com/vykulakov/InsAgent
  *
- * Copyright 2018 Vyacheslav Kulakov
+ * Copyright 2017-2018 Vyacheslav Kulakov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,20 @@
  * limitations under the License.
  */
 
-package ru.insagent.document.action;
+package ru.insagent.document.model;
 
-import ru.insagent.action.BaseAction;
+import lombok.Getter;
+import lombok.Setter;
+import ru.insagent.model.Filter;
+import ru.insagent.model.Unit;
+import ru.insagent.workflow.model.Node;
 
-import java.util.Arrays;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
-public class ActJournalAction extends BaseAction {
-	private static final long serialVersionUID = 1L;
-
-	{
-		ALLOW_ROLES = Arrays.asList("admin", "director", "manager", "register");
-		ALLOW_MSG = "У вас нет прав для работы с журналом актов";
-	}
-
-	public String executeImpl() {
-		return SUCCESS;
-	}
+@Getter
+@Setter
+public class ActFilter extends Filter {
+    private static final long serialVersionUID = -3893689810214482026L;
 }

@@ -23,7 +23,9 @@ import org.springframework.stereotype.Repository;
 import ru.insagent.dao.SimpleHDao;
 import ru.insagent.dao.UnitDao;
 import ru.insagent.document.model.Act;
+import ru.insagent.document.model.ActFilter;
 import ru.insagent.model.IdBase;
+import ru.insagent.model.Roles;
 import ru.insagent.model.Unit;
 import ru.insagent.model.User;
 import ru.insagent.workflow.dao.LinkDao;
@@ -52,13 +54,13 @@ public class ActDao extends SimpleHDao<Act> {
     {
         clazz = Act.class;
 
-        sortByMap.put("created",  "a.created");
-        sortByMap.put("type",     "a.actType.fullName");
-        sortByMap.put("nodeFrom", "a.nodeFrom.name");
-        sortByMap.put("nodeTo",   "a.nodeTo.name");
-        sortByMap.put("unitFrom", "a.unitFrom.name");
-        sortByMap.put("unitTo",   "a.unitTo.name");
-        sortByMap.put("amount",   "a.amount");
+        sortByMap.put("created",      "a.created");
+        sortByMap.put("typeName",     "a.type.fullName");
+        sortByMap.put("nodeFromName", "a.nodeFrom.name");
+        sortByMap.put("nodeToName",   "a.nodeTo.name");
+        sortByMap.put("unitFromName", "a.unitFrom.name");
+        sortByMap.put("unitToName",   "a.unitTo.name");
+        sortByMap.put("amount",       "a.amount");
 
         countQueryPrefix = ""
                 + " SELECT"
@@ -77,9 +79,9 @@ public class ActDao extends SimpleHDao<Act> {
                 + "     1 = 1";
     }
 
-    public List<Act> listByUser(User user, String sortBy, String sortDir, int limitRows, int limitOffset) {
-        List<Link> links = linkDao.listByRoles(null);
-        List<Unit> units = unitDao.listByRoles(null);
+    public List<Act> list(Roles roles, ActFilter filter, String sortBy, String sortDir, int limitRows, int limitOffset) {
+        List<Link> links = linkDao.listByRoles(roles);
+        List<Unit> units = unitDao.listByRoles(roles);
 
         StringBuilder sb = new StringBuilder("");
         Map<String, Object> objects = new HashMap<>();
@@ -91,17 +93,17 @@ public class ActDao extends SimpleHDao<Act> {
 
         sb.append(" AND ");
 
-        sb.append("(a.unitFrom IS NULL OR a.unitFromId IN :unitFromIds)");
+        sb.append("(a.unitFrom IS NULL OR a.unitFrom.id IN :unitFromIds)");
         objects.put("unitFromIds", units.stream().map(IdBase::getId).collect(Collectors.toList()));
 
         sb.append(") OR (");
 
         sb.append("(a.nodeTo.id IN :nodeToIds)");
-        objects.put("nodeFromIds", links.stream().map(Link::getNodeTo).map(IdBase::getId).collect(Collectors.toList()));
+        objects.put("nodeToIds", links.stream().map(Link::getNodeTo).map(IdBase::getId).collect(Collectors.toList()));
 
         sb.append(" AND ");
 
-        sb.append("(a.unitToId IS NULL OR a.unitToId IN :unitToIds)");
+        sb.append("(a.unitTo IS NULL OR a.unitTo.id IN :unitToIds)");
         objects.put("unitToIds", units.stream().map(IdBase::getId).collect(Collectors.toList()));
 
         sb.append(")");
